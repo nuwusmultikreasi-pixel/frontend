@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 465 818" role="img" aria-label="Logo Nuwus Multikreasi">
+  <defs><mask id="nuwus-cut-w"><rect width="465" height="818" fill="#fff"/><path d="M145 830V261A70 70 0 0 1 215 191H480V239H241A48 48 0 0 0 193 287V830ZM249 830V368A70 70 0 0 1 319 298H480V346H345A48 48 0 0 0 297 394V830ZM352 830V476A70 70 0 0 1 422 406H480V453H448A48 48 0 0 0 400 501V830Z" fill="#000"/></mask></defs>
+  <rect width="465" height="818" rx="56" fill="#ffffff" mask="url(#nuwus-cut-w)"/>
+</svg>
