@@ -1,0 +1,208 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftarkan Cafe — Dinezy</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <link rel="stylesheet" href="{% static 'core/auth.css' %}">
+</head>
+<body class="auth-page reg-v2">
+<div class="app-bg auth-bg" aria-hidden="true"><div class="scene"></div></div>
+<div class="auth-shell">
+    <aside class="auth-aside">
+        <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="aside-watermark" alt="" aria-hidden="true">
+        <a href="/" class="aside-brand">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark" alt="Logo Dinezy">
+            <span><b>{{ brand.nama }}</b><small>{{ brand.tagline }}</small></span>
+        </a>
+
+        <div class="aside-body">
+            <span class="aside-kicker">Pendaftaran Cafe</span>
+            <h1>Digitalkan cafe Anda dalam hitungan menit.</h1>
+            <p>Buat sendiri akun Owner dan Kasir Anda. Semua data langsung tersimpan di database dan ringkasan akun dikirim ke email Anda.</p>
+
+            <div class="aside-card">
+                <div class="ac-row"><span class="ac-ic">1</span><div><b>Data cafe, logo & QRIS</b><small>Tampil di nota, QR meja, dan halaman pembayaran</small></div></div>
+                <div class="ac-row"><span class="ac-ic">2</span><div><b>Buat akun Owner & Kasir</b><small>Username dan password pilihan Anda sendiri</small></div></div>
+                <div class="ac-row"><span class="ac-ic">3</span><div><b>Tanda tangani PKS</b><small>Langsung secara elektronik setelah formulir dikirim</small></div></div>
+            </div>
+        </div>
+
+        <div class="aside-foot">&copy; <span class="js-yr"></span> PT Nuwus Multikreasi Digital</div>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-top">
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Beranda</a>
+            <span class="text-muted small">Sudah punya akun? <a href="{% url 'login' %}" class="fw-semibold">Masuk</a></span>
+        </div>
+
+        <div class="auth-box wide">
+            <img src="{% static 'core/img/dinezy-mark-navy.png' %}" class="dz-mark dz-mark-lg mb-4 d-lg-none" alt="Logo Dinezy">
+                        <h2 class="auth-title">Daftarkan cafe Anda</h2>
+            <p class="auth-sub">Isi data cafe, unggah logo dan QRIS, buat akun Owner dan Kasir, lalu tanda tangani Perjanjian Kerja Sama.</p>
+
+            {% for m in messages %}
+                <div class="dz-alert dz-alert-error mb-3" role="alert"><i class="fas fa-circle-exclamation mt-1"></i><div>{{ m }}</div></div>
+            {% endfor %}
+
+            <form method="POST" action="{% url 'register' %}" id="formDaftar" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="hp-field" aria-hidden="true"><label for="f_web">Website</label><input type="text" id="f_web" name="website" tabindex="-1" autocomplete="off"></div>
+
+                <div class="reg-sec">
+                    <div class="reg-h"><span>1</span><div><b>Data cafe</b><small>Informasi yang tampil di nota, QR meja, laporan, dan invoice</small></div></div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Logo cafe <span class="text-danger">*</span></label>
+                            <label class="logo-drop" for="f_logo" id="logoDrop">
+                                <img id="logoPreview" alt="" hidden>
+                                <span class="ld-hint" id="logoHint"><i class="fas fa-cloud-arrow-up"></i>Unggah logo<small>PNG/JPG/WEBP · maks 2 MB</small></span>
+                            </label>
+                            <input type="file" id="f_logo" name="logo" accept="image/png,image/jpeg,image/webp" class="d-none" required>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label" for="f_cafe">Nama cafe <span class="text-danger">*</span></label>
+                                    <div class="input-icon"><i class="fas fa-store"></i>
+                                        <input id="f_cafe" type="text" name="nama_cafe" class="form-control form-control-lg" placeholder="Kopi Senja" value="{{ form.nama_cafe|default:'' }}" required maxlength="100" autofocus></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label" for="f_owner">Nama pemilik <span class="text-danger">*</span></label>
+                                    <input id="f_owner" type="text" name="nama_owner" class="form-control" placeholder="Nama lengkap" value="{{ form.nama_owner|default:'' }}" required maxlength="100">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label" for="f_wa">No. WhatsApp <span class="text-danger">*</span></label>
+                                    <input id="f_wa" type="tel" name="whatsapp" class="form-control" placeholder="08xxxxxxxxxx" value="{{ form.whatsapp|default:'' }}" required maxlength="20">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="f_email">Email <span class="text-danger">*</span></label>
+                            <input id="f_email" type="email" name="email_owner" class="form-control" placeholder="nama@email.com" value="{{ form.email_owner|default:'' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="f_alamat">Alamat cafe <span class="text-danger">*</span></label>
+                            <input id="f_alamat" type="text" name="alamat" class="form-control" placeholder="Nama jalan, kota" value="{{ form.alamat|default:'' }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reg-sec">
+                    <div class="reg-h"><span>2</span><div><b>QRIS cafe</b><small>Tampil otomatis saat pelanggan memilih pembayaran QRIS</small></div></div>
+                    <div class="row g-3 align-items-center">
+                        <div class="col-sm-5 col-md-4">
+                            <label class="logo-drop qris-drop" for="f_qris" id="qrisDrop">
+                                <img id="qrisPreview" alt="" hidden>
+                                <span class="ld-hint" id="qrisHint"><i class="fas fa-qrcode"></i>Unggah QRIS<small>PNG/JPG/WEBP · maks 3 MB</small></span>
+                            </label>
+                            <input type="file" id="f_qris" name="qris" accept="image/png,image/jpeg,image/webp" class="d-none">
+                        </div>
+                        <div class="col-sm-7 col-md-8">
+                            <ul class="qris-tips">
+                                <li><i class="fas fa-check"></i><span>Gunakan gambar QRIS resmi dari bank / penyedia pembayaran cafe Anda (bukan foto miring atau buram).</span></li>
+                                <li><i class="fas fa-check"></i><span>Pastikan nama merchant pada QRIS sesuai dengan nama cafe.</span></li>
+                                <li><i class="fas fa-check"></i><span>Pelanggan memindai QRIS ini, membayar, lalu mengunggah bukti untuk dikonfirmasi kasir.</span></li>
+                                <li><i class="fas fa-clock"></i><span>Belum punya? Lewati dulu, QRIS bisa diunggah kapan saja di menu <b>Setelan</b> dashboard owner.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reg-sec">
+                    <div class="reg-h"><span>3</span><div><b>Akun Owner</b><small>Untuk dashboard pemilik: menu, laporan, tagihan, setelan</small></div></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="f_ou">Username owner <span class="text-danger">*</span></label>
+                            <div class="input-icon"><i class="fas fa-user-tie"></i>
+                                <input id="f_ou" type="text" name="owner_username" class="form-control" placeholder="contoh: owner.kopisenja" value="{{ form.owner_username|default:'' }}" required pattern="[A-Za-z0-9._\-]{4,30}" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label" for="f_op">Password <span class="text-danger">*</span></label>
+                            <div class="pw-wrap"><input id="f_op" type="password" name="owner_password" class="form-control js-pw" placeholder="Min. 8 karakter" required minlength="8" autocomplete="new-password"><button type="button" class="pw-eye" tabindex="-1"><i class="fas fa-eye"></i></button></div>
+                            <div class="pw-meter"><span></span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label" for="f_op2">Ulangi password <span class="text-danger">*</span></label>
+                            <input id="f_op2" type="password" name="owner_password2" class="form-control" data-match="f_op" placeholder="Ketik ulang" required autocomplete="new-password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reg-sec">
+                    <div class="reg-h"><span>4</span><div><b>Akun Kasir</b><small>Untuk staf kasir: pesanan masuk, status menu, cetak nota</small></div></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="f_ku">Username kasir <span class="text-danger">*</span></label>
+                            <div class="input-icon"><i class="fas fa-cash-register"></i>
+                                <input id="f_ku" type="text" name="kasir_username" class="form-control" placeholder="contoh: kasir.kopisenja" value="{{ form.kasir_username|default:'' }}" required pattern="[A-Za-z0-9._\-]{4,30}" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label" for="f_kp">Password <span class="text-danger">*</span></label>
+                            <div class="pw-wrap"><input id="f_kp" type="password" name="kasir_password" class="form-control js-pw" placeholder="Min. 8 karakter" required minlength="8" autocomplete="new-password"><button type="button" class="pw-eye" tabindex="-1"><i class="fas fa-eye"></i></button></div>
+                            <div class="pw-meter"><span></span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label" for="f_kp2">Ulangi password <span class="text-danger">*</span></label>
+                            <input id="f_kp2" type="password" name="kasir_password2" class="form-control" data-match="f_kp" placeholder="Ketik ulang" required autocomplete="new-password">
+                        </div>
+                    </div>
+                    <p class="form-text mt-2 mb-0">Username: 4–30 karakter (huruf, angka, titik, minus, garis bawah). Password minimal 8 karakter dan tidak boleh hanya angka.</p>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="setuju" id="setuju" required>
+                    <label class="form-check-label small" for="setuju">Saya menyatakan data yang diisi benar dan telah membaca serta menyetujui <a href="{% url 'syarat' %}" target="_blank" rel="noopener" class="fw-semibold">Syarat &amp; Ketentuan Layanan</a>, termasuk biaya layanan {% tarif_nota %} per nota (ditambahkan ke total belanja pelanggan) yang ditagihkan setiap bulan dan dapat disesuaikan di kemudian hari dengan pemberitahuan sebelumnya. Setelah formulir dikirim, saya akan langsung diarahkan untuk menandatangani Perjanjian Kerja Sama secara elektronik (masa berlangganan minimum 3 bulan).</label>
+                </div>
+                <button type="submit" class="btn btn-dz btn-lg w-100" id="btnDaftar">Daftarkan Cafe <i class="fas fa-arrow-right ms-2"></i></button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.querySelectorAll('.js-yr').forEach(e => e.textContent = new Date().getFullYear());
+
+    function pratinjau(input, maksMb, img, hint, drop) {
+        input.addEventListener('change', () => {
+            const f = input.files[0]; if (!f) return;
+            if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { alert('Format harus PNG, JPG, atau WEBP.'); input.value = ''; return; }
+            if (f.size > maksMb * 1024 * 1024) { alert(`Ukuran maksimal ${maksMb} MB.`); input.value = ''; return; }
+            const el = document.getElementById(img); el.src = URL.createObjectURL(f); el.hidden = false;
+            document.getElementById(hint).hidden = true; document.getElementById(drop).classList.add('filled');
+        });
+    }
+    pratinjau(document.getElementById('f_logo'), 2, 'logoPreview', 'logoHint', 'logoDrop');
+    pratinjau(document.getElementById('f_qris'), 3, 'qrisPreview', 'qrisHint', 'qrisDrop');
+
+    document.querySelectorAll('.pw-eye').forEach(b => b.addEventListener('click', () => {
+        const i = b.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password';
+        b.firstElementChild.classList.toggle('fa-eye-slash');
+    }));
+    document.querySelectorAll('.js-pw').forEach(i => i.addEventListener('input', () => {
+        const v = i.value; let sc = 0;
+        if (v.length >= 8) sc++; if (/[A-Z]/.test(v) && /[a-z]/.test(v)) sc++; if (/\d/.test(v)) sc++; if (/[^A-Za-z0-9]/.test(v) || v.length >= 12) sc++;
+        const bar = i.closest('.col-sm-6').querySelector('.pw-meter span');
+        bar.style.width = (sc * 25) + '%'; bar.dataset.level = sc;
+    }));
+    document.querySelectorAll('[data-match]').forEach(i => i.addEventListener('input', () => {
+        i.setCustomValidity(i.value === document.getElementById(i.dataset.match).value ? '' : 'Password tidak sama');
+    }));
+    document.getElementById('formDaftar').addEventListener('submit', e => {
+        const f = e.target;
+        document.querySelectorAll('[data-match]').forEach(i => i.setCustomValidity(i.value === document.getElementById(i.dataset.match).value ? '' : 'Password tidak sama'));
+        const ou = document.getElementById('f_ou'), ku = document.getElementById('f_ku');
+        ku.setCustomValidity(ou.value && ou.value.toLowerCase() === ku.value.toLowerCase() ? 'Username kasir harus berbeda dengan owner' : '');
+        if (!f.checkValidity()) { e.preventDefault(); f.reportValidity(); return; }
+        const b = document.getElementById('btnDaftar'); b.disabled = true;
+        b.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan data & menyiapkan PKS...';
+    });
+</script>
+</body>
+</html>

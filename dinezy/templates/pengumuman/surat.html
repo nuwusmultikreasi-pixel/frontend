@@ -1,0 +1,108 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ p.judul }} — Dinezy</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @page { size: A4; margin: 16mm 0 18mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { margin: 0; background: #e8ecf2; font-family: 'Inter', Arial, sans-serif; color: #111827; }
+        .toolbar { position: sticky; top: 0; z-index: 10; background: #0b1d38; padding: 12px 16px; }
+        .toolbar .in { max-width: 210mm; margin: 0 auto; display: flex; align-items: center; gap: 10px; color: #b7c4d8; font-size: 13px; }
+        .toolbar a, .toolbar button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; text-decoration: none; cursor: pointer; white-space: nowrap; }
+        .toolbar .primary { background: #fff; color: #0b1d38; border-color: #fff; }
+        .toolbar .sp { flex: 1; }
+        .wrap { max-width: 210mm; margin: 20px auto; }
+        .msg { border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; font-size: 14px; }
+        .msg.success { background: #dcfce7; color: #14532d; } .msg.error { background: #fee2e2; color: #7f1d1d; }
+        .sheet { background: #fff; padding: 22mm 22mm 20mm; box-shadow: 0 20px 50px -25px rgba(11,29,56,.45); font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.6; }
+        .kop { display: flex; gap: 16px; align-items: center; border-bottom: 3px double #0b1d38; padding-bottom: 12px; margin-bottom: 18px; font-family: 'Inter', Arial, sans-serif; }
+        .kop img { height: 50px; }
+        .kop b { display: block; font-size: 17px; color: #0b1d38; letter-spacing: .02em; }
+        .kop small { display: block; font-size: 10.5px; color: #475569; line-height: 1.45; }
+        .meta { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
+        .meta table td { padding: 0 6px 0 0; vertical-align: top; }
+        .kepada { margin-bottom: 16px; }
+        .isi { white-space: pre-wrap; text-align: justify; }
+        .notice { display: flex; gap: 12px; align-items: center; font-family: 'Inter', Arial, sans-serif; margin-bottom: 16px; }
+        .notice .ic { width: 44px; height: 44px; border-radius: 12px; background: #eef3fb; color: #17345e; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .notice b { display: block; font-size: 18px; color: #0b1d38; }
+        .notice small { color: #64748b; font-size: 12px; }
+        .ttd { margin-top: 28px; margin-left: auto; width: 62mm; text-align: center; }
+        .ttd img { height: 70px; display: block; margin: 4px auto; }
+        .ttd .nm { font-weight: bold; text-decoration: underline; }
+        .lamp { font-family: 'Inter', Arial, sans-serif; margin-top: 22px; padding-top: 12px; border-top: 1px dashed #cbd5e1; font-size: 13px; }
+        .lamp a { color: #17345e; font-weight: 600; }
+        .baca { background: #fff; border-radius: 14px; padding: 18px 20px; margin-top: 16px; font-size: 13.5px; }
+        .baca h3 { font-size: 15px; margin: 0 0 10px; }
+        .baca table { width: 100%; border-collapse: collapse; }
+        .baca td { padding: 7px 0; border-bottom: 1px solid #eef2f7; }
+        .ok { color: #15803d; font-weight: 600; } .no { color: #94a3b8; }
+        @media (max-width: 760px) { .sheet { padding: 22px 18px; font-size: 11pt; } .meta { flex-direction: column; gap: 6px; } .toolbar .lbl { display: none; } }
+        @media print { body { background: #fff; } .toolbar, .baca, .msg { display: none !important; } .wrap { margin: 0; max-width: none; } .sheet { box-shadow: none; padding: 0 20mm; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><div class="in">
+    <a href="{{ kembali }}"><i class="fas fa-arrow-left"></i><span class="lbl">&nbsp; Kembali</span></a>
+    <span class="sp"></span>
+    {% if mode == 'admin' %}<a href="{% url 'panel_pengumuman_ubah' p.pk %}"><i class="fas fa-pen"></i><span class="lbl">&nbsp; Ubah</span></a>{% endif %}
+    {% if p.lampiran %}<a href="{% url 'pesan_lampiran' p.pk %}"><i class="fas fa-paperclip"></i><span class="lbl">&nbsp; Lampiran</span></a>{% endif %}
+    <button class="primary" type="button" onclick="window.print()"><i class="fas fa-print"></i>&nbsp; Cetak / PDF</button>
+</div></div>
+<div class="wrap">
+    {% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+    <article class="sheet">
+        <div class="kop">
+            <img src="{% static 'core/img/nuwus-mark-navy.png' %}" alt="">
+            <div><b>{{ p1.nama }}</b><small>Penyelenggara Layanan Dinezy<br>{{ p1.alamat }}<br>Email {{ p1.email }} · Telp. {{ p1.wa }}</small></div>
+        </div>
+
+        {% if formal %}
+        <div class="meta">
+            <table>
+                <tr><td>Nomor</td><td>:</td><td>{{ p.nomor }}</td></tr>
+                <tr><td>Lampiran</td><td>:</td><td>{% if p.lampiran %}1 (satu) berkas{% else %}-{% endif %}</td></tr>
+                <tr><td>Perihal</td><td>:</td><td><b>{{ p.judul }}</b></td></tr>
+            </table>
+            <div>Malang, {{ tanggal }}</div>
+        </div>
+        <div class="kepada">Kepada Yth.<br><b>{% if t %}{{ t.nama_owner }}<br>Pemilik {{ t.nama_cafe }}{% else %}Pemilik Cafe Mitra{% endif %}</b><br>di tempat</div>
+        {% else %}
+        <div class="notice">
+            <div class="ic"><i class="fas {{ ikon }}"></i></div>
+            <div><b>{{ p.judul }}</b><small>{{ p.get_kategori_display }} · {{ tanggal }} · No. {{ p.nomor }}</small></div>
+        </div>
+        {% endif %}
+
+        <div class="isi">{{ isi }}</div>
+
+        <div class="ttd">
+            {% if formal %}
+            Hormat kami,<br>{{ p1.nama }}
+            {% if p1.ttd %}<img src="{{ p1.ttd }}" alt="Tanda tangan direktur">{% else %}<div style="height:70px"></div>{% endif %}
+            <div class="nm">{{ p1.wakil }}</div><div>{{ p1.jabatan }}</div>
+            {% else %}
+            Salam hangat,<br><b>Tim Dinezy</b>
+            {% endif %}
+        </div>
+
+        {% if p.lampiran %}<div class="lamp"><i class="fas fa-paperclip"></i> Lampiran: <a href="{% url 'pesan_lampiran' p.pk %}">unduh berkas PDF</a></div>{% endif %}
+    </article>
+
+    {% if mode == 'admin' %}
+    <div class="baca">
+        <h3>Status baca ({{ status_baca|length }} cafe){% if t %} · pratinjau memakai data {{ t.nama_cafe }}{% endif %}</h3>
+        <table>
+            {% for s in status_baca %}<tr><td>{{ s.t.nama_cafe }}</td><td style="text-align:right">{% if s.waktu %}<span class="ok"><i class="fas fa-check-double"></i> dibaca {{ s.waktu|date:"d/m/Y H:i" }}</span>{% else %}<span class="no">belum dibaca</span>{% endif %}</td></tr>
+            {% empty %}<tr><td class="no">Belum ada cafe penerima.</td></tr>{% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>

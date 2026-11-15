@@ -1,0 +1,65 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}Tagihan{% endblock %}
+{% block heading %}Tagihan Layanan{% endblock %}
+{% block content %}
+<div class="pcard mb-4">
+    <div class="pcard-h"><div><h2>Berjalan · {{ periode_berjalan }}</h2><p>Estimasi tagihan bulan ini, terbit menjadi invoice pada tanggal 1 bulan depan</p></div></div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>Cafe</th><th>Nota sejauh ini</th><th>Tarif</th><th>Estimasi tagihan</th><th>Terbit</th><th>Jatuh tempo</th></tr></thead>
+            <tbody>
+            {% for r in running %}
+                <tr><td><b>{{ r.t.nama_cafe }}</b></td><td class="num">{{ r.run.jumlah_nota|angka }}</td><td class="num">{{ r.run.tarif|rupiah }}</td>
+                    <td class="num"><b>{{ r.run.total|rupiah }}</b></td><td class="num">{{ r.run.terbit|tgl }}</td><td class="num">{{ r.run.jatuh_tempo|tgl }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="pcard">
+    <div class="pcard-h">
+        <div><h2>Invoice</h2><p>{{ invoices|length }} invoice · {{ totals.nota|default:0|angka }} nota · {{ totals.total|default:0|rupiah }}</p></div>
+        <div class="filter-bar">
+            <div class="seg">
+                <a href="?cafe={{ cafe }}" class="{% if not status %}active{% endif %}">Semua</a>
+                <a href="?status=unpaid&cafe={{ cafe }}" class="{% if status == 'unpaid' %}active{% endif %}">Belum dibayar</a>
+                <a href="?status=overdue&cafe={{ cafe }}" class="{% if status == 'overdue' %}active{% endif %}">Lewat tempo</a>
+                <a href="?status=paid&cafe={{ cafe }}" class="{% if status == 'paid' %}active{% endif %}">Lunas</a>
+            </div>
+            <form method="get"><input type="hidden" name="status" value="{{ status }}">
+                <select name="cafe" class="form-select form-select-sm" style="min-width:170px" onchange="this.form.submit()">
+                    <option value="">Semua cafe</option>{% for c in cafes %}<option value="{{ c.slug }}" {% if c.slug == cafe %}selected{% endif %}>{{ c.nama_cafe }}</option>{% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>No. Invoice</th><th>Cafe</th><th>Periode</th><th>Nota</th><th>Total</th><th>Jatuh tempo</th><th>Status</th><th class="text-end">Aksi</th></tr></thead>
+            <tbody>
+            {% for i in invoices %}
+                <tr>
+                    <td class="num"><b>{{ i.nomor }}</b><small class="d-block">terbit {{ i.tanggal_terbit|tgl }}</small></td>
+                    <td>{{ i.tenant.nama_cafe }}</td><td>{{ i.periode }}</td>
+                    <td class="num">{{ i.jumlah_nota|angka }}</td><td class="num"><b>{{ i.total_bayar|rupiah }}</b>{% if i.denda_berjalan %}<small class="d-block text-danger">denda {{ i.denda_berjalan|rupiah }}</small>{% endif %}</td>
+                    <td class="num">{{ i.jatuh_tempo|tgl }}</td>
+                    <td>{% if i.status == 'paid' %}<span class="pill green">Lunas</span><small class="d-block mt-1">{{ i.dibayar_pada|date:"d/m/Y H:i" }}</small>
+                        {% elif i.terlambat %}<span class="pill red">Lewat jatuh tempo</span>{% else %}<span class="pill amber">Belum dibayar</span>{% endif %}</td>
+                    <td class="text-end">
+                        <div class="act">
+                            <a href="{% url 'invoice' i.pk %}" target="_blank" class="btn btn-xs btn-line"><i class="fas fa-file-lines me-1"></i>Invoice</a>
+                            <form method="post" action="{% url 'panel_tagihan_bayar' i.pk %}" {% if i.status == 'paid' %}data-confirm="Batalkan status lunas?" data-confirm-text="{{ i.nomor }} · {{ i.tenant.nama_cafe }} akan kembali menjadi Belum Dibayar." data-confirm-variant="warning" data-confirm-icon="fa-rotate-left" data-confirm-ok="Ya, batalkan"{% else %}data-confirm="Tandai lunas?" data-confirm-text="{{ i.nomor }} · {{ i.tenant.nama_cafe }} sebesar {{ i.total_bayar|rupiah }}{% if i.denda_berjalan %} (termasuk denda {{ i.denda_berjalan|rupiah }}){% endif %}. Akun cafe aktif kembali bila tidak ada tagihan lain." data-confirm-variant="success" data-confirm-icon="fa-circle-check" data-confirm-ok="Ya, lunas"{% endif %}>{% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                {% if i.status == 'paid' %}<input type="hidden" name="batal" value="1"><button class="btn btn-xs btn-line">Batalkan</button>
+                                {% else %}<button class="btn btn-xs btn-ok"><i class="fas fa-check me-1"></i>Tandai lunas</button>{% endif %}
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}<tr class="empty-row"><td colspan="8">Belum ada invoice untuk filter ini.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

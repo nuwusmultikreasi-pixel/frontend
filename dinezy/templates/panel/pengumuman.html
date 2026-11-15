@@ -1,0 +1,33 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}Pengumuman & Surat{% endblock %}
+{% block heading %}Pengumuman & Surat{% endblock %}
+{% block actions %}<a href="{% url 'panel_pengumuman_baru' %}" class="btn btn-light fw-semibold"><i class="fas fa-plus me-2"></i>Tulis pesan</a>{% endblock %}
+{% block content %}
+<div class="pcard">
+    <div class="pcard-h">
+        <div><h2>Pesan terkirim</h2><p>Tampil di menu Berkas &amp; Pesan pada dasbor owner. Pesan bertanda banner juga muncul di atas dasbor owner dan kasir.</p></div>
+    </div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>Pesan</th><th>Nomor</th><th>Penerima</th><th>Dibaca</th><th>Banner</th><th class="text-end">Aksi</th></tr></thead>
+            <tbody>
+            {% for r in rows %}{% with p=r.p %}
+                <tr>
+                    <td><div class="d-flex gap-2 align-items-start"><span class="pill {{ r.warna }}">{{ p.get_kategori_display }}</span></div>
+                        <b class="d-block mt-1">{{ p.judul }}</b><small class="d-block">{{ p.dibuat|date:"d/m/Y H:i" }} · {{ p.dibuat_oleh }}{% if p.lampiran %} · <i class="fas fa-paperclip"></i> lampiran{% endif %}</small></td>
+                    <td class="num">{{ p.nomor }}</td>
+                    <td>{{ r.penerima }}</td>
+                    <td class="num"><b>{{ p.n_baca }}</b> / {{ r.target }}</td>
+                    <td>{% if p.tampil_banner %}{% if p.berlaku_sampai and p.berlaku_sampai < now_dt %}<span class="pill gray">Selesai</span>{% else %}<span class="pill green">Aktif</span><small class="d-block">s.d. {{ p.berlaku_sampai|date:"d/m H:i" }}</small>{% endif %}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                    <td class="text-end"><div class="act">
+                        <a href="{% url 'panel_pengumuman_detail' p.pk %}" class="btn btn-xs btn-line"><i class="fas fa-eye me-1"></i>Lihat</a>
+                        <a href="{% url 'panel_pengumuman_ubah' p.pk %}" class="btn btn-xs btn-line"><i class="fas fa-pen me-1"></i>Ubah</a>
+                        <form method="post" action="{% url 'panel_pengumuman_hapus' p.pk %}" data-confirm="Hapus pesan ini?" data-confirm-text="{{ p.judul }} akan hilang dari semua dasbor cafe." data-confirm-variant="danger" data-confirm-icon="fa-trash" data-confirm-ok="Ya, hapus">{% csrf_token %}<button class="btn btn-xs btn-line text-danger"><i class="fas fa-trash"></i></button></form>
+                    </div></td>
+                </tr>
+            {% endwith %}{% empty %}<tr class="empty-row"><td colspan="6">Belum ada pesan. Klik "Tulis pesan" untuk membuat pengumuman pertama.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

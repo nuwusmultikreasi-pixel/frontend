@@ -1,0 +1,81 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}Ringkasan{% endblock %}
+{% block heading %}Ringkasan{% endblock %}
+{% block actions %}
+<a href="{% url 'panel_tagihan' %}" class="btn btn-dz"><i class="fas fa-file-invoice-dollar me-2"></i>Kelola Tagihan</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><div class="kpi dark"><div class="k-ic"><i class="fas fa-store"></i></div><small>Total cafe</small><b>{{ kpi.cafe }}</b><div class="k-sub">{{ kpi.diblokir }} cafe diblokir</div></div></div>
+    <div class="col-6 col-xl-3"><div class="kpi"><div class="k-ic"><i class="fas fa-receipt"></i></div><small>Nota bulan ini</small><b>{{ kpi.nota_bulan_ini|angka }}</b><div class="k-sub">Estimasi {{ kpi.estimasi_bulan_ini|rupiah }} · {{ tarif|rupiah }}/nota</div></div></div>
+    <div class="col-6 col-xl-3"><div class="kpi warn"><div class="k-ic"><i class="fas fa-hourglass-half"></i></div><small>Tagihan belum dibayar</small><b>{{ kpi.belum_dibayar|rupiah }}</b><div class="k-sub">{{ kpi.jatuh_tempo|rupiah }} lewat jatuh tempo</div></div></div>
+    <div class="col-6 col-xl-3"><div class="kpi good"><div class="k-ic"><i class="fas fa-circle-check"></i></div><small>Total sudah dibayar</small><b>{{ kpi.lunas_total|rupiah }}</b><div class="k-sub">Seluruh periode</div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="pcard h-100">
+            <div class="pcard-h"><div><h2>Pendapatan layanan 6 bulan terakhir</h2><p>Jumlah nota seluruh cafe × {{ tarif|rupiah }}</p></div></div>
+            <div class="pcard-b">
+                <div class="bars">
+                    {% for c in chart %}<div class="col"><span class="val">{{ c.total|rupiah }}</span><div class="bar" style="height: {{ c.pct }}%"></div></div>{% endfor %}
+                </div>
+                <div class="bars-x">{% for c in chart %}<span>{{ c.label }}<br><small>{{ c.nota }} nota</small></span>{% endfor %}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="pcard h-100">
+            <div class="pcard-h"><div><h2>Aturan tagihan</h2><p>Berjalan otomatis tanpa perlu input manual</p></div></div>
+            <div class="pcard-b">
+                <ul class="rule-list">
+                    <li><i class="fas fa-receipt"></i><span><b>{{ tarif|rupiah }} per nota</b> pesanan yang sudah diproses kasir.</span></li>
+                    <li><i class="fas fa-calendar-day"></i><span>Invoice terbit otomatis <b>tanggal 1</b> untuk bulan sebelumnya.</span></li>
+                    <li><i class="fas fa-hourglass-end"></i><span>Jatuh tempo <b>1 bulan</b> setelah terbit.</span></li>
+                    <li><i class="fas fa-lock"></i><span>Lewat jatuh tempo → login cafe <b>diblokir</b> & muncul notifikasi tagihan.</span></li>
+                    <li><i class="fas fa-lock-open"></i><span>Ditandai <b>lunas</b> → akun aktif kembali otomatis.</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pcard mb-4">
+    <div class="pcard-h"><div><h2>Status cafe</h2><p>Penggunaan bulan berjalan & status pembayaran</p></div><a href="{% url 'panel_cafe' %}" class="btn btn-sm btn-line">Kelola cafe <i class="fas fa-arrow-right ms-1"></i></a></div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>Cafe</th><th>Nota bulan ini</th><th>Estimasi</th><th>Belum dibayar</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td><div class="cafe"><div class="av">{% if r.t.logo %}<img src="{{ r.t.logo.url }}" alt="" onerror="this.replaceWith('{{ r.t.nama_cafe|slice:":1"|upper|escapejs }}')">{% else %}{{ r.t.nama_cafe|slice:":1"|upper }}{% endif %}</div><div><b>{{ r.t.nama_cafe }}</b><small>{{ r.t.slug }} · {{ r.t.nama_owner }}</small></div></div></td>
+                    <td class="num">{{ r.run.jumlah_nota|angka }}</td>
+                    <td class="num">{{ r.run.total|rupiah }}</td>
+                    <td class="num">{% if r.st.total_unpaid %}<b class="text-danger">{{ r.st.total_unpaid|rupiah }}</b>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                    <td><span class="pill {{ r.badge.0 }}">{{ r.badge.1 }}</span></td>
+                </tr>
+            {% empty %}<tr class="empty-row"><td colspan="5">Belum ada cafe terdaftar.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="pcard">
+    <div class="pcard-h"><div><h2>Invoice terbaru</h2></div><a href="{% url 'panel_tagihan' %}" class="btn btn-sm btn-line">Semua tagihan <i class="fas fa-arrow-right ms-1"></i></a></div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>No. Invoice</th><th>Cafe</th><th>Periode</th><th>Total</th><th>Jatuh tempo</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for i in recent %}
+                <tr>
+                    <td class="num"><b>{{ i.nomor }}</b></td><td>{{ i.tenant.nama_cafe }}</td><td>{{ i.periode }}</td>
+                    <td class="num">{{ i.total|rupiah }}</td><td class="num">{{ i.jatuh_tempo|tgl }}</td>
+                    <td>{% if i.status == 'paid' %}<span class="pill green">Lunas</span>{% elif i.terlambat %}<span class="pill red">Lewat jatuh tempo</span>{% else %}<span class="pill amber">Belum dibayar</span>{% endif %}</td>
+                    <td class="text-end"><a href="{% url 'invoice' i.pk %}" target="_blank" class="btn btn-xs btn-line"><i class="fas fa-file-lines me-1"></i>Invoice</a></td>
+                </tr>
+            {% empty %}<tr class="empty-row"><td colspan="7">Belum ada invoice. Invoice pertama terbit otomatis tanggal 1 bulan depan.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

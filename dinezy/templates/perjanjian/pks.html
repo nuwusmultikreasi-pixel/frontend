@@ -1,0 +1,228 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perjanjian Kerja Sama — {{ t.nama_cafe }}</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @page { size: A4; margin: 16mm 0 18mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { margin: 0; background: #e8ecf2; font-family: 'Inter', Arial, sans-serif; color: #111827; }
+        .toolbar { position: sticky; top: 0; z-index: 10; background: #0b1d38; padding: 12px 16px; }
+        .toolbar .in { max-width: 210mm; margin: 0 auto; display: flex; align-items: center; gap: 10px; color: #b7c4d8; font-size: 13px; }
+        .toolbar a, .toolbar button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; text-decoration: none; cursor: pointer; white-space: nowrap; }
+        .toolbar .primary { background: #fff; color: #0b1d38; border-color: #fff; }
+        .toolbar .sp { flex: 1; }
+        .st { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .st.menunggu { background: #fef3c7; color: #92400e; } .st.ditandatangani { background: #dbeafe; color: #1d4ed8; } .st.bermeterai { background: #dcfce7; color: #15803d; }
+
+        .wrap { max-width: 210mm; margin: 20px auto; }
+        .welcome { background: linear-gradient(135deg, #0b1d38, #17345e); color: #dbe5f3; border-radius: 16px; padding: 20px 22px; margin-bottom: 14px; font-size: 14px; }
+        .welcome h2 { color: #fff; font-size: 20px; margin: 10px 0 6px; }
+        .welcome p { margin: 0; line-height: 1.6; }
+        .welcome code { background: rgba(255,255,255,.12); color: #fff; padding: 1px 6px; border-radius: 6px; }
+        .welcome .steps { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; font-weight: 600; }
+        .welcome .steps span { padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.08); }
+        .welcome .steps .done { color: #86efac; }
+        .welcome .steps .now { background: #fff; color: #0b1d38; }
+        .msg { border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; font-size: 14px; }
+        .msg.success { background: #dcfce7; color: #14532d; } .msg.error { background: #fee2e2; color: #7f1d1d; } .msg.info { background: #dbeafe; color: #1e3a8a; }
+
+        .sheet { background: #fff; box-shadow: 0 20px 50px rgba(11,29,56,.18); padding: 18mm 20mm 16mm; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.55; }
+        .kop { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; border-bottom: 3px double #0b1d38; font-family: 'Inter', Arial, sans-serif; }
+        .kop img { height: 46px; }
+        .kop b { display: block; font-family: 'Source Sans 3', 'Inter', sans-serif; font-size: 19px; color: #0b1d38; }
+        .kop small { color: #4b5563; font-size: 11px; line-height: 1.4; display: block; }
+        .judul { text-align: center; margin: 22px 0 18px; }
+        .judul h1 { font-size: 14pt; margin: 0; letter-spacing: .03em; }
+        .judul p { margin: 4px 0 0; }
+        .pks-isi { text-align: justify; }
+        .pks-isi h3 { text-align: center; font-size: 12pt; margin: 18px 0 6px; break-after: avoid; page-break-after: avoid; }
+        .pks-isi li { break-inside: avoid; }
+        .pks-isi p { margin: 0 0 8px; }
+        .pks-isi ol.pihak { padding-left: 22px; margin: 6px 0 10px; } .pks-isi ol.pihak > li { margin-bottom: 8px; }
+        .pks-isi ol.ayat { padding-left: 30px; margin: 0 0 6px; list-style: none; counter-reset: ay; }
+        .pks-isi ol.ayat > li { counter-increment: ay; position: relative; margin-bottom: 4px; }
+        .pks-isi ol.ayat > li::before { content: '(' counter(ay) ')'; position: absolute; left: -30px; }
+        table.idn { border-collapse: collapse; margin: 2px 0 4px; } table.idn td { padding: 0 6px 0 0; vertical-align: top; } table.idn td:first-child { width: 120px; white-space: nowrap; }
+        .ttd { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; text-align: center; break-inside: avoid; }
+        .ttd .box { height: 92px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .ttd .box img.sig { max-height: 88px; max-width: 220px; }
+        .meterai { position: absolute; left: 6px; top: 8px; width: 66px; height: 72px; border: 1px dashed #9ca3af; color: #9ca3af; font: 600 9px/1.3 Inter, Arial, sans-serif; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .ttd .nm { font-weight: 700; text-decoration: underline; }
+        .verif { margin-top: 22px; border-top: 1px solid #e5e7eb; padding-top: 10px; font: 10px/1.6 Inter, Arial, sans-serif; color: #6b7280; display: flex; justify-content: space-between; gap: 16px; }
+        .verif b { color: #374151; }
+
+        .card { background: #fff; border-radius: 18px; padding: 22px 24px; margin-top: 16px; box-shadow: 0 10px 30px rgba(11,29,56,.12); font-size: 14px; }
+        .card h2 { font-family: 'Source Sans 3', 'Inter', sans-serif; font-size: 22px; margin: 0 0 4px; color: #0b1d38; }
+        .card p.sub { color: #64748b; margin: 0 0 16px; }
+        .pad-wrap { border: 1.5px dashed #9db3d6; border-radius: 14px; background: #f8fafd; position: relative; }
+        #pad { width: 100%; height: 190px; display: block; touch-action: none; cursor: crosshair; border-radius: 14px; }
+        .pad-hint { position: absolute; left: 0; right: 0; bottom: 46px; text-align: center; color: #9aa9c0; font-size: 13px; pointer-events: none; }
+        .pad-line { position: absolute; left: 30px; right: 30px; bottom: 38px; border-bottom: 1px solid #c9d6ea; pointer-events: none; }
+        .row2 { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; }
+        label.lb { display: block; font-weight: 600; font-size: 13px; margin: 14px 0 6px; }
+        input[type=text], input[type=file] { width: 100%; padding: 11px 13px; border: 1px solid #d5deea; border-radius: 10px; font: inherit; }
+        .chk { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0; font-size: 13px; color: #334155; line-height: 1.5; }
+        .chk input { margin-top: 3px; }
+        .btn { font: inherit; font-weight: 700; border: 0; border-radius: 12px; padding: 12px 18px; cursor: pointer; }
+        .btn.navy { background: linear-gradient(135deg, #17345e, #0b1d38); color: #fff; } .btn.line { background: #fff; border: 1px solid #d5deea; color: #17345e; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #e5e9f0; border-radius: 12px; overflow: hidden; margin: 12px 0 16px; }
+        .meta-grid div { padding: 10px 12px; border-right: 1px solid #e5e9f0; } .meta-grid div:last-child { border-right: 0; }
+        .meta-grid small { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: #64748b; font-weight: 700; } .meta-grid b { font-size: 13px; color: #0b1d38; word-break: break-all; }
+        .steps { margin: 0; padding-left: 18px; color: #475569; line-height: 1.7; }
+        @media (max-width: 760px) { .sheet { padding: 22px 18px; font-size: 11pt; } .ttd { gap: 10px; } .meta-grid { grid-template-columns: 1fr 1fr; } .toolbar .lbl { display: none; } }
+        @media print { body { background: #fff; } .toolbar, .card, .msg, .no-print { display: none !important; } .wrap { margin: 0; max-width: none; } .sheet { box-shadow: none; padding: 0 20mm; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><div class="in">
+    <a href="{{ kembali }}"><i class="fas fa-arrow-left"></i><span class="lbl">&nbsp; Kembali</span></a>
+    <span class="st {{ pks.status }}"><i class="fas {% if pks.status == 'menunggu' %}fa-pen-nib{% elif pks.status == 'ditandatangani' %}fa-signature{% else %}fa-stamp{% endif %}"></i>{{ pks.get_status_display }}</span>
+    <span class="sp"></span>
+    {% if pks.file_final %}<a href="{% url 'perjanjian_final' pks.pk %}"><i class="fas fa-download"></i><span class="lbl">&nbsp; PDF bermeterai</span></a>{% endif %}
+    <button type="button" class="primary" onclick="window.print()"><i class="fas fa-print"></i><span class="lbl">&nbsp; Cetak / PDF</span></button>
+</div></div>
+
+<div class="wrap">
+    {% for m in messages %}<div class="msg {{ m.tags }} no-print">{{ m }}</div>{% endfor %}
+
+    {% if baru %}
+    <div class="welcome no-print">
+        <div class="steps"><span class="done"><i class="fas fa-check"></i> Data cafe</span><span class="done"><i class="fas fa-check"></i> Akun</span><span class="now">3 · Tanda tangan PKS</span></div>
+        <h2>Pendaftaran {{ baru.nama_cafe }} berhasil.</h2>
+        <p>Satu langkah lagi: baca dan tanda tangani Perjanjian Kerja Sama di bawah ini. Akun Anda:
+            {% for a in baru.accounts %}<b>{{ a.role|title }}</b> <code>{{ a.username }}</code>{% if not forloop.last %} · {% endif %}{% endfor %}.
+            {% if baru.email_sent %}Ringkasan akun sudah dikirim ke {{ baru.email }}.{% else %}Email ringkasan akun belum terkirim, jadi catat username di atas.{% endif %}</p>
+    </div>
+    {% endif %}
+    {% if mode == 'owner' and pks.status == 'menunggu' %}
+    <div class="msg info no-print"><i class="fas fa-circle-info"></i>&nbsp; Baca Perjanjian di bawah ini, lalu tanda tangani di bagian paling bawah halaman. Batas penandatanganan: <b>{{ batas|tgl:True }}</b>.</div>
+    {% endif %}
+
+    <article class="sheet" id="dokumen">
+        <div class="kop">
+            <img src="{% static 'core/img/nuwus-mark-navy.png' %}" alt="">
+            <div><b>{{ p1.nama }}</b><small>Penyelenggara Layanan Dinezy<br>{{ p1.alamat }}<br>Email {{ p1.email }} · Telp. {{ p1.wa }}</small></div>
+        </div>
+        <div class="judul">
+            <h1>PERJANJIAN KERJA SAMA<br>PENGGUNAAN LAYANAN DINEZY</h1>
+            <p>Nomor: {{ pks.nomor }}</p>
+        </div>
+
+        {% include 'perjanjian/_isi_pks.html' %}
+
+        <div class="ttd">
+            <div>
+                <div>PIHAK PERTAMA,<br>{{ p1.nama }}</div>
+                <div class="box">{% if p1.ttd %}<img class="sig" src="{{ p1.ttd }}" alt="Tanda tangan PIHAK PERTAMA">{% endif %}</div>
+                <div class="nm">{{ p1.wakil }}</div><div>{{ p1.jabatan }}</div>
+            </div>
+            <div>
+                <div>PIHAK KEDUA,<br>{{ t.nama_cafe }}</div>
+                <div class="box">
+                    {% if pks.status != 'bermeterai' %}<span class="meterai">e-Meterai<br>Rp10.000</span>{% endif %}
+                    {% if ttd_p2 %}<img class="sig" src="{{ ttd_p2 }}" alt="Tanda tangan PIHAK KEDUA">{% endif %}
+                </div>
+                <div class="nm">{{ pks.nama_penandatangan|default:t.nama_owner }}</div><div>{{ pks.jabatan_penandatangan|default:"Pemilik" }}</div>
+            </div>
+        </div>
+
+        <div class="verif">
+            <div>
+                {% if pks.sudah_ttd %}Ditandatangani secara elektronik oleh <b>{{ pks.nama_penandatangan }}</b> pada <b>{{ pks.ttd_at|date:"d/m/Y H:i" }} WIB</b> · IP {{ pks.ttd_ip }}<br>{% endif %}
+                {% if pks.sk_disetujui_at %}Syarat &amp; Ketentuan v{{ versi }} disetujui pada {{ pks.sk_disetujui_at|date:"d/m/Y H:i" }} WIB{% endif %}
+            </div>
+            <div style="text-align:right">{% if pks.kode_dokumen %}Kode verifikasi dokumen<br><b>{{ pks.kode_dokumen|slice:":16"|upper }}</b>{% else %}Dokumen elektronik · Dinezy{% endif %}</div>
+        </div>
+    </article>
+
+    {% if mode == 'owner' and pks.status == 'menunggu' %}
+    <section class="card" id="tandatangan">
+        <h2><i class="fas fa-signature me-1"></i> Tanda Tangani Perjanjian</h2>
+        <p class="sub">Gunakan jari (HP) atau mouse untuk menandatangani di kotak berikut.</p>
+        <form method="post" id="formTtd">{% csrf_token %}
+            <div class="pad-wrap"><canvas id="pad"></canvas><div class="pad-line"></div><div class="pad-hint" id="padHint">Tanda tangan di sini</div></div>
+            <div class="row2"><span></span><button type="button" class="btn line" id="btnUlang"><i class="fas fa-rotate-left"></i>&nbsp; Ulangi</button></div>
+            <label class="lb" for="nama">Nama lengkap penanda tangan</label>
+            <input type="text" id="nama" name="nama" maxlength="120" value="{{ t.nama_owner }}" required>
+            <label class="chk"><input type="checkbox" name="setuju" id="setuju" required><span>Saya, selaku pemilik {{ t.nama_cafe }}, telah membaca, memahami, dan menyetujui seluruh isi Perjanjian Kerja Sama ini, termasuk ketentuan Biaya Layanan pada Pasal 5 yang dapat disesuaikan di kemudian hari dengan pemberitahuan paling lambat 30 hari sebelumnya.</span></label>
+            <input type="hidden" name="ttd" id="ttd">
+            <button type="submit" class="btn navy" id="btnTtd" disabled><i class="fas fa-pen-nib"></i>&nbsp; Tanda tangani perjanjian</button>
+        </form>
+    </section>
+    {% elif mode == 'owner' %}
+    <section class="card">
+        <h2>{% if pks.status == 'bermeterai' %}Perjanjian final sudah tersedia{% else %}Perjanjian sudah ditandatangani{% endif %}</h2>
+        <p class="sub" style="margin:0">{% if pks.status == 'bermeterai' %}Dokumen final yang sudah dibubuhi e-meterai dapat diunduh lewat tombol <b>PDF bermeterai</b> di atas.{% else %}Terima kasih. Tim Dinezy akan membubuhkan e-meterai, lalu dokumen final dapat diunduh dari halaman ini.{% endif %}</p>
+    </section>
+    {% endif %}
+
+    {% if mode == 'admin' %}
+    <section class="card">
+        <h2>Pengelolaan PKS · {{ t.nama_cafe }}</h2>
+        <div class="meta-grid">
+            <div><small>Status</small><b>{{ pks.get_status_display }}</b></div>
+            <div><small>S&amp;K disetujui</small><b>{% if pks.sk_disetujui_at %}{{ pks.sk_disetujui_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</b></div>
+            <div><small>Ditandatangani</small><b>{% if pks.ttd_at %}{{ pks.ttd_at|date:"d/m/Y H:i" }}{% else %}batas {{ batas|tgl }}{% endif %}</b></div>
+            <div><small>Tarif saat TTD</small><b>{% if pks.tarif_saat_ttd is not None %}{{ pks.tarif_saat_ttd|rupiah }}{% else %}-{% endif %}</b></div>
+        </div>
+        {% if pks.sudah_ttd %}
+        <ol class="steps">
+            <li>Klik <b>Cetak / PDF</b> → simpan sebagai PDF.</li>
+            <li>Bubuhkan e-meterai pada kotak di atas nama PIHAK KEDUA melalui distributor e-meterai resmi.</li>
+            <li>Unggah PDF bermeterai di bawah ini. Owner otomatis dapat mengunduhnya.</li>
+        </ol>
+        <form method="post" action="{% url 'panel_perjanjian_unggah' pks.pk %}" enctype="multipart/form-data" style="margin-top:12px">{% csrf_token %}
+            <label class="lb" for="ff">PDF final bermeterai {% if pks.file_final %}(mengganti file sebelumnya){% endif %}</label>
+            <div class="row2"><input type="file" id="ff" name="file_final" accept="application/pdf" required><button class="btn navy" type="submit"><i class="fas fa-upload"></i>&nbsp; Unggah</button></div>
+        </form>
+        {% if pks.final_at %}<p class="sub" style="margin:10px 0 0">Diunggah {{ pks.final_at|date:"d/m/Y H:i" }} oleh {{ pks.final_oleh }}.</p>{% endif %}
+        {% else %}
+        <p class="sub" style="margin:0">Menunggu owner menandatangani PKS dari dashboard owner (menu <b>Profil &amp; Akun → Perjanjian Kerja Sama</b>).</p>
+        {% endif %}
+    </section>
+    {% endif %}
+</div>
+
+{% if mode == 'owner' and pks.status == 'menunggu' %}
+<script>
+(() => {
+    const c = document.getElementById('pad'), ctx = c.getContext('2d'), hint = document.getElementById('padHint');
+    const btn = document.getElementById('btnTtd'), setuju = document.getElementById('setuju'), nama = document.getElementById('nama');
+    let drawing = false, kosong = true, last = null, panjang = 0;
+    function resize() {
+        const r = c.getBoundingClientRect(), dpr = Math.max(window.devicePixelRatio || 1, 2);
+        const img = kosong ? null : c.toDataURL();
+        c.width = r.width * dpr; c.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0b1d38'; ctx.lineWidth = 2.4;
+        if (img) { const i = new Image(); i.onload = () => ctx.drawImage(i, 0, 0, r.width, r.height); i.src = img; }
+    }
+    const pos = e => { const r = c.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    c.addEventListener('pointerdown', e => { drawing = true; last = pos(e); c.setPointerCapture(e.pointerId); });
+    c.addEventListener('pointermove', e => {
+        if (!drawing) return; const p = pos(e);
+        ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+        panjang += Math.hypot(p.x - last.x, p.y - last.y); last = p;
+        if (kosong && panjang > 40) { kosong = false; hint.style.display = 'none'; cek(); }
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => c.addEventListener(ev, () => drawing = false));
+    document.getElementById('btnUlang').onclick = () => { ctx.clearRect(0, 0, c.width, c.height); kosong = true; panjang = 0; hint.style.display = ''; cek(); };
+    function cek() { btn.disabled = kosong || !setuju.checked || nama.value.trim().length < 3; }
+    setuju.addEventListener('change', cek); nama.addEventListener('input', cek);
+    document.getElementById('formTtd').addEventListener('submit', e => {
+        if (kosong) { e.preventDefault(); return; }
+
+        document.getElementById('ttd').value = c.toDataURL('image/png');
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Menyimpan…';
+    });
+    window.addEventListener('resize', resize); resize();
+})();
+</script>
+{% endif %}
+</body>
+</html>

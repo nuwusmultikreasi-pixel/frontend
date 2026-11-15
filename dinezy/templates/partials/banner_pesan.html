@@ -1,0 +1,7 @@
+{% if banner %}
+<div class="info-banner {{ banner.kategori }} mb-4" role="status">
+    <span class="ib-ic"><i class="fas {% if banner.kategori == 'maintenance' %}fa-screwdriver-wrench{% elif banner.kategori == 'gangguan' %}fa-triangle-exclamation{% elif banner.kategori == 'pks' %}fa-file-signature{% else %}fa-bullhorn{% endif %}"></i></span>
+    <div class="flex-grow-1 min-w-0"><b>{{ banner.judul }}</b><span>{{ banner.get_kategori_display }} · {{ banner.dibuat|date:"d/m/Y H:i" }}</span></div>
+    {% if owner %}<a class="btn btn-sm ib-btn" href="{% url 'owner_pesan' tenant.slug banner.pk %}">Baca pesan</a>{% endif %}
+</div>
+{% endif %}

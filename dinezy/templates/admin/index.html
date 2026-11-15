@@ -1,0 +1,205 @@
+{% extends "admin/index.html" %}
+{% load i18n static dinezy %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .kpi-card {
+        border-radius: 16px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border: 1px solid #334155;
+    }
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px -8px rgba(15, 23, 42, 0.45);
+    }
+
+    .pulse-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse-green 1.8s infinite;
+    }
+    @keyframes pulse-green {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .tenant-card {
+        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        transition: all 0.25s ease;
+    }
+    .tenant-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 12px 28px -5px rgba(59, 130, 246, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 pb-5">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <h2 class="font-weight-bold text-dark mb-0 mr-2">Admin Server Control Center</h2>
+                <span class="badge badge-pill text-white px-3 py-1 font-weight-normal" style="background-color: #0f172a;">
+                    <span class="pulse-dot mr-1"></span> Live Data Engine
+                </span>
+            </div>
+            <p class="text-muted small mb-0 mt-1">Sistem Pengelolaan Multi-Tenant Kafe & Tagihan Aplikasi Realtime</p>
+        </div>
+
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'admin:core_tenant_add' %}" class="btn btn-sm btn-primary font-weight-bold px-3 py-2 shadow-sm" style="border-radius: 8px;">
+                <i class="fas fa-plus-circle mr-1"></i> Tambah Cafe / Tenant Baru
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-3">
+            <div class="card text-white kpi-card shadow-sm h-100" style="background-color: #0f172a;">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="text-uppercase small font-weight-bold" style="color: #94a3b8;">Total Omset Terkumpul</span>
+                            <h2 class="font-weight-bold my-2 text-white">{{ total_omset_formatted }}</h2>
+                        </div>
+                        <div class="p-3 rounded-circle" style="background-color: rgba(59, 130, 246, 0.15);">
+                            <i class="fas fa-wallet fa-lg text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="small mt-2" style="color: #10b981;">
+                        <i class="fas fa-sync-alt mr-1"></i> Akumulasi realtime dari database pesanan
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-3">
+            <div class="card text-white kpi-card shadow-sm h-100" style="background-color: #1e293b;">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="text-uppercase small font-weight-bold" style="color: #94a3b8;">Total Pesanan Masuk</span>
+                            <h2 class="font-weight-bold my-2 text-white">{{ total_orders }} Order</h2>
+                        </div>
+                        <div class="p-3 rounded-circle" style="background-color: rgba(245, 158, 11, 0.15);">
+                            <i class="fas fa-shopping-cart fa-lg" style="color: #f59e0b;"></i>
+                        </div>
+                    </div>
+                    <div class="small text-muted mt-2" style="color: #94a3b8 !important;">
+                        <i class="fas fa-database text-info mr-1"></i> Terhubung langsung ke database
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-12 mb-3">
+            <div class="card text-white kpi-card shadow-sm h-100" style="background-color: #0f172a;">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="text-uppercase small font-weight-bold" style="color: #94a3b8;">Total Tenant / Cafe</span>
+                            <h2 class="font-weight-bold my-2" style="color: #10b981;">{{ total_tenants }} Cafe</h2>
+                        </div>
+                        <div class="p-3 rounded-circle" style="background-color: rgba(16, 185, 129, 0.15);">
+                            <i class="fas fa-store fa-lg" style="color: #10b981;"></i>
+                        </div>
+                    </div>
+                    <div class="small mt-2" style="color: #94a3b8;">
+                        <i class="fas fa-check-circle text-success mr-1"></i> Multi-tenant system active
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-lg mb-4" style="border-radius: 16px !important; overflow: hidden;">
+        <div class="card-header text-white font-weight-bold py-3 d-flex justify-content-between align-items-center" style="background-color: #0f172a;">
+            <span><i class="fas fa-store text-primary mr-2"></i> DAFTAR TENANT CAFE (REALTIME)</span>
+            <span class="badge badge-primary px-3 py-1 font-weight-normal">Auto-Updated</span>
+        </div>
+        <div class="card-body bg-light p-4">
+            <p class="text-muted mb-4">Daftar cafe terdaftar di database server beserta kalkulasi tagihan aplikasi ({% tarif_nota %}/nota):</p>
+
+            <div class="row">
+                {% for tenant in tenant_list %}
+                <div class="col-lg-6 col-xl-6 mb-4">
+                    <div class="tenant-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge badge-success px-3 py-1 font-weight-bold">Status: {{ tenant.status }}</span>
+                                <span class="text-muted small"><i class="fas fa-hashtag mr-1"></i> ID: #{{ tenant.id }}</span>
+                            </div>
+
+                            <h4 class="font-weight-bold text-dark mb-1">{{ tenant.nama_cafe }}</h4>
+                            <p class="text-muted small mb-3"><i class="fas fa-link mr-1"></i> Slug: <code>{{ tenant.slug }}</code></p>
+
+                            <div class="row text-center bg-light p-3 rounded-lg mb-4 border">
+                                <div class="col-6 border-right">
+                                    <span class="text-muted small d-block">Jumlah Orderan</span>
+                                    <strong class="h5 font-weight-bold text-dark mb-0">{{ tenant.total_orders }} Order</strong>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted small d-block">Tagihan App ({% tarif_nota %}/nota)</span>
+                                    <strong class="h5 font-weight-bold text-primary mb-0">Rp {{ tenant.tagihan_app_formatted }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex gap-2 mb-2">
+                                <a href="{% url 'admin:core_order_changelist' %}?tenant__id__exact={{ tenant.id }}" class="btn btn-primary font-weight-bold flex-fill py-2" style="border-radius: 8px;">
+                                    <i class="fas fa-receipt mr-1"></i> Lihat Order
+                                </a>
+                                <a href="{% url 'admin:core_menu_changelist' %}?tenant__id__exact={{ tenant.id }}" class="btn btn-outline-dark font-weight-bold flex-fill py-2" style="border-radius: 8px;">
+                                    <i class="fas fa-utensils mr-1"></i> Lihat Menu
+                                </a>
+                            </div>
+                            <div class="mt-2">
+                                <a href="/api/tenant/{{ tenant.slug }}/cetak_invoice/" target="_blank" class="btn btn-info font-weight-bold d-block w-100 py-2 text-center" style="border-radius: 8px; background-color: #00bcd4; border: none;">
+                                    <i class="fas fa-file-pdf mr-1"></i> Download Invoice Tagihan PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Belum ada tenant/cafe terdaftar di database.</p>
+                    <a href="{% url 'admin:core_tenant_add' %}" class="btn btn-primary font-weight-bold">
+                        <i class="fas fa-plus mr-1"></i> Tambah Tenant Pertama
+                    </a>
+                </div>
+                {% endfor %}
+
+                <div class="col-lg-6 col-xl-6 mb-4">
+                    <div class="tenant-card p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center border-dashed" style="border-style: dashed; border-width: 2px; background: #ffffff;">
+                        <div class="p-3 bg-light rounded-circle shadow-sm mb-3 text-primary">
+                            <i class="fas fa-store-alt fa-2x"></i>
+                        </div>
+                        <h5 class="font-weight-bold text-dark mb-1">Registrasi Tenant Baru</h5>
+                        <p class="text-muted small mb-4" style="max-width: 300px;">Buka cabang atau tambahkan mitra cafe baru ke dalam platform server.</p>
+                        <a href="{% url 'admin:core_tenant_add' %}" class="btn text-white font-weight-bold px-4 py-2" style="background-color: #0f172a; border-radius: 8px;">
+                            <i class="fas fa-plus mr-1"></i> Tambah Tenant Baru
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="container-fluid px-3">
+    {{ block.super }}
+</div>
+{% endblock %}

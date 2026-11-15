@@ -1,0 +1,798 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinezy — Smarter Dining, Made Easy</title>
+    <meta name="description" content="Dinezy: QR Ordering &amp; Payment Platform for Restaurants and Cafés. Pemesanan mandiri via QR Code, kasir realtime, manajemen menu, dan laporan penjualan.">
+    <meta property="og:title" content="Dinezy — Smarter Dining, Made Easy">
+    <meta property="og:description" content="QR Ordering &amp; Payment Platform for Restaurants and Cafés.">
+    <meta property="og:type" content="website">
+    {% include 'partials/favicon.html' %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <style>
+        :root { --steel: #7ea6e6; --steel-2: #a9c4ee;
+
+            --display: 'Source Sans 3', 'Myriad Pro', 'Frutiger', 'Frutiger LT Std', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+        h1, h2, h3, h4, h5, h6, .brand-name, .btn, .stat-big { font-family: var(--display); letter-spacing: 0; }
+        h1, h2, h3 { font-weight: 800; }
+        body { background: #fff; }
+        .display { font-family: var(--display); letter-spacing: -.012em; font-weight: 800; }
+
+        .lp-nav { position: fixed; inset: 0 0 auto 0; z-index: 1030; padding: 14px 12px 0; background: transparent !important; }
+        .lp-nav > .container { max-width: 1180px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+            border-radius: 999px; padding: 8px 8px 8px 20px; backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+            box-shadow: 0 10px 30px -12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08); transition: background .3s, border-color .3s, box-shadow .3s, border-radius .3s; }
+        .lp-nav .nav-link { color: rgba(255,255,255,.78); font-weight: 500; font-size: .9rem; padding: .45rem .95rem !important; border-radius: 999px; transition: background .2s, color .2s; }
+        .lp-nav .nav-link:hover { color: #fff; background: rgba(255,255,255,.08); }
+        .lp-nav .brand-name { color: #fff; }
+        .lp-nav .logo-on-light { display: none; }
+        .lp-nav .btn { border-radius: 999px; padding: .5rem 1.15rem; }
+        .lp-nav .btn-ghost-light { color: #fff; border: 1px solid rgba(255,255,255,.25); background: transparent; }
+        .lp-nav .btn-ghost-light:hover { background: rgba(255,255,255,.1); color: #fff; }
+        .lp-nav .btn-light-solid { background: #fff; color: var(--navy-900); border: 1px solid #fff; }
+        .lp-nav .navbar-toggler { color: #fff; border-radius: 999px; }
+
+        .lp-nav.solid > .container { background: rgba(255,255,255,.78); border-color: rgba(15,33,62,.08); box-shadow: 0 12px 34px -14px rgba(11,29,56,.35); }
+        .lp-nav.solid .nav-link { color: var(--text); } .lp-nav.solid .nav-link:hover { color: var(--navy-900); background: var(--navy-50); }
+        .lp-nav.solid .brand-name { color: var(--ink); }
+        .lp-nav.solid .logo-on-light { display: block; } .lp-nav.solid .logo-on-dark { display: none; }
+        .lp-nav.solid .btn-ghost-light { color: var(--ink); border-color: var(--line-strong); } .lp-nav.solid .btn-ghost-light:hover { background: var(--navy-50); }
+        .lp-nav.solid .btn-light-solid { background: var(--navy-900); color: #fff; border-color: var(--navy-900); }
+        .lp-nav.solid .navbar-toggler { color: var(--ink); }
+        @media (max-width: 991.98px) {
+            .lp-nav > .container { padding: 8px 8px 8px 18px; }
+            .lp-nav.open > .container { border-radius: 24px; background: rgba(11,29,56,.92); }
+            .lp-nav.solid.open > .container { background: rgba(255,255,255,.96); }
+            .lp-nav .navbar-collapse { padding: 10px 4px 8px; }
+        }
+
+        .hero { position: relative; overflow: hidden; color: #b7c4d8; padding: 150px 0 0;
+            background:
+                radial-gradient(900px 520px at 78% 30%, rgba(42,85,148,.55), transparent 65%),
+                radial-gradient(700px 400px at 5% 0%, rgba(30,66,120,.45), transparent 60%),
+                var(--navy-950); }
+        .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size: 56px 56px; mask-image: linear-gradient(180deg, #000 0%, transparent 85%); }
+        .hero .container { position: relative; }
+        .eyebrow-dark { display: inline-flex; align-items: center; gap: 10px; font-size: .8rem; font-weight: 500; color: var(--steel-2); border: 1px solid rgba(169,196,238,.22); background: rgba(255,255,255,.04); padding: 6px 14px 6px 6px; border-radius: 999px; }
+        .eyebrow-dark b { background: var(--steel); color: var(--navy-950); font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+        .hero h1 { color: #fff; font-size: clamp(2.3rem, 5vw, 3.9rem); line-height: 1.04; font-weight: 800; margin: 22px 0 20px; }
+        .hero h1 .accent { color: var(--steel); }
+        .type-wrap { display: grid; }
+        .type-wrap > span { grid-area: 1 / 1; }
+        .type-ghost { visibility: hidden; }
+        .type-text::after { content: ''; display: inline-block; width: .08em; height: .9em; margin-left: .06em; vertical-align: -.08em; background: currentColor; animation: caret 1s steps(1) infinite; }
+        .type-text.mengetik::after { animation: none; }
+        @keyframes caret { 50% { opacity: 0; } }
+        .hero .lead { font-size: 1.08rem; line-height: 1.7; color: #a9b8cf; max-width: 540px; }
+        .btn-hero { background: #fff; color: var(--navy-900); font-weight: 600; padding: .85rem 1.4rem; border-radius: 10px; border: 0; }
+        .btn-hero:hover { background: #e9eff9; color: var(--navy-900); }
+        .btn-hero-ghost { color: #fff; border: 1px solid rgba(255,255,255,.25); padding: .85rem 1.4rem; border-radius: 10px; font-weight: 600; }
+        .btn-hero-ghost:hover { background: rgba(255,255,255,.07); color: #fff; }
+        .hero-checks { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 26px; font-size: .86rem; }
+        .hero-checks i { color: var(--steel); margin-right: 6px; }
+
+        .stage { position: relative; margin-top: 80px; }
+        .laptop { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; background: #fff; border-radius: 14px 14px 0 0; border: 1px solid rgba(255,255,255,.15); box-shadow: 0 -10px 80px rgba(42,85,148,.45); overflow: hidden; font-size: .78rem; color: var(--text); }
+        .laptop .bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: #f1f3f6; border-bottom: 1px solid var(--line); }
+        .laptop .bar i { width: 10px; height: 10px; border-radius: 50%; background: #d4d9e1; display: inline-block; }
+        .laptop .bar .url { margin: 0 auto; font-size: .72rem; color: var(--muted); background: #fff; padding: 3px 40px; border-radius: 6px; border: 1px solid var(--line); }
+        .lp-app { display: flex; min-height: 360px; }
+        .lp-side { width: 170px; background: var(--navy-900); padding: 14px 10px; color: #b7c4d8; flex-shrink: 0; }
+        .lp-side .b { display: flex; align-items: center; gap: 8px; color: #fff; font-weight: 600; font-size: .78rem; padding: 2px 6px 14px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 10px; }
+        .lp-side .b span { width: 22px; height: 22px; border-radius: 5px; background: #fff; color: var(--navy-900); display: flex; align-items: center; justify-content: center; font-size: .6rem; }
+        .lp-side .it { padding: 7px 8px; border-radius: 5px; font-size: .74rem; display: flex; gap: 8px; align-items: center; }
+        .lp-side .it.on { background: var(--navy-700); color: #fff; }
+        .lp-main { flex: 1; background: #f6f7f9; padding: 16px 18px; min-width: 0; }
+        .lp-main h6 { font-size: .9rem; margin: 0 0 12px; }
+        .kp { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+        .kp div { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+        .kp small { display: block; color: var(--muted); font-size: .66rem; }
+        .kp b { color: var(--ink); font-size: .95rem; }
+        .kp .up { color: var(--green); font-size: .62rem; font-weight: 600; }
+        .lp-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 10px; }
+        .panel { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+        .panel .t { font-weight: 600; color: var(--ink); font-size: .74rem; margin-bottom: 10px; }
+        .bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 6px; border-bottom: 1px solid var(--line); }
+        .bars span { flex: 1; background: var(--navy-700); border-radius: 3px 3px 0 0; opacity: .9; }
+        .bars span.lt { background: #c9d6ea; }
+        .mini-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0f1f3; font-size: .7rem; }
+        .mini-row:last-child { border: 0; }
+        .st { font-size: .6rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+
+        .phone { position: absolute; z-index: 2; right: max(2%, calc(50% - 560px)); bottom: -40px; width: 230px; background: #0a0f1a; border-radius: 34px; padding: 9px; box-shadow: 0 30px 60px rgba(0,0,0,.45); }
+        .phone .scr { background: #f6f7f9; border-radius: 26px; overflow: hidden; height: 420px; position: relative; }
+        .phone .ph-head { background: var(--navy-900); color: #fff; padding: 26px 14px 30px; }
+        .phone .ph-head b { font-size: .9rem; display: block; }
+        .phone .ph-head small { font-size: .62rem; color: #a9b8cf; }
+        .phone .ph-search { margin: -16px 10px 8px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: .62rem; color: var(--muted); }
+        .phone .ph-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding: 0 10px; }
+        .phone .card-m { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+        .phone .card-m .im { height: 58px; display: flex; align-items: center; justify-content: center; color: var(--navy-600); background: #e9eef6; font-size: 1.05rem; }
+        .phone .card-m .in { padding: 6px 7px 7px; }
+        .phone .card-m .n { font-size: .6rem; font-weight: 600; color: var(--ink); }
+        .phone .card-m .p { font-size: .6rem; font-weight: 700; color: var(--navy-800); }
+        .phone .card-m .bt { margin-top: 5px; background: var(--navy-800); color: #fff; text-align: center; font-size: .55rem; font-weight: 600; border-radius: 4px; padding: 3px; }
+        .phone .card-m.off { filter: grayscale(1); opacity: .7; }
+        .phone .card-m.off .bt { background: #d1d5db; color: #6b7280; }
+        .phone .ph-cart { position: absolute; left: 10px; right: 10px; bottom: 12px; background: var(--navy-900); color: #fff; border-radius: 8px; padding: 9px 12px; display: flex; justify-content: space-between; font-size: .64rem; font-weight: 600; }
+        .float-note { position: absolute; z-index: 3; left: max(1%, calc(50% - 690px)); top: 210px; background: #fff; border-radius: 12px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 20px 40px rgba(7,20,38,.35); font-size: .78rem; }
+        .float-note .ic { width: 36px; height: 36px; border-radius: 9px; background: var(--navy-800); color: #fff; display: flex; align-items: center; justify-content: center; }
+        .float-note b { color: var(--ink); display: block; }
+        .float-note span { color: var(--muted); font-size: .72rem; }
+        @media (max-width: 991.98px) { .phone, .float-note { display: none; } .lp-side { display: none; } .kp { grid-template-columns: repeat(2,1fr); } .lp-grid { grid-template-columns: 1fr; } }
+
+        .hero { padding-top: 120px; }
+        .hero-title { font-size: clamp(2.4rem, 4vw, 3.6rem) !important; line-height: 1.04; margin: 0 0 18px !important; }
+        .hero-copy .lead { max-width: 500px; margin: 0; font-size: 1.15rem; }
+
+        .mascot { position: relative; margin: 0 -70px 0 -20px; }
+
+        .is-cutout .m-img { display: block; width: 100%; height: auto; position: relative; z-index: 1;
+            -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent 100%); mask-image: linear-gradient(180deg, #000 80%, transparent 100%); }
+
+        .is-photo .m-frame { padding: 6px; border-radius: 32px; background: linear-gradient(155deg, #dbe8ff, #7ea6e6 30%, #2a5594 65%, rgba(126,166,230,.3));
+            box-shadow: 0 40px 80px -28px rgba(0,0,0,.7); }
+        .is-photo .m-img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 26px; }
+
+        .m-bubble { position: absolute; z-index: 3; display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,.97); color: var(--text);
+            border-radius: 18px; padding: 14px 16px; box-shadow: 0 24px 50px -16px rgba(0,0,0,.55); font-size: .8rem; line-height: 1.45; }
+        .m-bubble b { display: block; color: var(--ink); font-size: .92rem; margin-bottom: 2px; }
+        .m-bubble span { color: var(--muted); }
+        .m-ask { left: -2%; top: 0; max-width: 255px; border-bottom-left-radius: 4px; animation: floatA 6s ease-in-out infinite; }
+        .m-ask { align-items: center; }
+        .m-ask .m-avatar { width: 34px; height: 34px; border-radius: 50%; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.05rem; }
+        .m-answer { right: 3%; bottom: 9%; max-width: 300px; border-bottom-right-radius: 4px; animation: floatA 6s ease-in-out infinite; animation-delay: -3s; }
+        .m-answer .m-qr { width: 38px; height: 38px; border-radius: 11px; background: var(--navy-900); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem; }
+        .m-answer em { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-style: normal; font-weight: 600; font-size: .74rem; color: #15803d; background: #dcfce7; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+        .m-chip { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px 7px 7px; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap;
+            color: #fff; background: rgba(15,33,62,.72); border: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 18px 36px -14px rgba(0,0,0,.6); animation: floatA 7s ease-in-out infinite; }
+        .m-chip .ci { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; }
+        .ci.green { background: #dcfce7; color: #15803d; } .ci.amber { background: #fef3c7; color: #b45309; } .ci.blue { background: #dbeafe; color: #1d4ed8; }
+        .m-c1 { left: -4%; top: 60%; animation-delay: -1.5s; }
+        .m-c2 { left: 16%; bottom: 3%; animation-delay: -4s; }
+        .m-c4 { display: none; }
+        .m-dot { position: absolute; z-index: 2; right: 3%; top: 6%; width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            background: #fff; color: var(--navy-800); font-size: 1.1rem; box-shadow: 0 18px 36px -14px rgba(0,0,0,.6); animation: bellRing 4s ease-in-out infinite; }
+        .m-dot b { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #ef4444; color: #fff; font-size: .68rem; display: flex; align-items: center; justify-content: center; border: 2px solid #0b1d38; }
+        @keyframes bellRing { 0%, 70%, 100% { transform: rotate(0); } 74% { transform: rotate(-12deg); } 78% { transform: rotate(10deg); } 82% { transform: rotate(-6deg); } 86% { transform: rotate(3deg); } }
+        @keyframes floatA { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @media (max-width: 991.98px) {
+            .hero { padding-top: 112px; }
+            .hero-copy { text-align: center; } .hero-copy .lead { margin: 0 auto; }
+            .hero-copy .d-flex { justify-content: center; }
+            .mascot { margin: 10px auto 0; max-width: 620px; }
+        }
+        @media (max-width: 991.98px) {
+            .mascot { padding: 74px 0 70px; }
+            .m-ask { left: 0; top: 0; }
+            .m-dot { top: 6px; right: 0; }
+            .m-answer { top: auto; bottom: 0; right: 0; }
+            .m-c1 { left: 0; top: auto; bottom: 8px; }
+            .m-c2, .m-c4 { display: none; }
+        }
+        @media (max-width: 575.98px) {
+            .mascot { padding: 58px 0 58px; }
+            .m-bubble { padding: 9px 11px; font-size: .72rem; gap: 8px; } .m-bubble b { font-size: .8rem; margin: 0; }
+            .m-bubble .m-avatar, .m-bubble .m-qr { width: 28px; height: 28px; font-size: .85rem; }
+            .m-answer em { display: none; }
+            .m-chip { font-size: .66rem; padding: 4px 10px 4px 4px; gap: 6px; } .m-chip .ci { width: 20px; height: 20px; font-size: .6rem; }
+            .m-c1 { bottom: 10px; }
+            .m-dot { width: 36px; height: 36px; border-radius: 12px; font-size: .85rem; }
+            .row.g-5 { --bs-gutter-x: 1.5rem; }
+        }
+        @media (max-width: 400px) { .m-c1 { display: none; } }
+        @media (prefers-reduced-motion: reduce) { .m-bubble, .m-chip, .m-dot { animation: none; } }
+
+        .tech { padding: 70px 0 34px; border-bottom: 1px solid var(--line); }
+        .tech .lbl { font-size: .78rem; color: var(--muted); text-align: center; margin-bottom: 18px; }
+        .tech-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 38px; color: #6b7a90; font-weight: 600; font-size: .95rem; }
+        .tech-row span i { margin-right: 8px; color: var(--navy-600); }
+
+        .sec { padding: 96px 0; }
+        .kick { display: inline-block; font-size: .78rem; font-weight: 600; color: var(--navy-600); background: var(--navy-50); border: 1px solid var(--navy-100); padding: 4px 10px; border-radius: 999px; }
+        .sec-title { font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1.12; font-weight: 700; margin: 14px 0 14px; }
+        .sec-sub { color: var(--muted); font-size: 1.02rem; line-height: 1.7; max-width: 600px; }
+
+        .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+        .bx { border: 1px solid var(--line); border-radius: 18px; padding: 28px; background: #fff; position: relative; overflow: hidden; transition: border-color .2s, transform .2s, box-shadow .2s; }
+        .bx:hover { border-color: #c8d3e3; transform: translateY(-3px); box-shadow: 0 18px 40px -20px rgba(16,40,73,.35); }
+        .bx .ic { width: 44px; height: 44px; border-radius: 11px; background: var(--navy-50); color: var(--navy-700); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; border: 1px solid var(--navy-100); }
+        .bx h4 { font-size: 1.15rem; margin-bottom: 8px; font-family: var(--display); }
+        .bx p { color: var(--muted); font-size: .92rem; line-height: 1.65; margin: 0; }
+        .bx-a { grid-column: span 4; background: var(--navy-900); border-color: var(--navy-900); color: #a9b8cf; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+        .bx-a h4 { color: #fff; font-size: 1.5rem; }
+        .bx-a p { color: #a9b8cf; }
+        .bx-a .ic { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.12); }
+        .bx-a:hover { border-color: var(--navy-700); }
+        .bx-b, .bx-c { grid-column: span 2; }
+        .bx-d, .bx-e { grid-column: span 3; }
+        .bx-f { grid-column: span 4; display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; align-items: center; }
+        .qr-ill { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 18px; display: flex; gap: 16px; align-items: center; }
+        .qr-ill .qr { width: 104px; height: 104px; background: #fff; border-radius: 8px; padding: 8px; flex-shrink: 0;
+            background-image: radial-gradient(circle, var(--navy-900) 40%, transparent 42%); background-size: 11px 11px; background-origin: content-box; position: relative; }
+        .qr-ill .qr::before, .qr-ill .qr::after { content: ''; position: absolute; width: 26px; height: 26px; border: 5px solid var(--navy-900); border-radius: 4px; background: #fff; }
+        .qr-ill .qr::before { top: 6px; left: 6px; } .qr-ill .qr::after { top: 6px; right: 6px; }
+        .qr-ill .tag { color: #fff; font-weight: 700; font-size: 1.1rem; }
+        .qr-ill small { display: block; font-size: .74rem; color: #8fa1bd; }
+        .avail-demo .row-a { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; font-size: .86rem; background: #fff; }
+        .avail-demo .row-a.off { filter: grayscale(1); background: #f6f7f8; color: #8a919c; }
+        .tg { width: 38px; height: 22px; border-radius: 999px; background: var(--navy-700); position: relative; flex-shrink: 0; }
+        .tg::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; right: 3px; }
+        .tg.off { background: #cfd5de; } .tg.off::after { right: auto; left: 3px; }
+        @media (max-width: 991.98px) { .bento { grid-template-columns: 1fr 1fr; } .bx-a, .bx-f { grid-column: span 2; grid-template-columns: 1fr; } .bx-b, .bx-c, .bx-d, .bx-e { grid-column: span 1; } }
+        @media (max-width: 575.98px) { .bento { grid-template-columns: 1fr; } .bx-a, .bx-b, .bx-c, .bx-d, .bx-e, .bx-f { grid-column: span 1; } }
+
+        .stats-band { background: var(--navy-50); border-top: 1px solid var(--navy-100); border-bottom: 1px solid var(--navy-100); }
+        .stat-big { font-family: var(--display); font-size: 2.4rem; font-weight: 800; color: var(--navy-900); letter-spacing: -.01em; line-height: 1; }
+        .stat-cap { color: var(--muted); font-size: .88rem; margin-top: 8px; }
+        .stat-big { font-size: 2.9rem; font-variant-numeric: tabular-nums; }
+        .stat-big small { font-size: .55em; font-weight: 700; color: var(--navy-700); }
+        .stat-ic { width: 42px; height: 42px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px;
+            background: #fff; border: 1px solid var(--navy-100); color: var(--navy-700); box-shadow: 0 8px 18px -10px rgba(11,29,56,.35); transform: scale(.6) rotate(-12deg); opacity: 0;
+            transition: transform .6s cubic-bezier(.34,1.56,.64,1) .1s, opacity .4s ease .1s; }
+        .stat.in .stat-ic { transform: none; opacity: 1; }
+        .stat-line { height: 3px; width: 64px; border-radius: 3px; background: var(--navy-100); margin-top: 12px; overflow: hidden; }
+        .text-center .stat-line { margin-left: auto; margin-right: auto; }
+        @media (min-width: 768px) { .text-md-start .stat-line { margin-left: 0; } }
+        .stat-line i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--navy-800), #7ea6e6); transform: scaleX(0); transform-origin: left; transition: transform 1.4s cubic-bezier(.16,1,.3,1) .2s; }
+        .stat.in .stat-line i { transform: scaleX(1); }
+        .stat.in .stat-big { animation: statPop .5s ease 1.25s; }
+        @keyframes statPop { 50% { transform: scale(1.06); } }
+
+        .role-tabs { display: inline-flex; padding: 5px; background: var(--navy-50); border: 1px solid var(--navy-100); border-radius: 12px; gap: 4px; }
+        .role-tabs button { border: 0; background: transparent; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: .9rem; color: var(--muted); }
+        .role-tabs button.active { background: var(--navy-900); color: #fff; box-shadow: 0 6px 14px -6px rgba(7,20,38,.5); }
+        .role-pane { display: none; } .role-pane.active { display: block; animation: rise .4s ease both; }
+        @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .role-list { list-style: none; padding: 0; margin: 22px 0 0; }
+        .role-list li { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+        .role-list li:first-child { border-top: 0; }
+        .role-list .n { width: 30px; height: 30px; border-radius: 8px; background: var(--navy-50); color: var(--navy-700); font-weight: 700; font-size: .82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .role-list b { color: var(--ink); display: block; font-size: .95rem; }
+        .role-list span { color: var(--muted); font-size: .88rem; }
+        .role-visual { background: var(--navy-900); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; min-height: 340px; }
+        .role-visual::before { content: ''; position: absolute; width: 380px; height: 380px; right: -120px; top: -140px; background: radial-gradient(circle, rgba(126,166,230,.28), transparent 65%); }
+        .rv-card { position: relative; background: #fff; border-radius: 12px; padding: 16px; font-size: .8rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,.4); }
+        .rv-card + .rv-card { margin-top: 12px; }
+        .rv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .rv-head b { color: var(--ink); }
+
+        .steps { counter-reset: s; position: relative; }
+        .step2 { position: relative; padding-left: 64px; padding-bottom: 34px; }
+        .step2::before { counter-increment: s; content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 0; width: 44px; height: 44px; border-radius: 12px; background: #fff; border: 1px solid var(--line-strong); color: var(--navy-800); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: .85rem; font-family: var(--display); }
+        .step2::after { content: ''; position: absolute; left: 22px; top: 50px; bottom: 6px; width: 1px; background: var(--line-strong); }
+        .step2:last-child::after { display: none; }
+        .step2.on::before { background: var(--navy-900); border-color: var(--navy-900); color: #fff; }
+        .step2 h5 { font-size: 1.05rem; margin: 2px 0 6px; font-family: var(--display); }
+        .step2 p { color: var(--muted); font-size: .92rem; margin: 0; line-height: 1.65; }
+        .mail-mock { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(16,40,73,.35); }
+        .mail-mock .mh { padding: 14px 18px; border-bottom: 1px solid var(--line); font-size: .82rem; color: var(--muted); }
+        .mail-mock .mh b { color: var(--ink); }
+        .mail-mock .mb { padding: 20px 18px; font-size: .86rem; }
+        .mail-mock .banner { background: var(--navy-900); color: #fff; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+        .mail-mock .banner small { color: #8fa1bd; font-size: .7rem; letter-spacing: .08em; }
+        .cred-row { display: flex; justify-content: space-between; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; font-size: .8rem; }
+        .cred-row code { color: var(--navy-800); font-weight: 600; }
+
+        .faq .accordion-item { border: 1px solid var(--line); border-radius: 12px !important; margin-bottom: 10px; overflow: hidden; }
+        .faq .accordion-button { font-weight: 600; color: var(--ink); padding: 18px 20px; font-size: .95rem; box-shadow: none; }
+        .faq .accordion-button:not(.collapsed) { background: var(--navy-50); color: var(--navy-900); }
+        .faq .accordion-body { color: var(--muted); font-size: .92rem; line-height: 1.7; }
+
+        .auth-sec { background: var(--navy-950); position: relative; overflow: hidden; padding: 100px 0; color: #a9b8cf; }
+        .auth-sec::before { content: ''; position: absolute; inset: 0; background: radial-gradient(700px 420px at 15% 20%, rgba(42,85,148,.45), transparent 60%), radial-gradient(600px 380px at 95% 90%, rgba(42,85,148,.35), transparent 60%); }
+        .auth-sec .container { position: relative; }
+        .auth-sec .sec-title { color: #fff; }
+        .auth-sec .kick { background: rgba(255,255,255,.06); color: var(--steel-2); border-color: rgba(255,255,255,.12); }
+        .auth-card { background: #fff; border-radius: 18px; padding: 30px; height: 100%; scroll-margin-top: 90px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); color: var(--text); transition: box-shadow .3s; }
+        .auth-card h3 { font-size: 1.3rem; margin-bottom: 4px; font-family: var(--display); }
+        .auth-card .lead-sm { font-size: .88rem; color: var(--muted); margin-bottom: 22px; }
+        .auth-card.focus-ring { box-shadow: 0 0 0 4px rgba(126,166,230,.55), 0 30px 60px -20px rgba(0,0,0,.5); }
+        .auth-card.login { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); color: #c7d2e3; box-shadow: none; backdrop-filter: blur(6px); }
+        .auth-card.login h3 { color: #fff; }
+        .auth-card.login .lead-sm, .auth-card.login .note { color: #8fa1bd; }
+        .auth-card.login .form-label { color: #dbe4f1; }
+        .auth-card.login .form-control { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); color: #fff; }
+        .auth-card.login .form-control::placeholder { color: #7d8ea8; }
+        .auth-card.login .form-control:focus { border-color: var(--steel); box-shadow: 0 0 0 3px rgba(126,166,230,.25); }
+        .auth-card.login.focus-ring { box-shadow: 0 0 0 4px rgba(126,166,230,.55); }
+        .cta-tile { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 24px; border-radius: 16px; text-decoration: none; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); color: #a9b8cf; transition: background .2s, border-color .2s, transform .2s; }
+        .cta-tile:hover { background: rgba(255,255,255,.08); border-color: rgba(169,196,238,.4); transform: translateY(-3px); color: #a9b8cf; }
+        .cta-tile b { color: #fff; font-size: 1.05rem; margin-top: 10px; }
+        .cta-tile small { font-size: .86rem; line-height: 1.6; }
+        .cta-tile .ct-ic { width: 44px; height: 44px; border-radius: 11px; background: rgba(126,166,230,.16); color: #cfe0fa; display: flex; align-items: center; justify-content: center; }
+        .cta-tile .ct-go { margin-top: auto; padding-top: 14px; color: #fff; font-weight: 600; font-size: .9rem; }
+        .cta-tile .ct-go i { margin-left: 6px; transition: transform .2s; }
+        .cta-tile:hover .ct-go i { transform: translateX(4px); }
+        .info-box { background: var(--navy-50); border: 1px solid var(--navy-100); border-radius: 10px; padding: 12px 14px; font-size: .85rem; color: var(--navy-800); display: flex; gap: 10px; }
+
+        footer { background: var(--navy-950); color: #8fa1bd; font-size: .88rem; border-top: 1px solid rgba(255,255,255,.07); }
+        footer h6 { color: #fff; font-size: .85rem; font-weight: 600; margin-bottom: 14px; }
+        footer a { color: #b6c3d6; text-decoration: none; }
+        footer a:hover { color: #fff; }
+
+        .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.16,1,.3,1); }
+        .reveal.in { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+
+<nav class="lp-nav navbar navbar-expand-lg" id="lpNav">
+    <div class="container">
+        <a class="dz-brand" href="/">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark logo-on-dark" alt="Logo Dinezy">
+            <img src="{% static 'core/img/dinezy-mark-navy.png' %}" class="dz-mark logo-on-light" alt="Logo Dinezy">
+            <span class="brand-name fw-bold">Dinezy</span>
+        </a>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-label="Menu"><i class="fas fa-bars"></i></button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="#fitur">Fitur</a></li>
+                <li class="nav-item"><a class="nav-link" href="#peran">Peran</a></li>
+                <li class="nav-item"><a class="nav-link" href="#alur">Alur</a></li>
+                <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+            </ul>
+            <div class="d-flex gap-2 pt-2 pt-lg-0">
+                {% if dashboard_url %}
+                    <a href="{{ dashboard_url }}" class="btn btn-light-solid">Buka Dashboard</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-ghost-light">Masuk</a>
+                    <a href="{% url 'register' %}" class="btn btn-light-solid">Daftar Cafe</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="container">
+        <div class="row align-items-center g-5 hero-split">
+            <div class="col-lg-6 hero-copy">
+                <h1 class="display hero-title" aria-label="Pelanggan Bingung Mau Pesan? Biarkan Mereka Pesan Sendiri dari Meja.">
+                    <span aria-hidden="true">Pelanggan Bingung Mau Pesan?</span>
+                    <span class="type-wrap" aria-hidden="true"><span class="type-ghost">Biarkan Mereka Pesan Sendiri dari Meja.</span><span class="type-ghost">Tanpa Antre, Tanpa Salah Catat.</span><span class="type-ghost">Pesanan Masuk Langsung ke Kasir &amp; Dapur.</span><span class="type-ghost">Nota Rapi, Laporan Tersusun Otomatis.</span><span class="accent type-text" id="typeText" data-kalimat='["Biarkan Mereka Pesan Sendiri dari Meja.","Tanpa Antre, Tanpa Salah Catat.","Pesanan Masuk Langsung ke Kasir &amp; Dapur.","Nota Rapi, Laporan Tersusun Otomatis."]'>Biarkan Mereka Pesan Sendiri dari Meja.</span></span>
+                </h1>
+                <p class="lead">Scan QR, pilih menu, pesanan langsung masuk ke kasir.</p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="{% url 'register' %}" class="btn btn-hero">Daftarkan Cafe Anda <i class="fas fa-arrow-right ms-2"></i></a>
+                    <a href="{% url 'login' %}" class="btn btn-hero-ghost">Masuk</a>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mascot {% if hero.mode == 'cutout' %}is-cutout{% else %}is-photo{% endif %}">
+                    <div class="m-frame">
+                        <img src="{{ hero.src }}" alt="Pelanggan memesan dari meja menggunakan HP" class="m-img" loading="eager" width="1240" height="925">
+                    </div>
+
+                    <div class="m-bubble m-ask" aria-hidden="true">
+                        <span class="m-avatar"><i class="fas fa-circle-question"></i></span>
+                        <div><b>"Menunya mana, ya?"</b></div>
+                    </div>
+
+                    <div class="m-chip m-c1" aria-hidden="true"><span class="ci green"><i class="fas fa-wallet"></i></span>Bayar QRIS / Tunai</div>
+                    <div class="m-chip m-c2" aria-hidden="true"><span class="ci amber"><i class="fas fa-bolt"></i></span>± 5 detik ke kasir</div>
+                    <div class="m-chip m-c4" aria-hidden="true"><span class="ci blue"><i class="fas fa-utensils"></i></span>Menu habis otomatis ditandai</div>
+                    <div class="m-dot m-c3" aria-hidden="true"><i class="fas fa-bell"></i><b>3</b></div>
+
+                    <div class="m-bubble m-answer" aria-hidden="true">
+                        <span class="m-qr"><i class="fas fa-qrcode"></i></span>
+                        <div><b>Tinggal scan QR di meja</b>
+                            <em><i class="fas fa-circle-check"></i> Pesanan terkirim · Meja 07</em></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" aria-hidden="true">
+            <div class="float-note">
+                <div class="ic"><i class="fas fa-bell"></i></div>
+                <div><b>Pesanan baru · Meja 07</b><span>2 item · Rp 45.000</span></div>
+            </div>
+
+            <div class="laptop">
+                <div class="bar"><i></i><i></i><i></i><span class="url">dinezy / owner</span></div>
+                <div class="lp-app">
+                    <div class="lp-side">
+                        <div class="b"><img src="{% static 'core/img/dinezy-mark-white.png' %}" alt="" style="height:20px">Kopi Senja</div>
+                        <div class="it on"><i class="fas fa-chart-column"></i>Dashboard</div>
+                        <div class="it"><i class="fas fa-utensils"></i>Kelola Menu</div>
+                        <div class="it"><i class="fas fa-qrcode"></i>Meja & QR</div>
+                        <div class="it"><i class="fas fa-store"></i>Profil & Akun</div>
+                    </div>
+                    <div class="lp-main">
+                        <h6>Ringkasan Penjualan</h6>
+                        <div class="kp">
+                            <div><small>Pendapatan</small><b>Rp 8,4 jt</b> <span class="up">+12%</span></div>
+                            <div><small>Jumlah nota</small><b>312</b></div>
+                            <div><small>Item terjual</small><b>684</b></div>
+                            <div><small>Rata-rata / nota</small><b>Rp 27.000</b></div>
+                        </div>
+                        <div class="lp-grid">
+                            <div class="panel">
+                                <div class="t">Pendapatan harian</div>
+                                <div class="bars"><span style="height:45%"></span><span style="height:62%"></span><span style="height:38%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:88%"></span><span style="height:76%"></span><span class="lt" style="height:30%"></span></div>
+                            </div>
+                            <div class="panel">
+                                <div class="t">Menu terlaris</div>
+                                <div class="mini-row"><span>Kopi Susu Aren</span><b>124</b></div>
+                                <div class="mini-row"><span>Es Teh Susu</span><b>98</b></div>
+                                <div class="mini-row"><span>Mie Goreng</span><b>76</b></div>
+                                <div class="mini-row"><span>Croissant</span><span class="st badge-soft-gray">Habis</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phone">
+                <div class="scr">
+                    <div class="ph-head"><b>Kopi Senja</b><small>Meja 07 · Pilih menu Anda</small></div>
+                    <div class="ph-search"><i class="fas fa-search me-1"></i> Cari menu...</div>
+                    <div class="ph-grid">
+                        <div class="card-m"><div class="im"><i class="fas fa-mug-hot"></i></div><div class="in"><div class="n">Kopi Susu Aren</div><div class="p">Rp 18.000</div><div class="bt">Tambah</div></div></div>
+                        <div class="card-m"><div class="im"><i class="fas fa-glass-water"></i></div><div class="in"><div class="n">Es Teh Susu</div><div class="p">Rp 12.000</div><div class="bt">Tambah</div></div></div>
+                        <div class="card-m"><div class="im"><i class="fas fa-bowl-food"></i></div><div class="in"><div class="n">Mie Goreng</div><div class="p">Rp 15.000</div><div class="bt">Tambah</div></div></div>
+                        <div class="card-m off"><div class="im"><i class="fas fa-cookie"></i></div><div class="in"><div class="n">Croissant</div><div class="p">Rp 20.000</div><div class="bt">Habis</div></div></div>
+                    </div>
+                    <div class="ph-cart"><span>2 item · Lihat pesanan</span><span>Rp 30.000</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="tech">
+    <div class="container">
+        <div class="lbl">Dibangun dengan teknologi web modern</div>
+        <div class="tech-row">
+            <span><i class="fab fa-python"></i>Django</span>
+            <span><i class="fas fa-plug"></i>REST API</span>
+            <span><i class="fas fa-database"></i>MySQL</span>
+            <span><i class="fab fa-bootstrap"></i>Bootstrap 5</span>
+            <span><i class="fas fa-qrcode"></i>QR Code</span>
+            <span><i class="fas fa-mobile-screen"></i>Responsive</span>
+        </div>
+    </div>
+</section>
+
+<section class="sec" id="fitur">
+    <div class="container">
+        <div class="row align-items-end g-4 mb-5 reveal">
+            <div class="col-lg-7">
+                <span class="kick">Fitur</span>
+                <h2 class="sec-title display">Semua kebutuhan operasional cafe, dalam satu sistem.</h2>
+            </div>
+            <div class="col-lg-5"><p class="sec-sub mb-0">Mengurangi pencatatan manual, mempercepat pelayanan, dan memberi gambaran penjualan yang jelas bagi pemilik.</p></div>
+        </div>
+
+        <div class="bento">
+            <div class="bx bx-a reveal">
+                <div>
+                    <div class="ic"><i class="fas fa-qrcode"></i></div>
+                    <h4>Pesan langsung dari meja</h4>
+                    <p>Setiap meja memiliki QR Code unik. Pelanggan memindai, memilih menu, lalu mengirim pesanan. Nomor meja terbaca otomatis.</p>
+                </div>
+                <div class="qr-ill">
+                    <div class="qr"></div>
+                    <div><small>Kopi Senja</small><div class="tag">MEJA 07</div><small>Scan untuk membuka menu</small></div>
+                </div>
+            </div>
+            <div class="bx bx-b reveal">
+                <div class="ic"><i class="fas fa-cash-register"></i></div>
+                <h4>Kasir realtime</h4>
+                <p>Pesanan baru muncul otomatis. Kasir memproses antrean hingga pesanan selesai.</p>
+            </div>
+            <div class="bx bx-c reveal">
+                <div class="ic"><i class="fas fa-utensils"></i></div>
+                <h4>Kelola menu</h4>
+                <p>Owner menambah dan mengubah menu lengkap dengan foto, kategori, dan harga.</p>
+            </div>
+            <div class="bx bx-f reveal">
+                <div>
+                    <div class="ic"><i class="fas fa-toggle-on"></i></div>
+                    <h4>Status tersedia & habis</h4>
+                    <p>Kasir cukup menggeser satu tombol. Di layar pelanggan, menu yang habis langsung tampil abu-abu dan tidak dapat dipesan.</p>
+                </div>
+                <div class="avail-demo">
+                    <div class="row-a"><span><b class="text-dark">Kopi Susu Aren</b> · Rp 18.000</span><span class="tg"></span></div>
+                    <div class="row-a"><span><b class="text-dark">Mie Goreng</b> · Rp 15.000</span><span class="tg"></span></div>
+                    <div class="row-a off"><span><b>Croissant</b> · Habis</span><span class="tg off"></span></div>
+                </div>
+            </div>
+            <div class="bx bx-d reveal">
+                <div class="ic"><i class="fas fa-chart-column"></i></div>
+                <h4>Laporan penjualan</h4>
+                <p>Pendapatan, jumlah nota, dan menu terlaris dengan filter tanggal dan fitur cetak.</p>
+            </div>
+            <div class="bx bx-e reveal">
+                <div class="ic"><i class="fas fa-receipt"></i></div>
+                <h4>QRIS & nota</h4>
+                <p>Bayar tunai atau QRIS dengan unggah bukti. Kasir memverifikasi dan mencetak nota 80 mm.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-band py-5">
+    <div class="container">
+        <div class="row g-4 text-center text-md-start">
+            <div class="col-6 col-md-3 reveal stat"><span class="stat-ic"><i class="fas fa-users"></i></span><div class="stat-big"><span class="js-count" data-from="0" data-to="3">3</span></div><div class="stat-line"><i></i></div><div class="stat-cap">Peran pengguna: Owner, Kasir, Pelanggan</div></div>
+            <div class="col-6 col-md-3 reveal stat"><span class="stat-ic"><i class="fas fa-bolt"></i></span><div class="stat-big"><span class="js-count" data-from="0" data-to="5">5</span><small> dtk</small></div><div class="stat-line"><i></i></div><div class="stat-cap">Interval pembaruan pesanan di kasir</div></div>
+            <div class="col-6 col-md-3 reveal stat"><span class="stat-ic"><i class="fas fa-mobile-screen"></i></span><div class="stat-big"><span class="js-count" data-from="10" data-to="0">0</span></div><div class="stat-line"><i></i></div><div class="stat-cap">Aplikasi yang perlu diinstal pelanggan</div></div>
+            <div class="col-6 col-md-3 reveal stat"><span class="stat-ic"><i class="fas fa-shield-halved"></i></span><div class="stat-big"><span class="js-count" data-from="0" data-to="100">100</span><small>%</small></div><div class="stat-line"><i></i></div><div class="stat-cap">Data terpisah untuk setiap cafe</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec" id="peran">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <span class="kick">Peran Pengguna</span>
+            <h2 class="sec-title display">Dirancang untuk setiap orang di cafe Anda.</h2>
+            <div class="role-tabs mt-2" role="tablist">
+                <button class="active" data-role="owner" role="tab">Owner</button>
+                <button data-role="kasir" role="tab">Kasir</button>
+                <button data-role="pelanggan" role="tab">Pelanggan</button>
+            </div>
+        </div>
+
+        <div class="role-pane active" data-pane="owner">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5">
+                    <h3 class="display" style="font-size:1.6rem">Kendali penuh atas bisnis</h3>
+                    <p class="text-muted">Owner mengatur data cafe dan memantau kinerja penjualan kapan saja.</p>
+                    <ul class="role-list">
+                        <li><span class="n">1</span><div><b>Kelola menu</b><span>Tambah, ubah, hapus menu beserta foto dan harga.</span></div></li>
+                        <li><span class="n">2</span><div><b>Meja & QR Code</b><span>Buat data meja dan cetak stiker QR siap tempel.</span></div></li>
+                        <li><span class="n">3</span><div><b>Laporan penjualan</b><span>Grafik pendapatan, menu terlaris, dan cetak laporan.</span></div></li>
+                    </ul>
+                </div>
+                <div class="col-lg-7">
+                    <div class="role-visual">
+                        <div class="rv-card">
+                            <div class="rv-head"><b>Kelola Menu</b><span class="btn btn-sm btn-dz py-1">+ Tambah Menu</span></div>
+                            <div class="mini-row"><span>Kopi Susu Aren <span class="text-muted">· Minuman</span></span><b>Rp 18.000</b></div>
+                            <div class="mini-row"><span>Mie Goreng <span class="text-muted">· Makanan</span></span><b>Rp 15.000</b></div>
+                            <div class="mini-row"><span>Croissant <span class="text-muted">· Snack</span></span><span class="st badge-soft-gray">Habis</span></div>
+                        </div>
+                        <div class="rv-card" style="margin-left:18%">
+                            <div class="rv-head"><b>Pendapatan minggu ini</b><span class="badge-soft badge-soft-green">+12%</span></div>
+                            <div class="bars" style="height:80px"><span style="height:40%"></span><span style="height:58%"></span><span style="height:46%"></span><span style="height:72%"></span><span style="height:64%"></span><span style="height:90%"></span><span style="height:80%"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="role-pane" data-pane="kasir">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5">
+                    <h3 class="display" style="font-size:1.6rem">Layani pelanggan lebih cepat</h3>
+                    <p class="text-muted">Kasir fokus pada antrean pesanan tanpa harus mencatat manual.</p>
+                    <ul class="role-list">
+                        <li><span class="n">1</span><div><b>Pesanan realtime</b><span>Pesanan dari meja langsung muncul di layar kasir.</span></div></li>
+                        <li><span class="n">2</span><div><b>Tersedia / habis</b><span>Tandai menu yang habis dengan satu tombol.</span></div></li>
+                        <li><span class="n">3</span><div><b>Verifikasi & nota</b><span>Cek bukti QRIS dan cetak nota pembayaran.</span></div></li>
+                    </ul>
+                </div>
+                <div class="col-lg-7">
+                    <div class="role-visual">
+                        <div class="rv-card">
+                            <div class="rv-head"><b>#ORD-128 · Rina</b><span class="st badge-soft-amber">Antrean</span></div>
+                            <div class="text-muted mb-2" style="font-size:.74rem">Meja 07 · QRIS · 13.02</div>
+                            <div class="mini-row"><span>2× Kopi Susu Aren</span><span>Rp 36.000</span></div>
+                            <div class="mini-row"><span>1× Kentang Goreng</span><span>Rp 14.000</span></div>
+                            <div class="d-flex justify-content-between align-items-center mt-2"><b class="text-dark">Rp 50.000</b><span class="btn btn-sm btn-dz py-1">Proses Pesanan</span></div>
+                        </div>
+                        <div class="rv-card" style="margin-left:18%">
+                            <div class="avail-demo">
+                                <div class="row-a mb-2"><span>Matcha Latte</span><span class="tg"></span></div>
+                                <div class="row-a off mb-0"><span>Croissant · Habis</span><span class="tg off"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="role-pane" data-pane="pelanggan">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5">
+                    <h3 class="display" style="font-size:1.6rem">Pesan tanpa antre</h3>
+                    <p class="text-muted">Pelanggan cukup memakai ponsel, tanpa login dan tanpa instal aplikasi.</p>
+                    <ul class="role-list">
+                        <li><span class="n">1</span><div><b>Scan QR di meja</b><span>Menu cafe langsung terbuka di browser.</span></div></li>
+                        <li><span class="n">2</span><div><b>Pilih menu tersedia</b><span>Menu habis ditandai jelas dan tidak bisa dipilih.</span></div></li>
+                        <li><span class="n">3</span><div><b>Bayar tunai / QRIS</b><span>Kirim pesanan dan pantau status konfirmasi.</span></div></li>
+                    </ul>
+                </div>
+                <div class="col-lg-7">
+                    <div class="role-visual d-flex align-items-center justify-content-center">
+                        <div class="phone" style="position:relative;right:auto;bottom:auto;display:block">
+                            <div class="scr" style="height:330px">
+                                <div class="ph-head"><b>Kopi Senja</b><small>Meja 07 · Pilih menu Anda</small></div>
+                                <div class="ph-search"><i class="fas fa-search me-1"></i> Cari menu...</div>
+                                <div class="ph-grid">
+                                    <div class="card-m"><div class="im"><i class="fas fa-mug-hot"></i></div><div class="in"><div class="n">Kopi Susu Aren</div><div class="p">Rp 18.000</div><div class="bt">Tambah</div></div></div>
+                                    <div class="card-m off"><div class="im"><i class="fas fa-cookie"></i></div><div class="in"><div class="n">Croissant</div><div class="p">Rp 20.000</div><div class="bt">Habis</div></div></div>
+                                </div>
+                                <div class="ph-cart"><span>1 item · Lihat pesanan</span><span>Rp 18.000</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="sec pt-0" id="alur">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 reveal">
+                <span class="kick">Alur Pendaftaran</span>
+                <h2 class="sec-title display">Siap digunakan dalam hitungan menit.</h2>
+                <p class="sec-sub mb-4">Akun dibuat otomatis oleh sistem dan dikirim langsung ke email pemilik cafe.</p>
+                <div class="steps">
+                    <div class="step2 on"><h5>Isi formulir pendaftaran</h5><p>Masukkan nama cafe, data pemilik, dan email aktif.</p></div>
+                    <div class="step2"><h5>Terima akun melalui email</h5><p>Sistem menyimpan akun Owner & Kasir ke database lalu mengirim username dan password.</p></div>
+                    <div class="step2"><h5>Siapkan menu dan meja</h5><p>Owner menambahkan menu dan mencetak QR Code setiap meja.</p></div>
+                    <div class="step2"><h5>Mulai menerima pesanan</h5><p>Pelanggan memesan dari meja, kasir memproses secara realtime.</p></div>
+                </div>
+            </div>
+            <div class="col-lg-6 reveal">
+                <div class="mail-mock">
+                    <div class="mh"><b>Dinezy</b> &lt;noreply&gt;<br>Akun Dinezy untuk Kopi Senja</div>
+                    <div class="mb">
+                        <div class="banner"><small>DINEZY</small><div class="fw-bold mt-1">Akun Kopi Senja siap digunakan</div></div>
+                        <p class="text-muted mb-3">Gunakan kode cafe <b class="text-dark">kopi-senja</b> saat login.</p>
+                        <div class="cred-row"><span class="text-muted">Owner</span><code>owner.kopi-senja</code></div>
+                        <div class="cred-row"><span class="text-muted">Kasir</span><code>kasir.kopi-senja</code></div>
+                        <div class="cred-row"><span class="text-muted">Password</span><code>••••••••••</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="sec pt-0" id="faq">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4 reveal">
+                <span class="kick">FAQ</span>
+                <h2 class="sec-title display">Pertanyaan umum</h2>
+                <p class="sec-sub">Belum menemukan jawaban? Hubungi admin Dinezy.</p>
+            </div>
+            <div class="col-lg-8 reveal">
+                <div class="accordion faq" id="faqAcc">
+                    <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1">Apakah pelanggan perlu mengunduh aplikasi?</button></h3>
+                        <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc"><div class="accordion-body">Tidak. Pelanggan cukup memindai QR Code di meja dan menu akan terbuka di browser ponsel.</div></div></div>
+                    <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">Bagaimana cara mendapatkan akun Owner dan Kasir?</button></h3>
+                        <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">Setelah mengisi formulir pendaftaran, sistem otomatis membuat dua akun dan mengirim username serta password ke email yang didaftarkan.</div></div></div>
+                    <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">Apakah data antar cafe bisa tercampur?</button></h3>
+                        <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">Tidak. Login memerlukan nama atau kode cafe, dan setiap akun hanya dapat mengakses data cafe tempat akun tersebut terdaftar.</div></div></div>
+                    <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">Apa yang terjadi jika menu habis?</button></h3>
+                        <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">Kasir menandai menu sebagai habis. Di halaman pelanggan, kartu menu berubah abu-abu dan tombol tambah dinonaktifkan. Sistem juga menolak pesanan yang berisi menu habis.</div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="auth-sec" id="mulai">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 reveal">
+                <span class="kick">Mulai Sekarang</span>
+                <h2 class="sec-title display">Siap membawa cafe Anda ke sistem digital?</h2>
+                <p class="mb-4" style="max-width:520px">Daftarkan cafe secara gratis. Akun Owner dan Kasir dikirim otomatis ke email Anda, lalu Anda bisa langsung masuk ke dashboard.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'register' %}" class="btn btn-hero btn-lg">Daftarkan Cafe <i class="fas fa-arrow-right ms-2"></i></a>
+                    <a href="{% url 'login' %}" class="btn btn-hero-ghost btn-lg">Sudah punya akun? Masuk</a>
+                </div>
+            </div>
+            <div class="col-lg-6 reveal">
+                <div class="row g-3">
+                    <div class="col-sm-6"><a href="{% url 'register' %}" class="cta-tile">
+                        <span class="ct-ic"><i class="fas fa-store"></i></span>
+                        <b>Pendaftaran Cafe</b><small>Untuk cafe yang belum memiliki akun. Akun dikirim via email.</small>
+                        <span class="ct-go">Daftar <i class="fas fa-arrow-right"></i></span></a></div>
+                    <div class="col-sm-6"><a href="{% url 'login' %}" class="cta-tile">
+                        <span class="ct-ic"><i class="fas fa-right-to-bracket"></i></span>
+                        <b>Login Owner & Kasir</b><small>Masuk ke dashboard sesuai cafe tempat akun Anda terdaftar.</small>
+                        <span class="ct-go">Masuk <i class="fas fa-arrow-right"></i></span></a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="pt-5 pb-4">
+    <div class="container">
+        <div class="row g-4 pb-4">
+            <div class="col-lg-5">
+                <div class="d-flex align-items-center gap-3 mb-3"><img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark" style="height:44px" alt="Logo Dinezy"><div><b class="text-white d-block">{{ brand.nama }}</b><small>{{ brand.tagline }}</small></div></div>
+                <p class="mb-0" style="max-width:360px">{{ brand.deskripsi }}. Dikelola oleh PT Nuwus Multikreasi Digital.</p>
+            </div>
+            <div class="col-6 col-lg-2 offset-lg-1">
+                <h6>Produk</h6>
+                <div class="d-grid gap-2"><a href="#fitur">Fitur</a><a href="#peran">Peran</a><a href="#alur">Alur</a></div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6>Akun</h6>
+                <div class="d-grid gap-2"><a href="{% url 'register' %}">Pendaftaran</a><a href="{% url 'login' %}">Login</a><a href="#faq">FAQ</a></div>
+            </div>
+        </div>
+        <div class="pt-3 small d-flex flex-column flex-md-row justify-content-between gap-2" style="border-top:1px solid rgba(255,255,255,.08)">
+            <span>&copy; <span id="yr"></span> PT Nuwus Multikreasi Digital</span>
+            <span>Sistem Pemesanan & Manajemen Cafe</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function () {
+        const el = document.getElementById('typeText');
+        if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const kalimat = JSON.parse(el.dataset.kalimat);
+        let k = 0, n = kalimat[0].length, hapus = true;
+        const jeda = (ms) => setTimeout(langkah, ms);
+        function langkah() {
+            const teks = kalimat[k];
+            if (hapus) {
+                n--;
+                el.textContent = teks.slice(0, n);
+                el.classList.add('mengetik');
+                if (n > 0) return jeda(28);
+                hapus = false; k = (k + 1) % kalimat.length;
+                el.classList.remove('mengetik');
+                return jeda(380);
+            }
+            n++;
+            el.textContent = kalimat[k].slice(0, n);
+            el.classList.add('mengetik');
+            if (n < kalimat[k].length) return jeda(55 + Math.random() * 45);
+            el.classList.remove('mengetik');
+            hapus = true;
+            jeda(2600);
+        }
+        setTimeout(langkah, 3200);
+    })();
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    const nav = document.getElementById('lpNav');
+    const onScroll = () => nav.classList.toggle('solid', scrollY > 40);
+    const nc = document.getElementById('navMain');
+    nc.addEventListener('show.bs.collapse', () => nav.classList.add('open'));
+    nc.addEventListener('hidden.bs.collapse', () => nav.classList.remove('open'));
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+    const hitung = el => {
+        const a = +el.dataset.from, b = +el.dataset.to, dur = 1400, t0 = performance.now();
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = b; return; }
+        const step = now => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+            el.textContent = Math.round(a + (b - a) * e); if (p < 1) requestAnimationFrame(step); };
+        el.textContent = a; requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); e.target.querySelectorAll('.js-count').forEach(hitung); io.unobserve(e.target); } }), { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    document.querySelectorAll('.role-tabs button').forEach(b => b.addEventListener('click', () => {
+        document.querySelectorAll('.role-tabs button').forEach(x => x.classList.toggle('active', x === b));
+        document.querySelectorAll('.role-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === b.dataset.role));
+    }));
+</script>
+</body>
+</html>

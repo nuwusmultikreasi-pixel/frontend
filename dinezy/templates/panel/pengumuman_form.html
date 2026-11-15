@@ -1,0 +1,106 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}{% if p.pk %}Ubah pesan{% else %}Tulis pesan{% endif %}{% endblock %}
+{% block heading %}{% if p.pk %}Ubah pesan{% else %}Tulis pengumuman / surat{% endif %}{% endblock %}
+{% block actions %}<a href="{% url 'panel_pengumuman' %}" class="btn btn-outline-light"><i class="fas fa-arrow-left me-2"></i>Kembali</a>{% endblock %}
+{% block content %}
+<style>
+    .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+    .tpl { text-align: left; border: 1px solid var(--line-strong); background: #fff; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .tpl:hover, .tpl.on { border-color: var(--navy-600); background: var(--navy-50); }
+    .tpl b { display: block; font-size: .88rem; color: var(--ink); }
+    .tpl small { color: var(--muted); font-size: .74rem; }
+    .cafe-list { max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+    .isi-area { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .86rem; line-height: 1.55; }
+    .hint code { background: var(--navy-50); padding: 1px 6px; border-radius: 6px; color: var(--navy-800); }
+</style>
+<form method="post" enctype="multipart/form-data" id="formPesan">{% csrf_token %}
+<div class="row g-4">
+    <div class="col-xl-8">
+        {% if not p.pk %}
+        <div class="pcard mb-4">
+            <div class="pcard-h"><div><h2>Pilih templat</h2><p>Templat mengisi kategori, judul, dan isi. Bagian dalam [kurung siku] wajib Anda sesuaikan.</p></div></div>
+            <div class="pcard-b"><div class="tpl-grid">
+                {% for t in templat %}<button type="button" class="tpl" data-i="{{ forloop.counter0 }}"><b>{{ t.nama }}</b><small>{{ t.judul|truncatechars:42 }}</small></button>{% endfor %}
+            </div></div>
+        </div>
+        {% endif %}
+        <div class="pcard">
+            <div class="pcard-b">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label" for="kategori">Kategori</label>
+                        <select class="form-select" name="kategori" id="kategori" required>
+                            {% for k, label in kategori %}<option value="{{ k }}" {% if p.kategori == k %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label" for="judul">Judul / perihal</label>
+                        <input class="form-control" name="judul" id="judul" maxlength="150" required value="{{ p.judul }}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label d-flex justify-content-between" for="isi"><span>Isi pesan</span><small class="text-muted"><span id="hitung">0</span>/{{ maks_isi }}</small></label>
+                        <textarea class="form-control isi-area" name="isi" id="isi" rows="16" maxlength="{{ maks_isi }}" required>{{ p.isi }}</textarea>
+                        <div class="form-text hint mt-2">Isian otomatis per cafe: <code>{nama_cafe}</code> <code>{nama_owner}</code> <code>{tarif}</code> <code>{wa_admin}</code> <code>{tanggal}</code>. Kategori Perjanjian, Tagihan, dan Surat resmi tampil sebagai surat berkop dengan tanda tangan direktur.</div>
+                        <div class="text-danger small mt-1" id="kurungWarn" hidden><i class="fas fa-triangle-exclamation me-1"></i>Masih ada bagian [dalam kurung siku] yang belum diisi.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="pcard mb-4">
+            <div class="pcard-h"><div><h2>Penerima</h2></div></div>
+            <div class="pcard-b">
+                <div class="form-check mb-2"><input class="form-check-input" type="radio" name="penerima" value="semua" id="pSemua" {% if p.penerima != 'pilih' %}checked{% endif %}><label class="form-check-label" for="pSemua">Semua cafe</label></div>
+                <div class="form-check mb-2"><input class="form-check-input" type="radio" name="penerima" value="pilih" id="pPilih" {% if p.penerima == 'pilih' %}checked{% endif %}><label class="form-check-label" for="pPilih">Cafe tertentu</label></div>
+                <div class="cafe-list mt-2" id="cafeList" {% if p.penerima != 'pilih' %}hidden{% endif %}>
+                    <input class="form-control form-control-sm mb-2" id="cariCafe" placeholder="Cari cafe...">
+                    {% for c in cafes %}<div class="form-check cafe-item"><input class="form-check-input" type="checkbox" name="tenants" value="{{ c.pk }}" id="c{{ c.pk }}" {% if c.pk in dipilih %}checked{% endif %}><label class="form-check-label" for="c{{ c.pk }}">{{ c.nama_cafe }} <small class="text-muted">{{ c.nama_owner }}</small></label></div>{% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="pcard mb-4">
+            <div class="pcard-h"><div><h2>Tampilan</h2></div></div>
+            <div class="pcard-b">
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" role="switch" name="tampil_banner" id="banner" {% if p.tampil_banner %}checked{% endif %}><label class="form-check-label" for="banner">Tampilkan sebagai banner di dasbor owner &amp; kasir</label></div>
+                <label class="form-label small mt-2" for="sampai">Banner tampil sampai</label>
+                <input type="datetime-local" class="form-control" name="berlaku_sampai" id="sampai" value="{{ p.berlaku_sampai|date:'Y-m-d\TH:i' }}">
+                <div class="form-text">Kosongkan untuk 3 hari.</div>
+            </div>
+        </div>
+        <div class="pcard mb-4">
+            <div class="pcard-h"><div><h2>Lampiran</h2><p>Opsional, PDF maks 5 MB</p></div></div>
+            <div class="pcard-b">
+                <input type="file" class="form-control" name="lampiran" accept="application/pdf">
+                {% if p.lampiran %}<div class="form-check mt-2"><input class="form-check-input" type="checkbox" name="hapus_lampiran" value="1" id="hapusLamp"><label class="form-check-label small" for="hapusLamp">Hapus lampiran saat ini</label></div>{% endif %}
+            </div>
+        </div>
+        <button class="btn btn-dz btn-lg w-100" type="submit"><i class="fas fa-paper-plane me-2"></i>{% if p.pk %}Simpan perubahan{% else %}Kirim ke cafe{% endif %}</button>
+    </div>
+</div>
+</form>
+{{ templat|json_script:"templat-data" }}
+{% endblock %}
+{% block scripts %}
+<script>
+    const TPL = JSON.parse(document.getElementById('templat-data').textContent);
+    const isi = document.getElementById('isi'), hitung = document.getElementById('hitung');
+    const segar = () => { hitung.textContent = isi.value.length; document.getElementById('kurungWarn').hidden = !/\[[^\]]+\]/.test(isi.value + document.getElementById('judul').value); };
+    isi.addEventListener('input', segar); document.getElementById('judul').addEventListener('input', segar); segar();
+    document.querySelectorAll('.tpl').forEach(b => b.addEventListener('click', () => {
+        const t = TPL[+b.dataset.i];
+        document.querySelectorAll('.tpl').forEach(x => x.classList.toggle('on', x === b));
+        document.getElementById('kategori').value = t.kategori;
+        document.getElementById('judul').value = t.judul;
+        document.getElementById('banner').checked = t.banner;
+        isi.value = t.isi; segar(); isi.focus();
+    }));
+    document.querySelectorAll('input[name=penerima]').forEach(r => r.addEventListener('change', () => {
+        document.getElementById('cafeList').hidden = document.getElementById('pPilih').checked === false;
+    }));
+    document.getElementById('cariCafe').addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll('.cafe-item').forEach(el => el.hidden = !el.textContent.toLowerCase().includes(q));
+    });
+</script>
+{% endblock %}

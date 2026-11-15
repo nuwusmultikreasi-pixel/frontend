@@ -1,0 +1,91 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}Akun & Password{% endblock %}
+{% block heading %}Akun & Password{% endblock %}
+{% block actions %}
+<form method="get" class="d-none d-md-block"><div class="input-icon"><i class="fas fa-search"></i><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Cari cafe..." style="width:240px"></div></form>
+{% endblock %}
+{% block content %}
+<div class="akun-info">
+    <div class="ai-ic"><i class="fas fa-shield-halved"></i></div>
+    <div><b>{{ tersimpan }} dari {{ total }} password tersedia</b>
+        <span>Password disimpan terenkripsi. Akun lama yang belum tampil akan tersimpan otomatis saat akun tersebut login berikutnya, atau atur password baru.</span></div>
+</div>
+
+<div class="akun-grid">
+{% for c in cafes %}
+    <section class="akun-cafe {% if sorot == c.t.pk|stringformat:'s' %}sorot{% endif %}" id="cafe-{{ c.t.pk }}">
+        <header>
+            <div class="cafe">
+                <div class="av">{% if c.t.logo %}<img src="{{ c.t.logo.url }}" alt="" onerror="this.replaceWith('{{ c.t.nama_cafe|slice:":1"|upper|escapejs }}')">{% else %}{{ c.t.nama_cafe|slice:":1"|upper }}{% endif %}</div>
+                <div><b>{{ c.t.nama_cafe }}</b><small>kode: {{ c.t.slug }} · {{ c.t.email_owner }}</small></div>
+            </div>
+            {% if c.akun %}
+            <form method="post" action="{% url 'panel_cafe_akun' c.t.pk %}" data-confirm="Reset password {{ c.t.nama_cafe }}?" data-confirm-text="Owner & Kasir mendapat password acak baru dan dikirim ke {{ c.t.email_owner }}." data-confirm-variant="warning" data-confirm-icon="fa-key" data-confirm-ok="Ya, reset">{% csrf_token %}
+                <input type="hidden" name="reset" value="1"><button class="btn btn-xs btn-line"><i class="fas fa-rotate me-1"></i>Reset acak & kirim email</button>
+            </form>
+            {% else %}
+            <form method="post" action="{% url 'panel_cafe_akun' c.t.pk %}">{% csrf_token %}<button class="btn btn-xs btn-line"><i class="fas fa-user-plus me-1"></i>Buat akun</button></form>
+            {% endif %}
+        </header>
+        <div class="akun-rows">
+        {% for a in c.akun %}
+            <div class="akun-row">
+                <span class="role {{ a.p.role }}"><i class="fas {% if a.p.role == 'owner' %}fa-user-tie{% else %}fa-cash-register{% endif %}"></i>{{ a.p.get_role_display }}</span>
+                <div class="fld">
+                    <label>Username</label>
+                    <div class="val"><code>{{ a.u.username }}</code><button type="button" class="ic-btn js-copy" data-copy="{{ a.u.username }}" title="Salin username"><i class="far fa-copy"></i></button></div>
+                </div>
+                <div class="fld">
+                    <label>Password</label>
+                    {% if a.pw %}
+                    <div class="val"><code class="pw" data-pw="{{ a.pw }}">••••••••••</code>
+                        <button type="button" class="ic-btn js-eye" title="Tampilkan"><i class="far fa-eye"></i></button>
+                        <button type="button" class="ic-btn js-copy" data-copy="{{ a.pw }}" title="Salin password"><i class="far fa-copy"></i></button></div>
+                    {% else %}
+                    <div class="val none"><i class="fas fa-hourglass-half me-1"></i>Belum tersimpan</div>
+                    {% endif %}
+                </div>
+                <div class="meta">
+                    <span><i class="far fa-clock"></i>{% if a.diset %}Diatur {{ a.diset|date:"d/m/Y H:i" }}{% else %}Belum diatur{% endif %}</span>
+                    <span><i class="fas fa-right-to-bracket"></i>{% if a.login %}Login {{ a.login|date:"d/m/Y H:i" }}{% else %}Belum pernah login{% endif %}</span>
+                </div>
+                <form method="post" action="{% url 'panel_akun_password' a.p.pk %}" class="js-setpw" data-nama="{{ a.u.username }}">{% csrf_token %}<input type="hidden" name="password">
+                    <button type="button" class="btn btn-xs btn-navy js-setpw-btn"><i class="fas fa-pen me-1"></i>Atur password</button></form>
+            </div>
+        {% empty %}
+            <div class="akun-empty">Belum ada akun Owner / Kasir untuk cafe ini.</div>
+        {% endfor %}
+        </div>
+    </section>
+{% empty %}
+    <div class="pcard"><div class="pcard-b text-center text-muted py-5">Tidak ada cafe yang cocok.</div></div>
+{% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    document.querySelectorAll('.js-copy').forEach(b => b.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(b.dataset.copy); DZUI.toast({ type: 'success', title: 'Disalin', text: 'Teks disalin ke clipboard.', timeout: 2200 }); }
+        catch (_) { DZUI.toast({ type: 'warning', title: 'Tidak bisa menyalin', text: b.dataset.copy }); }
+    }));
+    document.querySelectorAll('.js-eye').forEach(b => b.addEventListener('click', () => {
+        const c = b.parentElement.querySelector('.pw'), show = c.textContent.startsWith('•');
+        c.textContent = show ? c.dataset.pw : '••••••••••';
+        b.firstElementChild.className = show ? 'far fa-eye-slash' : 'far fa-eye';
+    }));
+    const acak = () => { const s = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'; let r = ''; const a = new Uint32Array(10); crypto.getRandomValues(a); a.forEach(n => r += s[n % s.length]); return r; };
+    document.querySelectorAll('.js-setpw-btn').forEach(b => b.addEventListener('click', async () => {
+        const f = b.closest('form');
+        const ok = await DZUI.confirm({
+            title: 'Atur password baru', text: `Untuk akun "${f.dataset.nama}". Minimal 8 karakter, tanpa spasi.`,
+            icon: 'fa-key', ok: 'Simpan password',
+            html: `<div class="dlg-pw"><input type="text" id="dlgPw" class="form-control" autocomplete="off" spellcheck="false" placeholder="Password baru" value="${acak()}"><button type="button" class="ic-btn" id="dlgAcak" title="Buat acak"><i class="fas fa-dice"></i></button></div>`
+        });
+        const v = (document.getElementById('dlgPw') || {}).value || '';
+        if (!ok) return;
+        if (v.trim().length < 8 || /\s/.test(v)) return DZUI.toast({ type: 'error', title: 'Password tidak valid', text: 'Minimal 8 karakter dan tanpa spasi.' });
+        f.password.value = v.trim(); f.submit();
+    }));
+    document.addEventListener('click', e => { if (e.target.closest('#dlgAcak')) document.getElementById('dlgPw').value = acak(); });
+</script>
+{% endblock %}

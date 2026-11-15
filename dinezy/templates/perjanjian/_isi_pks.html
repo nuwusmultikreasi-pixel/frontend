@@ -1,0 +1,149 @@
+{% load dinezy %}<div class="pks-isi">
+<p>Pada hari ini, <b>{{ tanggal }}</b>, yang bertanda tangan di bawah ini:</p>
+
+<ol class="pihak">
+    <li>
+        <table class="idn">
+            <tr><td>Nama</td><td>:</td><td><b>{{ p1.wakil }}</b></td></tr>
+            <tr><td>Jabatan</td><td>:</td><td>{{ p1.jabatan }}</td></tr>
+            <tr><td>Alamat</td><td>:</td><td>{{ p1.alamat }}</td></tr>
+        </table>
+        <p>dalam hal ini bertindak dalam jabatannya selaku {{ p1.jabatan }} untuk dan atas nama <b>{{ p1.nama }}</b>, perseroan perorangan yang didirikan berdasarkan hukum Negara Republik Indonesia{% if p1.sk %} dengan Keputusan Menteri Hukum Republik Indonesia Nomor {{ p1.sk }}{% endif %}{% if p1.nib %} dan Nomor Induk Berusaha (NIB) {{ p1.nib }}{% endif %}, penyelenggara layanan Dinezy, selanjutnya disebut <b>PIHAK PERTAMA</b>.</p>
+    </li>
+    <li>
+        <table class="idn">
+            <tr><td>Nama</td><td>:</td><td><b>{{ pks.nama_penandatangan|default:t.nama_owner }}</b></td></tr>
+            <tr><td>Jabatan</td><td>:</td><td>{{ pks.jabatan_penandatangan|default:"Pemilik" }}</td></tr>
+            <tr><td>Nama Usaha</td><td>:</td><td>{{ t.nama_cafe }}</td></tr>
+            <tr><td>Alamat Usaha</td><td>:</td><td>{{ t.alamat }}</td></tr>
+            <tr><td>Email</td><td>:</td><td>{{ t.email_owner }}</td></tr>
+            <tr><td>No. HP</td><td>:</td><td>{{ t.whatsapp }}</td></tr>
+        </table>
+        <p>dalam hal ini bertindak untuk dan atas nama usaha <b>{{ t.nama_cafe }}</b>, selanjutnya disebut <b>PIHAK KEDUA</b>.</p>
+    </li>
+</ol>
+
+<p>PIHAK PERTAMA dan PIHAK KEDUA secara bersama-sama disebut <b>PARA PIHAK</b> dan masing-masing disebut <b>PIHAK</b>. PARA PIHAK terlebih dahulu menerangkan bahwa PIHAK PERTAMA menyelenggarakan layanan perangkat lunak pemesanan dan pengelolaan cafe bernama Dinezy, dan PIHAK KEDUA bermaksud menggunakan layanan tersebut untuk usahanya. Berdasarkan hal tersebut, PARA PIHAK sepakat mengikatkan diri dalam Perjanjian Kerja Sama ini (selanjutnya disebut <b>Perjanjian</b>) dengan ketentuan sebagai berikut:</p>
+
+<h3>Pasal 1<br>Definisi</h3>
+<ol class="ayat">
+    <li><b>Layanan</b> adalah sistem Dinezy berbasis web yang meliputi menu digital dan pemesanan melalui kode QR, dasbor kasir, dasbor pemilik, pencetakan nota dan tiket dapur, laporan penjualan, serta fitur lain yang disediakan PIHAK PERTAMA dari waktu ke waktu.</li>
+    <li><b>Pelanggan</b> adalah konsumen PIHAK KEDUA yang melakukan pemesanan melalui Layanan.</li>
+    <li><b>Pesanan</b> adalah permintaan pembelian yang dibuat Pelanggan melalui Layanan.</li>
+    <li><b>Nota</b> adalah setiap Pesanan yang telah berstatus <i>Diproses</i> atau <i>Selesai</i> di dalam Layanan.</li>
+    <li><b>Biaya Layanan</b> adalah biaya penggunaan Layanan yang dikenakan untuk setiap Nota sebagaimana diatur dalam Pasal 5.</li>
+    <li><b>Dasbor</b> adalah halaman pengelolaan akun PIHAK KEDUA di dalam Layanan.</li>
+    <li><b>Invoice</b> adalah dokumen tagihan Biaya Layanan yang diterbitkan PIHAK PERTAMA setiap bulan.</li>
+    <li><b>Masa Tenggang</b> adalah jangka waktu 3 (tiga) hari kalender terhitung sejak hari setelah tanggal jatuh tempo Invoice.</li>
+    <li><b>Denda Keterlambatan</b> adalah sejumlah uang yang wajib dibayar PIHAK KEDUA atas keterlambatan pelunasan Invoice sebagaimana diatur dalam Pasal 6.</li>
+    <li><b>Masa Berlangganan Minimum</b> adalah jangka waktu paling singkat penggunaan Layanan sebagaimana diatur dalam Pasal 10.</li>
+</ol>
+
+<h3>Pasal 2<br>Ruang Lingkup</h3>
+<ol class="ayat">
+    <li>PIHAK PERTAMA memberikan hak kepada PIHAK KEDUA untuk menggunakan Layanan bagi kegiatan usaha PIHAK KEDUA selama Perjanjian berlaku.</li>
+    <li>Hak penggunaan sebagaimana dimaksud pada ayat (1) bersifat non-eksklusif dan tidak dapat dialihkan kepada pihak lain tanpa persetujuan tertulis PIHAK PERTAMA.</li>
+    <li>Seluruh hak kekayaan intelektual atas Layanan, termasuk perangkat lunak, desain, dan merek Dinezy, tetap menjadi milik PIHAK PERTAMA.</li>
+</ol>
+
+<h3>Pasal 3<br>Hak dan Kewajiban PIHAK PERTAMA</h3>
+<ol class="ayat">
+    <li>PIHAK PERTAMA berkewajiban menyediakan dan memelihara Layanan agar dapat digunakan secara wajar, termasuk melakukan perbaikan gangguan dalam waktu yang wajar.</li>
+    <li>PIHAK PERTAMA berkewajiban menjaga kerahasiaan dan keamanan data PIHAK KEDUA sebagaimana diatur dalam Pasal 7.</li>
+    <li>PIHAK PERTAMA berkewajiban memberikan informasi tagihan secara transparan melalui Dasbor dan Invoice.</li>
+    <li>PIHAK PERTAMA berhak menerima pembayaran Biaya Layanan sesuai Perjanjian.</li>
+    <li>PIHAK PERTAMA berhak melakukan pemeliharaan, pembaruan, penambahan, atau perubahan fitur Layanan sepanjang tidak menghilangkan fungsi utama Layanan.</li>
+    <li>PIHAK PERTAMA berhak menangguhkan akses Layanan sesuai ketentuan Pasal 6 ayat (10) dan Pasal 10 ayat (6).</li>
+</ol>
+
+<h3>Pasal 4<br>Hak dan Kewajiban PIHAK KEDUA</h3>
+<ol class="ayat">
+    <li>PIHAK KEDUA berhak menggunakan seluruh fitur Layanan yang tersedia sesuai Perjanjian.</li>
+    <li>PIHAK KEDUA berkewajiban memberikan data usaha yang benar dan memperbaruinya apabila terjadi perubahan.</li>
+    <li>PIHAK KEDUA berkewajiban menjaga kerahasiaan nama pengguna dan kata sandi akun Pemilik dan Kasir, serta bertanggung jawab atas seluruh aktivitas yang dilakukan melalui akun tersebut.</li>
+    <li>PIHAK KEDUA berkewajiban memastikan kebenaran nama, harga, dan ketersediaan menu yang ditampilkan kepada Pelanggan.</li>
+    <li>PIHAK KEDUA menyediakan sendiri perangkat dan sarana pendukung, antara lain telepon pintar atau komputer, printer, dan koneksi internet.</li>
+    <li>PIHAK KEDUA berkewajiban membayar Biaya Layanan tepat waktu sesuai Pasal 6.</li>
+    <li>PIHAK KEDUA dilarang menggunakan Layanan untuk kegiatan yang melanggar peraturan perundang-undangan, mengganggu sistem, atau merugikan pihak lain.</li>
+</ol>
+
+<h3>Pasal 5<br>Biaya Layanan</h3>
+<ol class="ayat">
+    <li>Atas penggunaan Layanan, PIHAK KEDUA dikenakan Biaya Layanan sebesar <b>{{ tarif|rupiah }},00 ({{ tarif_kata }} rupiah)</b> untuk setiap Nota.</li>
+    <li>Biaya Layanan ditambahkan secara otomatis pada total pembayaran Pelanggan dan dicantumkan pada Nota dengan keterangan "Biaya layanan". PIHAK KEDUA menerima pembayaran tersebut dari Pelanggan dan menyetorkan Biaya Layanan kepada PIHAK PERTAMA melalui Invoice bulanan.</li>
+    <li>PIHAK PERTAMA berhak menyesuaikan besaran Biaya Layanan, baik berupa kenaikan maupun penurunan, dengan mempertimbangkan antara lain biaya operasional, infrastruktur, pengembangan Layanan, dan kondisi pasar.</li>
+    <li>Setiap penyesuaian Biaya Layanan wajib diberitahukan secara tertulis kepada PIHAK KEDUA melalui Dasbor, surat elektronik (email), dan/atau WhatsApp paling lambat <b>30 (tiga puluh) hari kalender</b> sebelum tanggal berlakunya.</li>
+    <li>Besaran Biaya Layanan yang baru berlaku untuk Pesanan yang dibuat sejak tanggal berlakunya penyesuaian dan tidak berlaku surut terhadap Nota yang telah diterbitkan sebelumnya.</li>
+    <li>Apabila PIHAK KEDUA tidak menyetujui penyesuaian Biaya Layanan, PIHAK KEDUA dapat mengakhiri Perjanjian sebelum tanggal berlakunya penyesuaian dengan pemberitahuan tertulis, tanpa dikenakan denda, dengan tetap menyelesaikan seluruh kewajiban pembayaran yang telah timbul.</li>
+    <li>Penggunaan Layanan oleh PIHAK KEDUA setelah tanggal berlakunya penyesuaian dianggap sebagai persetujuan PIHAK KEDUA atas besaran Biaya Layanan yang baru.</li>
+    <li>Selain ketentuan ayat (3) sampai dengan ayat (7), PIHAK PERTAMA dapat menetapkan besaran Biaya Layanan khusus bagi PIHAK KEDUA berdasarkan kesepakatan PARA PIHAK.</li>
+    <li>Pajak dan pungutan lain atas penjualan PIHAK KEDUA kepada Pelanggan sepenuhnya menjadi tanggung jawab PIHAK KEDUA.</li>
+</ol>
+
+<h3>Pasal 6<br>Penagihan, Pembayaran, dan Denda Keterlambatan</h3>
+<ol class="ayat">
+    <li>PIHAK PERTAMA menerbitkan Invoice atas jumlah Biaya Layanan seluruh Nota dalam satu bulan kalender pada tanggal 1 (satu) bulan berikutnya.</li>
+    <li>Invoice disampaikan kepada PIHAK KEDUA melalui Dasbor dan dapat pula dikirimkan melalui surat elektronik (email) dan/atau WhatsApp sesuai data kontak yang terdaftar. Invoice dianggap telah diterima PIHAK KEDUA pada tanggal Invoice tersedia di Dasbor.</li>
+    <li>PIHAK KEDUA wajib melunasi Invoice paling lambat pada hari terakhir bulan diterbitkannya Invoice (selanjutnya disebut <b>tanggal jatuh tempo</b>).</li>
+    <li>Pembayaran dilakukan melalui metode yang ditetapkan dan diinformasikan oleh PIHAK PERTAMA. Pembayaran dianggap sah setelah dana diterima dan dikonfirmasi oleh PIHAK PERTAMA.</li>
+    <li>Kepada PIHAK KEDUA diberikan Masa Tenggang selama <b>3 (tiga) hari kalender</b> setelah tanggal jatuh tempo. Pelunasan dalam Masa Tenggang tidak dikenakan Denda Keterlambatan.</li>
+    <li>Apabila Invoice belum dilunasi sampai berakhirnya Masa Tenggang, PIHAK KEDUA dikenakan Denda Keterlambatan sebesar <b>{{ denda.permil_teks }}‰ ({{ denda_permil_kata }} permil) per hari kalender</b> dari jumlah Invoice yang belum dibayar, terhitung sejak hari pertama setelah Masa Tenggang berakhir sampai dengan tanggal pelunasan, dengan jumlah keseluruhan paling banyak <b>{{ denda.maks_teks }}% ({{ denda_maks_kata }} persen)</b> dari nilai Invoice yang bersangkutan.</li>
+    <li>Sesuai Pasal 1238 Kitab Undang-Undang Hukum Perdata, PARA PIHAK sepakat bahwa lewatnya Masa Tenggang dengan sendirinya membuktikan kelalaian PIHAK KEDUA tanpa memerlukan surat teguran atau somasi terlebih dahulu.</li>
+    <li>Denda Keterlambatan merupakan ganti rugi yang besarnya telah disepakati PARA PIHAK sebagaimana dimaksud dalam Pasal 1249 dan Pasal 1304 sampai dengan Pasal 1312 Kitab Undang-Undang Hukum Perdata, ditetapkan secara wajar dan proporsional, serta tidak menghapus kewajiban PIHAK KEDUA untuk melunasi pokok Invoice.</li>
+    <li>Jumlah Denda Keterlambatan dicantumkan dalam Invoice dan Dasbor serta wajib dibayar bersamaan dengan pelunasan pokok Invoice.</li>
+    <li>Apabila Invoice belum dilunasi setelah tanggal jatuh tempo, PIHAK PERTAMA berhak menangguhkan akses masuk Pemilik dan Kasir ke Layanan sampai Invoice beserta Denda Keterlambatan dilunasi. Akses dipulihkan setelah pelunasan dikonfirmasi oleh PIHAK PERTAMA.</li>
+    <li>Selama masa penangguhan, Biaya Layanan dan Denda Keterlambatan yang telah timbul tetap menjadi kewajiban PIHAK KEDUA.</li>
+</ol>
+
+<h3>Pasal 7<br>Kerahasiaan dan Pelindungan Data</h3>
+<ol class="ayat">
+    <li>Data usaha dan data transaksi PIHAK KEDUA merupakan milik PIHAK KEDUA. PIHAK PERTAMA hanya mengolah data tersebut untuk menyelenggarakan Layanan.</li>
+    <li>PIHAK PERTAMA wajib menjaga kerahasiaan data PIHAK KEDUA dan tidak akan menjual atau memberikannya kepada pihak lain, kecuali atas persetujuan PIHAK KEDUA atau berdasarkan kewajiban menurut peraturan perundang-undangan.</li>
+    <li>PIHAK PERTAMA dapat menggunakan data statistik yang telah dianonimkan dan tidak mengidentifikasi PIHAK KEDUA maupun Pelanggan untuk keperluan pengembangan Layanan.</li>
+    <li>PARA PIHAK wajib mematuhi peraturan perundang-undangan mengenai pelindungan data pribadi dalam pelaksanaan Perjanjian ini.</li>
+</ol>
+
+<h3>Pasal 8<br>Batasan Tanggung Jawab</h3>
+<ol class="ayat">
+    <li>PIHAK PERTAMA berupaya agar Layanan tersedia secara terus-menerus, namun tidak menjamin Layanan bebas dari gangguan, termasuk gangguan yang disebabkan oleh jaringan internet, perangkat PIHAK KEDUA, atau penyedia layanan pihak ketiga.</li>
+    <li>PIHAK PERTAMA tidak bertanggung jawab atas kerugian tidak langsung, kehilangan keuntungan, atau kerugian yang timbul akibat kelalaian PIHAK KEDUA dalam menjaga akun dan perangkatnya.</li>
+    <li>Tanggung jawab PIHAK PERTAMA atas kerugian langsung yang terbukti disebabkan oleh kesalahan PIHAK PERTAMA dibatasi paling banyak sebesar jumlah Biaya Layanan yang dibayarkan PIHAK KEDUA dalam 3 (tiga) bulan terakhir sebelum kejadian.</li>
+</ol>
+
+<h3>Pasal 9<br>Keadaan Kahar</h3>
+<ol class="ayat">
+    <li>Keadaan kahar adalah keadaan di luar kekuasaan PARA PIHAK, antara lain bencana alam, kebakaran, wabah, huru-hara, gangguan listrik atau jaringan berskala luas, serta kebijakan pemerintah, yang mengakibatkan tidak dapat dilaksanakannya kewajiban dalam Perjanjian.</li>
+    <li>PIHAK yang mengalami keadaan kahar wajib memberitahukan kepada PIHAK lainnya paling lambat 7 (tujuh) hari kalender sejak terjadinya keadaan kahar.</li>
+    <li>Kewajiban yang terdampak keadaan kahar ditangguhkan selama keadaan kahar berlangsung, dan PARA PIHAK tidak saling menuntut atas keterlambatan yang diakibatkannya.</li>
+</ol>
+
+<h3>Pasal 10<br>Jangka Waktu, Masa Berlangganan Minimum, dan Pengakhiran</h3>
+<ol class="ayat">
+    <li>Perjanjian berlaku sejak ditandatangani oleh PIHAK KEDUA untuk jangka waktu 1 (satu) tahun dan diperpanjang secara otomatis untuk jangka waktu yang sama, kecuali salah satu PIHAK menyatakan tidak memperpanjang.</li>
+    <li>PIHAK KEDUA wajib menggunakan Layanan untuk Masa Berlangganan Minimum selama <b>3 (tiga) bulan</b> terhitung sejak tanggal penandatanganan Perjanjian.</li>
+    <li>Selama Masa Berlangganan Minimum, PIHAK KEDUA tidak dapat mengakhiri Perjanjian, kecuali dalam hal sebagaimana dimaksud dalam Pasal 5 ayat (6), keadaan kahar menurut Pasal 9 yang berlangsung lebih dari 30 (tiga puluh) hari kalender, atau PIHAK PERTAMA melalaikan kewajibannya menurut Pasal 3 ayat (1) dan ayat (2).</li>
+    <li>Pemberitahuan pengakhiran yang disampaikan PIHAK KEDUA selama Masa Berlangganan Minimum di luar hal sebagaimana dimaksud pada ayat (3) baru berlaku efektif pada hari terakhir Masa Berlangganan Minimum, dan seluruh Invoice sampai dengan tanggal tersebut tetap wajib dilunasi.</li>
+    <li>Setelah Masa Berlangganan Minimum berakhir, masing-masing PIHAK dapat mengakhiri Perjanjian dengan pemberitahuan tertulis kepada PIHAK lainnya paling lambat 30 (tiga puluh) hari kalender sebelum tanggal pengakhiran.</li>
+    <li>PIHAK PERTAMA dapat menangguhkan akses dan/atau mengakhiri Perjanjian secara sepihak apabila PIHAK KEDUA melanggar Pasal 4 ayat (7) atau tidak melunasi Invoice beserta Denda Keterlambatan lebih dari 60 (enam puluh) hari kalender setelah tanggal jatuh tempo.</li>
+    <li>Pengakhiran Perjanjian tidak menghapus kewajiban pembayaran Biaya Layanan dan Denda Keterlambatan yang telah timbul sebelum tanggal pengakhiran.</li>
+    <li>PARA PIHAK sepakat mengesampingkan ketentuan Pasal 1266 Kitab Undang-Undang Hukum Perdata sepanjang mengenai keharusan adanya putusan pengadilan untuk mengakhiri Perjanjian.</li>
+</ol>
+
+<h3>Pasal 11<br>Penyelesaian Perselisihan</h3>
+<ol class="ayat">
+    <li>Perselisihan yang timbul dari Perjanjian diselesaikan terlebih dahulu secara musyawarah untuk mufakat dalam jangka waktu 30 (tiga puluh) hari kalender.</li>
+    <li>Apabila musyawarah tidak mencapai mufakat, PARA PIHAK sepakat menyelesaikannya melalui {{ p1.pengadilan }}.</li>
+    <li>Perjanjian ini tunduk pada hukum Negara Republik Indonesia.</li>
+</ol>
+
+<h3>Pasal 12<br>Ketentuan Lain</h3>
+<ol class="ayat">
+    <li>Perubahan Perjanjian, selain penyesuaian Biaya Layanan menurut Pasal 5, dituangkan dalam addendum yang disetujui PARA PIHAK dan merupakan bagian yang tidak terpisahkan dari Perjanjian.</li>
+    <li>Syarat dan Ketentuan Layanan Dinezy yang disetujui PIHAK KEDUA saat pendaftaran merupakan bagian yang tidak terpisahkan dari Perjanjian. Apabila terdapat perbedaan, yang berlaku adalah ketentuan dalam Perjanjian.</li>
+    <li>Pemberitahuan antarPIHAK dianggap sah apabila disampaikan melalui Dasbor, surat elektronik (email), atau WhatsApp sesuai data kontak yang terdaftar.</li>
+    <li>Perjanjian dibuat dan ditandatangani dalam bentuk dokumen elektronik dengan tanda tangan elektronik sebagaimana diatur dalam Undang-Undang tentang Informasi dan Transaksi Elektronik beserta peraturan pelaksanaannya, dan dibubuhi meterai elektronik sesuai ketentuan peraturan perundang-undangan mengenai bea meterai.</li>
+    <li>Salinan elektronik Perjanjian yang tersimpan dalam Layanan mempunyai kekuatan hukum yang sama bagi PARA PIHAK.</li>
+</ol>
+
+<p>Demikian Perjanjian ini dibuat dengan itikad baik dan disetujui oleh PARA PIHAK dalam keadaan sadar, sehat jasmani dan rohani, serta tanpa paksaan dari pihak mana pun.</p>
+</div>

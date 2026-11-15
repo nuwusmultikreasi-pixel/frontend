@@ -1,0 +1,97 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syarat &amp; Ketentuan Layanan — Dinezy</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #f4f7fb; font-family: 'Inter', Arial, sans-serif; color: #1f2937; line-height: 1.7; }
+        header { background: #0b1d38; color: #fff; padding: 40px 20px 70px; }
+        header .in, main { max-width: 860px; margin: 0 auto; }
+        header a.brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 700; }
+        header a.brand img { height: 30px; }
+        header h1 { font-family: 'Source Sans 3', 'Inter', sans-serif; font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 26px 0 6px; line-height: 1.1; }
+        header p { color: #a9c4ee; margin: 0; }
+        main { background: #fff; border-radius: 20px; margin-top: -40px; padding: 34px clamp(20px, 5vw, 48px); box-shadow: 0 20px 50px rgba(11,29,56,.12); margin-bottom: 40px; }
+        h2 { font-family: 'Source Sans 3', 'Inter', sans-serif; color: #0b1d38; font-size: 1.3rem; margin: 28px 0 8px; }
+        h2:first-of-type { margin-top: 0; }
+        ol { padding-left: 22px; } li { margin-bottom: 6px; }
+        .note { background: #eef3fb; border: 1px solid #dbe6f6; border-radius: 12px; padding: 14px 16px; font-size: .92rem; }
+        .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid #e5e9f0; margin-top: 30px; padding-top: 16px; font-size: .85rem; color: #64748b; }
+        .back { display: inline-block; margin-top: 18px; color: #fff; text-decoration: none; font-weight: 600; font-size: .9rem; opacity: .85; }
+</style>
+</head>
+<body>
+<header><div class="in">
+    <a class="brand" href="/"><img src="{% static 'core/img/dinezy-mark-white.png' %}" alt="">Dinezy</a>
+    <h1>Syarat &amp; Ketentuan Layanan</h1>
+    <p>Versi {{ versi }} · berlaku sejak {{ berlaku }} · {{ p1.nama }}</p>
+</div></header>
+<main>
+    <div class="note">Dengan mendaftarkan cafe dan menggunakan Dinezy, Anda menyatakan telah membaca dan menyetujui Syarat &amp; Ketentuan ini. Hubungan kerja sama selanjutnya dituangkan dalam Perjanjian Kerja Sama (PKS) yang ditandatangani secara elektronik dari dashboard owner.</div>
+
+    <h2>1. Ketentuan Umum</h2>
+    <ol>
+        <li>Dinezy ("Layanan") adalah sistem pemesanan dan pengelolaan cafe berbasis web yang diselenggarakan oleh {{ p1.nama }} ("Kami").</li>
+        <li>"Mitra" adalah pemilik usaha cafe yang mendaftarkan usahanya pada Layanan. "Pelanggan" adalah konsumen Mitra yang memesan melalui Layanan.</li>
+        <li>"Nota" adalah setiap pesanan yang telah berstatus <i>Diproses</i> atau <i>Selesai</i>.</li>
+    </ol>
+
+    <h2>2. Pendaftaran dan Akun</h2>
+    <ol>
+        <li>Mitra wajib mengisi data usaha yang benar, lengkap, dan terbaru, termasuk logo usaha.</li>
+        <li>Setiap cafe memperoleh akun Owner dan akun Kasir. Mitra bertanggung jawab menjaga kerahasiaan nama pengguna dan kata sandi serta seluruh aktivitas yang dilakukan melalui akun tersebut.</li>
+        <li>Setelah mengisi formulir pendaftaran, Mitra langsung diarahkan untuk menandatangani Perjanjian Kerja Sama secara elektronik, dan wajib menyelesaikannya paling lambat 14 (empat belas) hari setelah pendaftaran.</li>
+        <li>Mitra dapat mengunggah gambar QRIS usahanya. Gambar QRIS ditampilkan kepada Pelanggan saat memilih pembayaran QRIS, dan Mitra bertanggung jawab atas kebenaran QRIS tersebut.</li>
+        <li>Masa berlangganan minimum adalah 3 (tiga) bulan sejak Perjanjian Kerja Sama ditandatangani.</li>
+    </ol>
+
+    <h2>3. Biaya Layanan</h2>
+    <ol>
+        <li>Penggunaan Layanan tidak dikenakan biaya langganan bulanan. Mitra dikenakan Biaya Layanan sebesar {{ tarif|rupiah }},00 ({{ tarif_kata }} rupiah) untuk setiap Nota.</li>
+        <li>Biaya Layanan ditambahkan secara otomatis pada total pembayaran Pelanggan dan tercantum pada Nota sebagai "Biaya layanan".</li>
+        <li>Kami dapat menyesuaikan besaran Biaya Layanan di kemudian hari. Setiap penyesuaian diberitahukan paling lambat 30 (tiga puluh) hari kalender sebelum berlaku melalui dashboard, email, dan/atau WhatsApp, dan tidak berlaku surut terhadap Nota yang telah terbit.</li>
+        <li>Mitra yang tidak menyetujui penyesuaian Biaya Layanan dapat berhenti menggunakan Layanan sebelum tanggal berlakunya tanpa dikenakan denda, dengan tetap menyelesaikan tagihan yang telah timbul.</li>
+    </ol>
+
+    <h2>4. Penagihan dan Penangguhan Akses</h2>
+    <ol>
+        <li>Invoice Biaya Layanan diterbitkan setiap tanggal 1 untuk seluruh Nota bulan sebelumnya dan dapat dilihat di dashboard owner.</li>
+        <li>Invoice wajib dilunasi paling lambat pada hari terakhir bulan diterbitkannya Invoice.</li>
+        <li>Mitra mendapat masa tenggang 3 (tiga) hari kalender setelah jatuh tempo. Apabila Invoice belum dilunasi sampai masa tenggang berakhir, dikenakan denda keterlambatan {{ denda.permil_teks }}‰ per hari dari jumlah Invoice yang belum dibayar, paling banyak {{ denda.maks_teks }}% dari nilai Invoice.</li>
+        <li>Apabila Invoice belum dilunasi setelah jatuh tempo, akses login Owner dan Kasir ditangguhkan sampai Invoice beserta denda dilunasi dan dikonfirmasi.</li>
+    </ol>
+
+    <h2>5. Kewajiban dan Larangan</h2>
+    <ol>
+        <li>Mitra bertanggung jawab atas kebenaran nama, harga, foto, dan ketersediaan menu yang ditampilkan kepada Pelanggan, serta atas kualitas produk yang dijual.</li>
+        <li>Mitra dilarang menggunakan Layanan untuk menjual barang atau jasa yang dilarang hukum, mengganggu atau mencoba membobol sistem, maupun merugikan pihak lain.</li>
+        <li>Perangkat, printer, dan koneksi internet yang dibutuhkan disediakan oleh Mitra.</li>
+    </ol>
+
+    <h2>6. Data dan Privasi</h2>
+    <ol>
+        <li>Data usaha dan transaksi Mitra adalah milik Mitra. Kami mengolahnya hanya untuk menyelenggarakan Layanan dan tidak menjualnya kepada pihak lain.</li>
+        <li>Kami dapat menggunakan data statistik yang telah dianonimkan untuk pengembangan Layanan.</li>
+        <li>Kami menjaga keamanan data sesuai peraturan perundang-undangan mengenai pelindungan data pribadi.</li>
+    </ol>
+
+    <h2>7. Batasan Tanggung Jawab</h2>
+    <ol>
+        <li>Kami berupaya agar Layanan selalu tersedia, namun tidak menjamin Layanan bebas dari gangguan jaringan, perangkat, atau layanan pihak ketiga.</li>
+        <li>Kami tidak bertanggung jawab atas kerugian tidak langsung atau kerugian akibat kelalaian Mitra dalam menjaga akun dan perangkatnya.</li>
+    </ol>
+
+    <h2>8. Perubahan dan Hukum yang Berlaku</h2>
+    <ol>
+        <li>Kami dapat memperbarui Syarat &amp; Ketentuan ini. Versi terbaru selalu tersedia di halaman ini, dan perubahan penting akan diberitahukan kepada Mitra.</li>
+        <li>Syarat &amp; Ketentuan ini tunduk pada hukum Negara Republik Indonesia. Hal yang lebih rinci diatur dalam Perjanjian Kerja Sama.</li>
+    </ol>
+
+    <div class="foot"><span>Pertanyaan: {{ p1.email }} · Telp. {{ p1.wa }}</span><span>Versi {{ versi }}</span></div>
+</main>
+</body>
+</html>

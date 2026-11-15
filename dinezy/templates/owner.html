@@ -1,0 +1,907 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard — {{ tenant.nama_cafe }}</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <style>
+        .tile-actions { display: flex; gap: 6px; padding: 0 14px 12px; }
+        .tile-actions .btn { flex: 1; }
+        .foto-drop { border: 1px dashed var(--line-strong); border-radius: 8px; background: #fafbfc; cursor: pointer; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .foto-drop:hover { border-color: var(--navy-500); background: var(--navy-50); }
+        .foto-drop img { width: 100%; height: 100%; object-fit: cover; }
+        .foto-drop .hint { text-align: center; color: var(--muted); font-size: .82rem; padding: 12px; }
+        .foto-drop .hint i { font-size: 1.3rem; color: #9aa8bd; display: block; margin-bottom: 8px; }
+        .meja-card { background: #fff; border-radius: 16px; overflow: hidden; height: 100%; display: flex; flex-direction: column; transition: transform .2s; }
+        .meja-card:hover { transform: translateY(-3px); }
+        .meja-card .mt { position: relative; background: var(--navy-900); color: #fff; padding: 16px 16px 34px; overflow: hidden; }
+        .meja-card .mt::after { content: ''; position: absolute; right: -40px; top: -50px; width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, rgba(126,166,230,.4), transparent 65%); }
+        .meja-card .mt small { display: block; font-size: .66rem; letter-spacing: .14em; color: #a9c4ee; font-weight: 600; }
+        .meja-card .mt b { font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 1.9rem; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
+        .meja-card .mt-del { position: relative; z-index: 1; border: 0; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.1); color: #fecaca; }
+        .meja-card .mt-del:hover { background: rgba(239,68,68,.25); }
+        .meja-card .mq { margin-top: -24px; position: relative; z-index: 1; display: flex; justify-content: center; }
+        .meja-card .mf { display: flex; gap: 8px; padding: 6px 14px 14px; margin-top: auto; }
+        .qr-box { width: 138px; height: 138px; margin: 0 auto 10px; padding: 8px; background: #fff; border-radius: 12px; box-shadow: 0 8px 20px -8px rgba(11,29,56,.35); display: flex; align-items: center; justify-content: center; }
+        .qr-box img, .qr-box canvas { width: 100% !important; height: 100% !important; }
+        .acc-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; }
+        .acc-row .av { width: 36px; height: 36px; border-radius: 50%; background: var(--navy-50); color: var(--navy-700); display: flex; align-items: center; justify-content: center; font-size: .85rem; }
+        .filter-chip { border: 1px solid var(--line-strong); background: #fff; border-radius: 6px; padding: 4px 12px; font-size: .8rem; font-weight: 500; color: var(--text); }
+        .print-opt { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; text-align: center; height: 100%; transition: border-color .2s, background .2s; }
+        .print-opt b { color: var(--ink); font-size: .92rem; } .print-opt small { color: var(--muted); font-size: .72rem; }
+        .btn-check:checked + .print-opt { border-color: var(--navy-700); background: var(--navy-50); box-shadow: inset 0 0 0 1px var(--navy-700); }
+        .paper { display: flex; flex-direction: column; gap: 3px; padding: 6px; background: #fff; border: 1px solid var(--line-strong); border-radius: 3px; margin-bottom: 6px; box-shadow: 0 2px 4px rgba(0,0,0,.06); }
+        .paper i { display: block; height: 3px; border-radius: 2px; background: #cbd5e1; } .paper i:first-child { background: var(--navy-700); }
+        .paper.p57 { width: 24px; height: 40px; } .paper.p58 { width: 26px; height: 48px; } .paper.p80 { width: 34px; height: 48px; } .paper.pa5 { width: 36px; height: 50px; } .paper.pa4 { width: 42px; height: 56px; }
+        .kp-opt { padding: 10px 12px 10px 36px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
+        .logo-box { display: flex; align-items: center; justify-content: center; height: 170px; border: 2px dashed var(--line-strong); border-radius: 14px; background: var(--navy-50); cursor: pointer; padding: 14px; color: var(--navy-700); font-weight: 600; }
+        .logo-box img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .logo-box.qris-box { height: 240px; }
+        .logo-box span i { display: block; font-size: 1.5rem; text-align: center; margin-bottom: 6px; }
+        .filter-chip.active { background: var(--navy-800); color: #fff; border-color: var(--navy-800); }
+        dl.profile dt { font-weight: 500; color: var(--muted); }
+        dl.profile dd { color: var(--ink); }
+            .pks-banner { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 16px; padding: 14px 18px; box-shadow: 0 10px 24px -16px rgba(11,29,56,.5); }
+        .pks-banner .ic, .pks-card .ic { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #fef3c7; color: #b45309; flex-shrink: 0; }
+        .pks-banner > div > b:first-child { display: block; color: var(--ink); } .pks-banner span b { color: var(--ink); } .pks-banner span { font-size: .86rem; color: var(--muted); }
+        .pks-card { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; } .pks-card .ic { background: var(--navy-50); color: var(--navy-800); }
+        @media (max-width: 575.98px) { .pks-banner { flex-wrap: wrap; } .pks-banner .btn { width: 100%; } }
+</style>
+</head>
+<body class="app-body">
+    <input type="hidden" id="hiddenTenantId" value="{{ tenant.id }}">
+    <input type="hidden" id="hiddenTenantSlug" value="{{ tenant.slug }}">
+    <input type="hidden" id="hiddenTenantName" value="{{ tenant.nama_cafe|default:'NAMA CAFE' }}">
+
+<div class="app-bg" aria-hidden="true"><div class="scene"></div></div>
+{% include "partials/splash.html" %}
+<div class="app">
+    <aside class="app-sidebar" id="sidebar" aria-label="Navigasi">
+        <div class="sb-brand">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark" alt="Logo Dinezy">
+            <div class="txt min-w-0"><b class="text-truncate">{{ tenant.nama_cafe }}</b><small>Panel Owner</small></div>
+        </div>
+        <div class="sb-label">Menu Utama</div>
+        <nav class="nav" role="tablist">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-stat" data-title="Dashboard" type="button" title="Dashboard"><i class="fas fa-chart-column"></i><span class="lbl">Dashboard</span></button>
+            <button class="nav-link" id="tab-menu-btn" data-bs-toggle="tab" data-bs-target="#tab-menu" data-title="Kelola Menu" type="button" title="Kelola Menu"><i class="fas fa-utensils"></i><span class="lbl">Kelola Menu</span><span class="count" id="menuCount">0</span></button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-meja" data-title="Meja & QR Code" type="button" onclick="loadMejaData()" title="Meja & QR Code"><i class="fas fa-qrcode"></i><span class="lbl">Meja & QR Code</span></button>
+            <button class="nav-link" id="tab-tagihan-btn" data-bs-toggle="tab" data-bs-target="#tab-tagihan" data-title="Tagihan Layanan" type="button" title="Tagihan"><i class="fas fa-file-invoice-dollar"></i><span class="lbl">Tagihan</span>{% if tagihan.unpaid %}<span class="count">{{ tagihan.unpaid|length }}</span>{% endif %}</button>
+            <button class="nav-link" id="tab-berkas-btn" data-bs-toggle="tab" data-bs-target="#tab-berkas" data-title="Berkas & Pesan" type="button" title="Berkas & Pesan"><i class="fas fa-inbox"></i><span class="lbl">Berkas & Pesan</span>{% if pesan_baru %}<span class="count count-alert">{{ pesan_baru }}</span>{% endif %}</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-akun" data-title="Profil & Akun" type="button" title="Profil & Akun"><i class="fas fa-store"></i><span class="lbl">Profil & Akun</span></button>
+            <button class="nav-link" id="tab-setelan-btn" data-bs-toggle="tab" data-bs-target="#tab-setelan" data-title="Setelan" type="button" title="Setelan"><i class="fas fa-sliders"></i><span class="lbl">Setelan</span></button>
+        </nav>
+        <div class="sb-label">Lainnya</div>
+        <nav class="nav extra">
+            <a class="nav-link" href="/menu/{{ tenant.slug }}/" target="_blank" title="Halaman Pelanggan"><i class="fas fa-arrow-up-right-from-square"></i><span class="lbl">Halaman Pelanggan</span></a>
+        </nav>
+        <div class="sb-foot">
+            <div class="sb-user">
+                <div class="sb-avatar">{{ tenant.nama_owner|default:request.user.username|slice:":1"|upper }}</div>
+                <div class="txt min-w-0"><b class="text-truncate">{{ tenant.nama_owner|default:request.user.username }}</b><small>Owner · {{ tenant.slug }}</small></div>
+            </div>
+            <a href="/logout/" class="sb-logout" title="Keluar"><i class="fas fa-right-from-bracket"></i><span class="lbl">Keluar</span></a>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div><div class="crumb">{{ tenant.nama_cafe }} · Owner</div><h1 id="pageTitle">Dashboard</h1></div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/menu/{{ tenant.slug }}/" target="_blank" class="btn btn-dz-outline d-none d-md-inline-flex align-items-center"><i class="fas fa-eye me-2"></i>Lihat Menu</a>
+                <button class="btn btn-dz" onclick="openMenuModal()"><i class="fas fa-plus me-2"></i>Tambah Menu</button>
+            </div>
+        </header>
+
+        <div class="app-content">
+        {% if tagihan.unpaid %}
+        <div class="lock-banner mb-4" role="alert">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <div><b>Ada tagihan layanan yang belum dibayar: {{ tagihan.total_unpaid|rupiah }}</b>
+                <span>Bayar sebelum {{ tagihan.next_due|tgl:True }}. Jika melewati jatuh tempo, login Owner & Kasir akan diblokir otomatis.
+                <a href="#" onclick="bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-tagihan-btn')).show();return false" class="text-white fw-semibold ms-1">Lihat tagihan →</a></span></div>
+        </div>
+        {% endif %}
+        {% include 'partials/banner_pesan.html' with owner=True %}
+        {% if pks.status == 'menunggu' %}
+        <div class="pks-banner mb-4" role="note">
+            <div class="ic"><i class="fas fa-file-signature"></i></div>
+            <div class="flex-grow-1"><b>Tanda tangani Perjanjian Kerja Sama</b>
+                <span>Lengkapi tanda tangan elektronik PKS Dinezy sebelum <b>{{ pks_batas|tgl:True }}</b>. Hanya perlu ±2 menit.</span></div>
+            <a href="{% url 'owner_perjanjian' tenant.slug %}" class="btn btn-dz btn-sm px-3">Baca &amp; tanda tangani <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        {% endif %}
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active" id="tab-stat">
+                <div class="dz-card dz-card-pad mb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                    <div>
+                        <h4 class="dz-section-title">Ringkasan Penjualan</h4>
+                        <p class="dz-section-sub">Pesanan yang sudah diproses & selesai, berdasarkan rentang waktu.</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <input type="date" id="startDate" class="form-control form-control-sm" style="width:auto">
+                        <span class="text-muted small">s/d</span>
+                        <input type="date" id="endDate" class="form-control form-control-sm" style="width:auto">
+                        <button onclick="applyFilter()" class="btn btn-sm btn-dz"><i class="fas fa-filter me-1"></i> Filter</button>
+                        <button onclick="printLaporanKeuangan()" class="btn btn-sm btn-dz"><i class="fas fa-file-lines me-1"></i> Laporan Rekap</button>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-xl-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Pendapatan</div><div class="stat-value" id="valPendapatan">Rp 0</div></div><div class="stat-icon grad"><i class="fas fa-wallet"></i></div></div></div></div>
+                    <div class="col-6 col-xl-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Jumlah Nota</div><div class="stat-value" id="valNota">0</div></div><div class="stat-icon"><i class="fas fa-file-invoice"></i></div></div></div></div>
+                    <div class="col-6 col-xl-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Item Terjual</div><div class="stat-value" id="valItemTerjual">0</div></div><div class="stat-icon"><i class="fas fa-bowl-food"></i></div></div></div></div>
+                    <div class="col-6 col-xl-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Rata-rata / Nota</div><div class="stat-value" id="valAov">Rp 0</div></div><div class="stat-icon"><i class="fas fa-calculator"></i></div></div></div></div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8"><div class="dz-card dz-card-pad h-100">
+                        <h6 class="fw-800 mb-3">Pendapatan Harian</h6>
+                        <div style="position:relative;height:300px"><canvas id="chartTrend"></canvas></div>
+                    </div></div>
+                    <div class="col-lg-4"><div class="dz-card dz-card-pad h-100">
+                        <h6 class="fw-800 mb-3">Metode Pembayaran</h6>
+                        <div style="position:relative;height:260px"><canvas id="chartPayment"></canvas></div>
+                    </div></div>
+                </div>
+
+                <div class="dz-card overflow-hidden">
+                    <div class="p-4 pb-3"><h6 class="fw-800 mb-0">Rincian Menu Terjual <span id="labelTabelTanggal" class="text-muted fw-normal small"></span></h6></div>
+                    <div class="table-responsive">
+                        <table class="table dz-table">
+                            <thead><tr><th class="text-center" width="6%">No</th><th>Nama Menu</th><th class="text-center" width="16%">Porsi</th><th class="text-end" width="22%">Total Penjualan</th></tr></thead>
+                            <tbody id="tableMenuBody"><tr><td colspan="4" class="text-center py-4 text-muted">Memuat data...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-menu">
+                <div class="dz-card dz-card-pad mb-4">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                        <div>
+                            <h4 class="dz-section-title">Daftar Menu Cafe</h4>
+                            <p class="dz-section-sub"><span id="sumTersedia">0</span> tersedia · <span id="sumHabis">0</span> habis. Menu habis tampil monokrom di layar pelanggan.</p>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="input-icon" style="min-width:220px"><i class="fas fa-search"></i><input type="search" id="menuSearch" class="form-control form-control-sm" placeholder="Cari menu..." oninput="renderMenuGrid()"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-3" id="kategoriFilter"></div>
+                </div>
+                <div class="row g-3" id="menuGrid">
+                    <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-meja">
+                <div class="dz-card dz-card-pad mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <h4 class="dz-section-title">Manajemen Meja</h4>
+                        <p class="dz-section-sub">Tambah meja lalu cetak kartu QR. "Cetak Semua QR" mencetak 4 kartu per lembar A4 lengkap dengan garis potong.</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="input-icon" style="width:230px" title="Ubah jika testing via IP Wi-Fi lokal (contoh: http://192.168.1.10:8000)">
+                            <i class="fas fa-globe"></i><input type="text" id="baseUrlDomain" class="form-control form-control-sm" placeholder="Base URL" onchange="renderMejaCards()">
+                        </div>
+                        <button class="btn btn-dz-outline" id="btnPrintAll" onclick="printMeja()" disabled><i class="fas fa-print me-2"></i>Cetak Semua QR</button>
+                        <button class="btn btn-dz" data-bs-toggle="modal" data-bs-target="#modalTambahMeja"><i class="fas fa-plus me-2"></i>Tambah Meja</button>
+                    </div>
+                </div>
+                <div class="row g-3" id="gridMejaContainer">
+                    <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-tagihan">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><div class="stat-card"><div class="stat-title">Bulan berjalan · {{ bulan_ini.periode }}</div><div class="stat-value">{{ bulan_ini.total|rupiah }}</div><div class="small text-muted mt-1">{{ bulan_ini.jumlah_nota }} nota × {{ tarif|rupiah }} · terbit {{ bulan_ini.terbit|tgl }}</div></div></div>
+                    <div class="col-md-4"><div class="stat-card"><div class="stat-title">Belum dibayar</div><div class="stat-value {% if tagihan.total_unpaid %}text-danger{% endif %}">{{ tagihan.total_unpaid|rupiah }}</div><div class="small text-muted mt-1">{% if tagihan.next_due %}Jatuh tempo {{ tagihan.next_due|tgl }}{% else %}Tidak ada tagihan tertunda{% endif %}</div></div></div>
+                    <div class="col-md-4"><div class="stat-card"><div class="stat-title">Ketentuan</div><div class="small mt-2" style="line-height:1.6">{{ tarif|rupiah }} per nota yang diproses, otomatis ditambahkan ke total nota pelanggan sebagai <b>biaya layanan</b>. Invoice terbit tiap tanggal 1 dan jatuh tempo di akhir bulan. Lewat jatuh tempo akun diblokir; lewat 3 hari setelahnya dikenakan denda {{ denda.permil_teks }}‰ per hari (maks. {{ denda.maks_teks }}%).</div></div></div>
+                </div>
+                <div class="dz-card overflow-hidden">
+                    <div class="p-4 pb-3"><h6 class="fw-800 mb-0">Riwayat invoice</h6></div>
+                    <div class="table-responsive">
+                        <table class="table dz-table">
+                            <thead><tr><th>No. Invoice</th><th>Periode</th><th class="text-center">Nota</th><th class="text-end">Total</th><th>Jatuh tempo</th><th>Status</th><th></th></tr></thead>
+                            <tbody>
+                            {% for i in invoices %}
+                                <tr><td class="fw-semibold">{{ i.nomor }}</td><td>{{ i.periode }}</td><td class="text-center">{{ i.jumlah_nota }}</td><td class="text-end fw-bold">{{ i.total_bayar|rupiah }}{% if i.denda_berjalan %}<small class="d-block text-danger fw-semibold">denda {{ i.denda_berjalan|rupiah }}</small>{% endif %}</td><td>{{ i.jatuh_tempo|tgl }}</td>
+                                    <td>{% if i.status == 'paid' %}<span class="badge-soft badge-soft-green">Lunas</span>{% elif i.terlambat %}<span class="badge-soft badge-soft-red">Lewat jatuh tempo</span>{% else %}<span class="badge-soft badge-soft-amber">Belum dibayar</span>{% endif %}</td>
+                                    <td class="text-end"><a href="{% url 'invoice' i.pk %}" target="_blank" class="btn btn-sm btn-dz-outline"><i class="fas fa-file-lines me-1"></i>Invoice</a></td></tr>
+                            {% empty %}
+                                <tr><td colspan="7" class="text-center text-muted py-4">Belum ada invoice. Invoice pertama terbit {{ bulan_ini.terbit|tgl:True }}.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-setelan">
+                {% for m in messages %}{% if 'setelan' in m.tags %}
+                <div class="dz-alert {% if 'error' in m.tags %}dz-alert-error{% else %}dz-alert-success{% endif %} mb-3"><i class="fas {% if 'error' in m.tags %}fa-circle-exclamation{% else %}fa-circle-check{% endif %} mt-1"></i><div>{{ m }}</div></div>
+                {% endif %}{% endfor %}
+                <form method="POST" action="{% url 'owner_setelan' tenant.slug %}" enctype="multipart/form-data" id="formSetelan">
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="dz-card dz-card-pad mb-4">
+                                <h5 class="dz-section-title mb-1"><i class="fas fa-print me-2 text-navy"></i>Jenis printer nota</h5>
+                                <p class="dz-section-sub mb-3">Layout nota & tiket dapur menyesuaikan ukuran kertas printer kasir.</p>
+                                <div class="row g-2 print-opts">
+                                    {% for val, label in print_types %}
+                                    <div class="col-4 col-md">
+                                        <input type="radio" class="btn-check" name="print_type" id="pt{{ val }}" value="{{ val }}" {% if tenant.print_type == val %}checked{% endif %}>
+                                        <label class="print-opt" for="pt{{ val }}">
+                                            <span class="paper p{{ val }}"><i></i><i></i><i></i></span>
+                                            <b>{% if val == '57' %}57×30{% elif val == '58' %}58 mm{% elif val == '80' %}80 mm{% else %}{{ val|upper }}{% endif %}</b>
+                                            <small>{% if val == '57' or val == '58' or val == '80' %}Thermal{% else %}Printer biasa{% endif %}</small>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="dz-card dz-card-pad mb-4">
+                                <h5 class="dz-section-title mb-1"><i class="fas fa-fire-burner me-2 text-navy"></i>Cetak tiket dapur</h5>
+                                <p class="dz-section-sub mb-3">Tiket berisi nomor meja & daftar menu (tanpa harga) untuk tim dapur, dicetak dari halaman kasir.</p>
+                                {% for val, label in kitchen_choices %}
+                                <div class="form-check kp-opt">
+                                    <input class="form-check-input" type="radio" name="kitchen_print" id="kp{{ val }}" value="{{ val }}" {% if tenant.kitchen_print == val %}checked{% endif %}>
+                                    <label class="form-check-label" for="kp{{ val }}">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                                <div class="dz-alert dz-alert-info mt-3 small"><i class="fas fa-lightbulb mt-1"></i><div>Agar tiket langsung tercetak tanpa jendela dialog, jalankan Chrome kasir dengan opsi <code>--kiosk-printing</code> dan jadikan printer dapur sebagai printer default.</div></div>
+                            </div>
+
+                            <div class="dz-card dz-card-pad">
+                                <h5 class="dz-section-title mb-3"><i class="fas fa-receipt me-2 text-navy"></i>Isi nota</h5>
+                                <label class="form-label" for="notaFooter">Pesan di bawah nota</label>
+                                <input type="text" class="form-control mb-3" id="notaFooter" name="nota_footer" maxlength="120" value="{{ tenant.nota_footer }}" placeholder="Terima kasih atas kunjungan Anda!">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="notaQr" name="nota_show_qr" {% if tenant.nota_show_qr %}checked{% endif %}>
+                                    <label class="form-check-label" for="notaQr">Tampilkan QR "Pesan lagi dari meja" di nota</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="dz-card dz-card-pad mb-4">
+                                <h5 class="dz-section-title mb-1"><i class="fas fa-image me-2 text-navy"></i>Logo cafe</h5>
+                                <p class="dz-section-sub mb-3">Tampil di nota, kartu QR meja, laporan rekap, dan invoice.</p>
+                                <label class="logo-box" for="setLogo">
+                                    {% if tenant.logo %}<img src="{{ tenant.logo.url }}" id="setLogoPrev" alt="Logo">{% else %}<img id="setLogoPrev" alt="" hidden><span id="setLogoHint"><i class="fas fa-cloud-arrow-up"></i>Unggah logo</span>{% endif %}
+                                </label>
+                                <input type="file" id="setLogo" name="logo" accept="image/png,image/jpeg,image/webp" class="d-none">
+                                <div class="form-text">PNG/JPG/WEBP, maks 2 MB. Klik kotak untuk mengganti.</div>
+                            </div>
+                            <div class="dz-card dz-card-pad mb-4">
+                                <h5 class="dz-section-title mb-1"><i class="fas fa-qrcode me-2 text-navy"></i>QRIS pembayaran</h5>
+                                <p class="dz-section-sub mb-3">Ditampilkan kepada pelanggan saat memilih pembayaran QRIS.</p>
+                                <label class="logo-box qris-box" for="setQris">
+                                    {% if tenant.qris_image %}<img src="{{ tenant.qris_image.url }}" id="setQrisPrev" alt="QRIS">{% else %}<img id="setQrisPrev" alt="" hidden><span id="setQrisHint"><i class="fas fa-cloud-arrow-up"></i>Unggah QRIS</span>{% endif %}
+                                </label>
+                                <input type="file" id="setQris" name="qris" accept="image/png,image/jpeg,image/webp" class="d-none">
+                                <div class="form-text">PNG/JPG/WEBP, maks 3 MB. Gunakan gambar QRIS resmi dari bank/penyedia pembayaran.</div>
+                                {% if tenant.qris_image %}<div class="form-check mt-2"><input class="form-check-input" type="checkbox" name="hapus_qris" value="1" id="hapusQris"><label class="form-check-label small" for="hapusQris">Hapus QRIS saat disimpan</label></div>{% endif %}
+                            </div>
+                            <div class="dz-card dz-card-pad">
+                                <h5 class="dz-section-title mb-3"><i class="fas fa-eye me-2 text-navy"></i>Coba cetak</h5>
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-dz-outline" onclick="previewCetak('nota')"><i class="fas fa-receipt me-2"></i>Contoh nota</button>
+                                    <button type="button" class="btn btn-dz-outline" onclick="previewCetak('dapur')"><i class="fas fa-fire-burner me-2"></i>Contoh tiket dapur</button>
+                                </div>
+                                <hr>
+                                <button type="submit" class="btn btn-dz w-100 btn-lg"><i class="fas fa-floppy-disk me-2"></i>Simpan Setelan</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="tab-berkas">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <div class="dz-card dz-card-pad">
+                            <h5 class="dz-section-title mb-1"><i class="fas fa-folder-open me-2 text-navy"></i>Berkas cafe</h5>
+                            <p class="dz-section-sub mb-2">Dokumen resmi kerja sama Anda dengan Dinezy.</p>
+                            <div class="berkas-row">
+                                <span class="bi"><i class="fas fa-file-signature"></i></span>
+                                <div class="flex-grow-1 min-w-0"><b class="d-block">Perjanjian Kerja Sama</b>
+                                    <small class="text-muted">No. {{ pks.nomor }} · {% if pks.status == 'bermeterai' %}final bermeterai{% elif pks.status == 'ditandatangani' %}ditandatangani {{ pks.ttd_at|date:"d/m/Y" }}, menunggu e-meterai{% else %}belum ditandatangani{% endif %}</small></div>
+                                <a href="{% url 'owner_perjanjian' tenant.slug %}" class="btn btn-dz-outline btn-sm">{% if pks.status == 'menunggu' %}Tanda tangani{% else %}Buka{% endif %}</a>
+                            </div>
+                            {% if pks.file_final %}
+                            <div class="berkas-row">
+                                <span class="bi"><i class="fas fa-stamp"></i></span>
+                                <div class="flex-grow-1 min-w-0"><b class="d-block">PKS final bermeterai</b><small class="text-muted">PDF · {{ pks.final_at|date:"d/m/Y" }}</small></div>
+                                <a href="{% url 'perjanjian_final' pks.pk %}" class="btn btn-dz-outline btn-sm"><i class="fas fa-download"></i></a>
+                            </div>
+                            {% endif %}
+                            <div class="berkas-row">
+                                <span class="bi"><i class="fas fa-scale-balanced"></i></span>
+                                <div class="flex-grow-1 min-w-0"><b class="d-block">Syarat &amp; Ketentuan Layanan</b><small class="text-muted">Versi terbaru</small></div>
+                                <a href="{% url 'syarat' %}" target="_blank" class="btn btn-dz-outline btn-sm">Buka</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="dz-card overflow-hidden">
+                            <div class="p-4 pb-3 d-flex justify-content-between align-items-center"><h6 class="fw-800 mb-0"><i class="fas fa-inbox me-2 text-navy"></i>Kotak pesan</h6>{% if pesan_baru %}<span class="badge-soft badge-soft-red">{{ pesan_baru }} belum dibaca</span>{% endif %}</div>
+                            {% for m in pesan %}
+                            <a class="inbox-item {% if not m.sudah_dibaca %}baru{% endif %}" href="{% url 'owner_pesan' tenant.slug m.pk %}">
+                                <span class="ii-ic"><i class="fas {{ ikon_pesan|get_item:m.kategori }}"></i></span>
+                                <span class="min-w-0"><span class="ii-t">{{ m.judul }}</span><span class="ii-m">{{ m.get_kategori_display }} · {{ m.dibuat|date:"d/m/Y H:i" }}{% if m.lampiran %} · <i class="fas fa-paperclip"></i>{% endif %}</span></span>
+                            </a>
+                            {% empty %}
+                            <div class="dz-empty py-5"><div class="ico"><i class="fas fa-envelope-open"></i></div><h6>Belum ada pesan</h6><p class="small mb-0">Pengumuman, informasi pemeliharaan, dan surat dari Dinezy akan tampil di sini.</p></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-akun">
+                <div class="row g-4">
+                    <div class="col-12"><div class="dz-card dz-card-pad pks-card">
+                        <div class="ic"><i class="fas fa-file-signature"></i></div>
+                        <div class="flex-grow-1 min-w-0">
+                            <h5 class="dz-section-title mb-1">Perjanjian Kerja Sama</h5>
+                            <div class="small text-muted">Nomor {{ pks.nomor }} ·
+                                {% if pks.status == 'bermeterai' %}final bermeterai{% elif pks.status == 'ditandatangani' %}ditandatangani {{ pks.ttd_at|date:"d/m/Y" }}, menunggu e-meterai{% else %}belum ditandatangani (batas {{ pks_batas|tgl }}){% endif %}</div>
+                        </div>
+                        {% if pks.status == 'bermeterai' %}<span class="badge-soft badge-soft-green">Final</span>{% elif pks.status == 'ditandatangani' %}<span class="badge-soft badge-soft-blue">Ditandatangani</span>{% else %}<span class="badge-soft badge-soft-amber">Menunggu</span>{% endif %}
+                        <a href="{% url 'owner_perjanjian' tenant.slug %}" class="btn btn-dz-outline btn-sm">{% if pks.status == 'menunggu' %}Tanda tangani{% else %}Lihat PKS{% endif %}</a>
+                        <a href="{% url 'syarat' %}" target="_blank" class="btn btn-link btn-sm">S&amp;K</a>
+                    </div></div>
+                    <div class="col-lg-6"><div class="dz-card dz-card-pad h-100">
+                        <h5 class="dz-section-title mb-3">Akun Pengguna</h5>
+                        <div class="acc-row mb-3">
+                            <div class="av" style="background:var(--navy-800);color:#fff"><i class="fas fa-user-tie"></i></div>
+                            <div class="flex-grow-1"><div class="fw-800 text-dark">{{ request.user.username }}</div><div class="small text-muted">Owner · akun Anda</div></div>
+                            <span class="badge-soft badge-soft-blue">Owner</span>
+                        </div>
+                        {% for k in kasir_accounts %}
+                        <div class="acc-row mb-3">
+                            <div class="av"><i class="fas fa-cash-register"></i></div>
+                            <div class="flex-grow-1"><div class="fw-800 text-dark">{{ k.username }}</div><div class="small text-muted">Kasir</div></div>
+                            <span class="badge-soft badge-soft-gray">Kasir</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small">Belum ada akun kasir.</p>
+                        {% endfor %}
+                        <p class="small text-muted mb-0">Password akun dikirim ke email pendaftaran ({{ tenant.email_owner }}).</p>
+                    </div></div>
+                    <div class="col-lg-6"><div class="dz-card dz-card-pad h-100">
+                        <h5 class="dz-section-title mb-3">Profil Cafe</h5>
+                        <dl class="row small mb-0 profile">
+                            <dt class="col-4 text-muted fw-semibold">Nama</dt><dd class="col-8 fw-bold text-dark">{{ tenant.nama_cafe }}</dd>
+                            <dt class="col-4 text-muted fw-semibold">Kode Cafe</dt><dd class="col-8"><code>{{ tenant.slug }}</code></dd>
+                            <dt class="col-4 text-muted fw-semibold">Pemilik</dt><dd class="col-8">{{ tenant.nama_owner }}</dd>
+                            <dt class="col-4 text-muted fw-semibold">Email</dt><dd class="col-8">{{ tenant.email_owner }}</dd>
+                            <dt class="col-4 text-muted fw-semibold">WhatsApp</dt><dd class="col-8">{{ tenant.whatsapp }}</dd>
+                            <dt class="col-4 text-muted fw-semibold">Alamat</dt><dd class="col-8">{{ tenant.alamat }}</dd>
+                            <dt class="col-4 text-muted fw-semibold">Link Menu</dt><dd class="col-8"><a href="/menu/{{ tenant.slug }}/" target="_blank">/menu/{{ tenant.slug }}/</a></dd>
+                        </dl>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+    <div class="modal fade" id="modalMenu" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header grad">
+                    <h5 class="modal-title" id="modalMenuTitle"><i class="fas fa-plus-circle me-2"></i>Tambah Menu Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formMenu" onsubmit="submitMenu(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="menuId">
+                        <div class="row g-4">
+                            <div class="col-md-5">
+                                <label class="form-label">Foto Menu</label>
+                                <label class="foto-drop w-100" for="menuFoto" id="fotoDrop">
+                                    <div class="hint" id="fotoHint"><i class="fas fa-camera"></i>Klik untuk unggah foto<br><span class="small">JPG / PNG, maks 5 MB</span></div>
+                                    <img id="fotoPreview" class="d-none" alt="Preview">
+                                </label>
+                                <input type="file" id="menuFoto" accept="image/*" class="d-none" onchange="previewFoto(this)">
+                            </div>
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <label class="form-label">Nama Menu</label>
+                                    <input type="text" id="menuNama" class="form-control" placeholder="Contoh: Kopi Susu Aren" required maxlength="100">
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Kategori</label>
+                                        <select id="menuKategori" class="form-select">
+                                            {% for val, label in kategori_choices %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Harga (Rp)</label>
+                                        <input type="number" id="menuHarga" class="form-control" placeholder="18000" min="0" step="500" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Deskripsi <span class="text-muted fw-normal">(opsional)</span></label>
+                                    <textarea id="menuDeskripsi" class="form-control" rows="2" maxlength="255" placeholder="Contoh: Espresso, susu segar & gula aren"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-3 rounded-2" style="background:#fafbfc;border:1px solid var(--line)">
+                                    <div><div class="fw-800 text-dark small">Status Menu</div><div class="small text-muted" id="statusLabel">Tersedia untuk dipesan</div></div>
+                                    <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" id="menuTersedia" checked style="width:2.8em;height:1.5em" onchange="document.getElementById('statusLabel').innerText=this.checked?'Tersedia untuk dipesan':'Habis — tampil monokrom di pelanggan'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                        <button type="button" class="btn btn-dz-ghost" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-dz px-4" id="btnSimpanMenu"><i class="fas fa-save me-2"></i>Simpan Menu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalTambahMeja" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header grad">
+                    <h5 class="modal-title"><i class="fas fa-chair me-2"></i>Tambah Meja Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formTambahMeja" onsubmit="submitTambahMeja(event)">
+                        <label class="form-label">Nomor / Nama Meja</label>
+                        <input type="text" id="inputNomorMeja" class="form-control form-control-lg mb-2" placeholder="Contoh: 01, 02, atau VIP-1" required maxlength="20">
+                        <div class="form-text mb-3">Nomor ini otomatis terbaca saat pelanggan scan QR Code.</div>
+                        <button type="submit" class="btn btn-dz w-100 btn-lg">Simpan Meja</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalQrMeja" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-800">QR Code Meja</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center pb-4">
+                    <div class="p-2 border rounded-2 d-inline-block mb-3 bg-white"><div id="modalQrCanvas"></div></div>
+                    <h4 class="fw-800 mb-1" id="modalQrMejaName">MEJA --</h4>
+                    <p class="text-muted small mb-3" id="modalQrTenantName">--</p>
+                    <div class="input-group input-group-sm mb-3 px-3">
+                        <input type="text" id="modalQrUrlText" class="form-control text-center" readonly>
+                        <button class="btn btn-dz-ghost" onclick="copyQrUrl()"><i class="fas fa-copy"></i> Salin</button>
+                    </div>
+                    <button onclick="printSingleQr()" class="btn btn-dz px-4"><i class="fas fa-print me-2"></i>Cetak Stiker QR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="{% static 'core/print-templates.js' %}"></script>
+    <script src="{% static 'core/dinezy-ui.js' %}"></script>
+
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const TENANT_ID = document.getElementById('hiddenTenantId').value;
+        const TENANT_SLUG = document.getElementById('hiddenTenantSlug').value;
+        const TENANT_NAME = document.getElementById('hiddenTenantName').value;
+        const TENANT_LOGO = "{% if tenant.logo %}{{ tenant.logo.url|escapejs }}{% endif %}";
+        const STATIC_LOGO_WHITE = "{% static 'core/img/dinezy-mark-white.png' %}";
+        const STATIC_LOGO_NAVY = "{% static 'core/img/dinezy-mark-navy.png' %}";
+
+        let allOrders = [], filteredOrders = [], listMeja = [], listMenu = [];
+        let trendChart = null, paymentChart = null, activeQrData = null, activeKategori = 'Semua';
+
+        axios.defaults.xsrfCookieName = 'csrftoken';
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+        axios.defaults.withCredentials = true;
+
+        const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        const toast = (icon, title) => window.DZUI
+            ? DZUI.toast({ type: icon === 'error' ? 'error' : icon, title, timeout: 2600 })
+            : Swal.fire({ toast: true, position: 'top-end', icon, title, timer: 1800, showConfirmButton: false });
+        const apiError = (err, fallback) => {
+            const d = err?.response?.data;
+            if (d && typeof d === 'object') return Object.values(d).flat().join(' ');
+            return fallback;
+        };
+
+        document.getElementById('baseUrlDomain').value = window.location.origin;
+
+        async function loadOwnerData() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/order/?tenant=${TENANT_ID}`);
+                allOrders = res.data.filter(o => o.status_pesanan === 'Selesai' || o.status_pesanan === 'Diproses');
+                applyFilter();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('tableMenuBody').innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger">Gagal memuat data pesanan.</td></tr>`;
+            }
+        }
+
+        function applyFilter() {
+            const s = document.getElementById('startDate').value, e = document.getElementById('endDate').value;
+            let label = '· Semua waktu';
+            if (s && e) label = `· ${s} s/d ${e}`; else if (s) label = `· Sejak ${s}`; else if (e) label = `· Sampai ${e}`;
+            document.getElementById('labelTabelTanggal').innerText = label;
+            filteredOrders = allOrders.filter(o => {
+                const d = o.created_at ? o.created_at.substring(0, 10) : null;
+                if (!d) return true;
+                return !(s && d < s) && !(e && d > e);
+            });
+            processDataAndRender();
+        }
+
+        function summarizeMenu(orders) {
+            const sum = {};
+            orders.forEach(o => (o.items || []).forEach(it => {
+                const n = it.nama_menu || ('Menu ID ' + it.menu), q = Number(it.jumlah || 0), h = Number(it.harga_satuan || 0);
+                if (!sum[n]) sum[n] = { qty: 0, subtotal: 0, harga: h };
+                sum[n].qty += q; sum[n].subtotal += q * h;
+            }));
+            return sum;
+        }
+
+        function processDataAndRender() {
+            let total = 0, items = 0;
+            const pay = { QRIS: 0, Tunai: 0 }, daily = {};
+            filteredOrders.forEach(o => {
+                const t = Number(o.total_harga || 0) - Number(o.biaya_layanan || 0); total += t;
+                const m = String(o.metode_pembayaran || 'TUNAI').toUpperCase();
+                if (m === 'QRIS') pay.QRIS++; else pay.Tunai++;
+                const d = o.created_at ? o.created_at.substring(0, 10) : 'Hari ini';
+                if (!daily[d]) daily[d] = { rp: 0, n: 0 };
+                daily[d].rp += t; daily[d].n++;
+                (o.items || []).forEach(it => items += Number(it.jumlah || 0));
+            });
+            const n = filteredOrders.length;
+            document.getElementById('valPendapatan').innerText = rp(total);
+            document.getElementById('valNota').innerText = n;
+            document.getElementById('valItemTerjual').innerText = items;
+            document.getElementById('valAov').innerText = n ? rp(Math.round(total / n)) : 'Rp 0';
+
+            const sum = summarizeMenu(filteredOrders), keys = Object.keys(sum).sort((a, b) => sum[b].qty - sum[a].qty);
+            document.getElementById('tableMenuBody').innerHTML = keys.length ? keys.map((k, i) => `
+                <tr><td class="text-center text-muted">${i + 1}</td><td class="fw-bold text-dark">${esc(k)}</td>
+                <td class="text-center"><span class="badge-soft badge-soft-blue">${sum[k].qty}</span></td>
+                <td class="text-end fw-bold" style="color:var(--dz-blue-700)">${rp(sum[k].subtotal)}</td></tr>`).join('')
+                : `<tr><td colspan="4" class="text-center py-4 text-muted">Belum ada transaksi pada rentang tanggal ini.</td></tr>`;
+
+            renderCharts(daily, pay);
+        }
+
+        function renderCharts(daily, pay) {
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            Chart.defaults.color = '#64748b';
+            const labels = Object.keys(daily).sort();
+            const ctx = document.getElementById('chartTrend').getContext('2d');
+            const g = ctx.createLinearGradient(0, 0, 0, 300); g.addColorStop(0, '#17345e'); g.addColorStop(1, '#17345e');
+            trendChart && trendChart.destroy();
+            trendChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length ? labels : ['Belum ada data'],
+                    datasets: [
+                        { label: 'Pendapatan (Rp)', data: labels.map(d => daily[d].rp), backgroundColor: g, borderRadius: 3, maxBarThickness: 34, yAxisID: 'y' },
+                        { label: 'Jumlah Nota', data: labels.map(d => daily[d].n), type: 'line', borderColor: '#d97706', backgroundColor: '#d97706', borderWidth: 2, pointRadius: 3, tension: .35, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, grid: { color: '#eef0f3' }, ticks: { callback: v => v >= 1000 ? (v / 1000) + 'k' : v } },
+                        y1: { position: 'right', beginAtZero: true, grid: { display: false }, ticks: { precision: 0 } }
+                    }
+                }
+            });
+            paymentChart && paymentChart.destroy();
+            paymentChart = new Chart(document.getElementById('chartPayment'), {
+                type: 'doughnut',
+                data: { labels: ['QRIS', 'Tunai'], datasets: [{ data: [pay.QRIS, pay.Tunai], backgroundColor: ['#17345e', '#9fb3cf'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } }
+            });
+        }
+
+        function printLaporanKeuangan() {
+            const p = new URLSearchParams();
+            const s = document.getElementById('startDate').value, e = document.getElementById('endDate').value;
+            if (s) p.set('mulai', s); if (e) p.set('sampai', e);
+            window.open(`/${TENANT_SLUG}/owner/laporan/${p.toString() ? '?' + p : ''}`, '_blank');
+        }
+
+        async function loadMenus() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/menu/?tenant=${TENANT_ID}`);
+                listMenu = res.data;
+                renderKategoriFilter();
+                renderMenuGrid();
+            } catch (e) {
+                document.getElementById('menuGrid').innerHTML = `<div class="col-12"><div class="dz-alert dz-alert-error">Gagal memuat menu.</div></div>`;
+            }
+        }
+
+        function renderKategoriFilter() {
+            const cats = ['Semua', ...new Set(listMenu.map(m => m.kategori || 'Lainnya'))];
+            if (!cats.includes(activeKategori)) activeKategori = 'Semua';
+            document.getElementById('kategoriFilter').innerHTML = cats.map(c =>
+                `<button class="filter-chip ${c === activeKategori ? 'active' : ''}" onclick="activeKategori='${esc(c)}';renderKategoriFilter();renderMenuGrid()">${esc(c)}</button>`).join('');
+        }
+
+        function renderMenuGrid() {
+            const q = document.getElementById('menuSearch').value.toLowerCase().trim();
+            const tersedia = listMenu.filter(m => m.tersedia).length;
+            document.getElementById('menuCount').innerText = listMenu.length;
+            document.getElementById('sumTersedia').innerText = tersedia;
+            document.getElementById('sumHabis').innerText = listMenu.length - tersedia;
+
+            const items = listMenu.filter(m => (activeKategori === 'Semua' || m.kategori === activeKategori) && (!q || m.nama_menu.toLowerCase().includes(q)));
+            const grid = document.getElementById('menuGrid');
+            if (!listMenu.length) {
+                grid.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-utensils"></i></div><h6>Belum ada menu</h6><p class="small mb-3">Tambahkan menu pertama cafe Anda agar pelanggan bisa memesan.</p><button class="btn btn-dz" onclick="openMenuModal()"><i class="fas fa-plus me-2"></i>Tambah Menu</button></div></div>`;
+                return;
+            }
+            if (!items.length) { grid.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><h6>Tidak ada menu yang cocok</h6></div></div>`; return; }
+
+            grid.innerHTML = items.map(m => `
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="menu-tile ${m.tersedia ? '' : 'is-habis'}">
+                        <div class="thumb">
+                            ${m.foto ? `<img src="${esc(m.foto)}" alt="${esc(m.nama_menu)}" loading="lazy">` : `<div class="ph"><i class="fas fa-mug-hot"></i></div>`}
+                            <span class="cat">${esc(m.kategori || 'Lainnya')}</span>
+                            ${m.tersedia ? '' : '<div class="sold-out"><span>HABIS</span></div>'}
+                        </div>
+                        <div class="body">
+                            <div class="name">${esc(m.nama_menu)}</div>
+                            ${m.deskripsi ? `<div class="desc">${esc(m.deskripsi)}</div>` : ''}
+                            <div class="price">${rp(m.harga)}</div>
+                        </div>
+                        <div class="tile-actions">
+                            <button class="btn btn-sm btn-dz-ghost" onclick="openMenuModal(${m.id})"><i class="fas fa-pen me-1"></i>Ubah</button>
+                            <button class="btn btn-sm btn-soft-danger" onclick="deleteMenu(${m.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="avail-switch">
+                            <span class="small fw-bold ${m.tersedia ? 'text-success' : 'text-secondary'}">${m.tersedia ? '● Tersedia' : '● Habis'}</span>
+                            <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" ${m.tersedia ? 'checked' : ''} onchange="toggleTersedia(${m.id}, this.checked, this)"></div>
+                        </div>
+                    </div>
+                </div>`).join('');
+        }
+
+        const menuModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMenu'));
+
+        function openMenuModal(id = null) {
+            const f = document.getElementById('formMenu'); f.reset();
+            document.getElementById('menuId').value = id || '';
+            document.getElementById('fotoPreview').classList.add('d-none');
+            document.getElementById('fotoHint').classList.remove('d-none');
+            document.getElementById('menuTersedia').checked = true;
+            document.getElementById('statusLabel').innerText = 'Tersedia untuk dipesan';
+            document.getElementById('modalMenuTitle').innerHTML = id ? '<i class="fas fa-pen me-2"></i>Ubah Menu' : '<i class="fas fa-plus-circle me-2"></i>Tambah Menu Baru';
+            if (id) {
+                const m = listMenu.find(x => x.id === id); if (!m) return;
+                document.getElementById('menuNama').value = m.nama_menu;
+                document.getElementById('menuKategori').value = m.kategori || 'Lainnya';
+                document.getElementById('menuHarga').value = m.harga;
+                document.getElementById('menuDeskripsi').value = m.deskripsi || '';
+                document.getElementById('menuTersedia').checked = m.tersedia;
+                document.getElementById('statusLabel').innerText = m.tersedia ? 'Tersedia untuk dipesan' : 'Habis — tampil monokrom di pelanggan';
+                if (m.foto) { const p = document.getElementById('fotoPreview'); p.src = m.foto; p.classList.remove('d-none'); document.getElementById('fotoHint').classList.add('d-none'); }
+            }
+            menuModal().show();
+            setTimeout(() => document.getElementById('menuNama').focus(), 350);
+        }
+
+        function previewFoto(input) {
+            const file = input.files[0]; if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { input.value = ''; return Swal.fire('Foto terlalu besar', 'Maksimal 5 MB.', 'warning'); }
+            const p = document.getElementById('fotoPreview');
+            p.src = URL.createObjectURL(file); p.classList.remove('d-none');
+            document.getElementById('fotoHint').classList.add('d-none');
+        }
+
+        async function submitMenu(e) {
+            e.preventDefault();
+            const id = document.getElementById('menuId').value;
+            const fd = new FormData();
+            fd.append('nama_menu', document.getElementById('menuNama').value.trim());
+            fd.append('kategori', document.getElementById('menuKategori').value);
+            fd.append('harga', document.getElementById('menuHarga').value);
+            fd.append('deskripsi', document.getElementById('menuDeskripsi').value.trim());
+            fd.append('tersedia', document.getElementById('menuTersedia').checked ? 'true' : 'false');
+            const foto = document.getElementById('menuFoto').files[0];
+            if (foto) fd.append('foto', foto);
+
+            const btn = document.getElementById('btnSimpanMenu');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+            try {
+                if (id) await axios.patch(`${API_BASE_URL}/menu/${id}/`, fd);
+                else await axios.post(`${API_BASE_URL}/menu/`, fd);
+                menuModal().hide();
+                toast('success', id ? 'Menu diperbarui' : 'Menu ditambahkan');
+                await loadMenus();
+                bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-menu-btn')).show();
+            } catch (err) {
+                Swal.fire('Gagal menyimpan', apiError(err, 'Periksa kembali data menu.'), 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-save me-2"></i>Simpan Menu';
+            }
+        }
+
+        async function toggleTersedia(id, value, el) {
+            try {
+                const res = await axios.post(`${API_BASE_URL}/menu/${id}/toggle_tersedia/`, { tersedia: value });
+                const idx = listMenu.findIndex(m => m.id === id); if (idx > -1) listMenu[idx] = res.data.data;
+                renderMenuGrid();
+                toast('success', res.data.message);
+            } catch (err) {
+                el.checked = !value;
+                Swal.fire('Gagal', apiError(err, 'Tidak dapat mengubah status.'), 'error');
+            }
+        }
+
+        async function deleteMenu(id) {
+            const m = listMenu.find(x => x.id === id);
+            const ok = await Swal.fire({ title: `Hapus "${esc(m?.nama_menu)}"?`, text: 'Menu akan hilang dari daftar pelanggan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonText: 'Batal', confirmButtonText: 'Ya, hapus' });
+            if (!ok.isConfirmed) return;
+            try { await axios.delete(`${API_BASE_URL}/menu/${id}/`); toast('success', 'Menu dihapus'); loadMenus(); }
+            catch (err) { Swal.fire('Gagal', 'Menu tidak bisa dihapus (mungkin sudah tercatat di pesanan). Tandai sebagai "Habis" saja.', 'error'); }
+        }
+
+        const customerUrlFor = nomor => `${document.getElementById('baseUrlDomain').value.replace(/\/$/, '')}/menu/${TENANT_SLUG}/?meja=${encodeURIComponent(nomor)}`;
+
+        async function loadMejaData() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/meja/?tenant=${TENANT_ID}`);
+                listMeja = res.data; renderMejaCards();
+            } catch (e) {
+                document.getElementById('gridMejaContainer').innerHTML = `<div class="col-12"><div class="dz-alert dz-alert-error">Gagal memuat data meja.</div></div>`;
+            }
+        }
+
+        function renderMejaCards() {
+            const c = document.getElementById('gridMejaContainer');
+            document.getElementById('btnPrintAll').disabled = !listMeja.length;
+            if (!listMeja.length) {
+                c.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-qrcode"></i></div><h6>Belum ada meja</h6><p class="small mb-3">Tambah meja lalu cetak QR Code-nya.</p><button class="btn btn-dz" data-bs-toggle="modal" data-bs-target="#modalTambahMeja"><i class="fas fa-plus me-2"></i>Tambah Meja</button></div></div>`;
+                return;
+            }
+            c.innerHTML = listMeja.map((m, i) => `
+                <div class="col-sm-6 col-lg-4 col-xxl-3">
+                    <div class="meja-card">
+                        <div class="mt">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div><small>MEJA</small><b>${esc(m.nomor_meja)}</b></div>
+                                <button onclick="deleteMeja(${i})" class="mt-del" title="Hapus meja"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                        <div class="mq"><div class="qr-box"><div id="qr-thumb-${m.id}"></div></div></div>
+                        <div class="mf">
+                            <button onclick="previewQrModal(${i})" class="btn btn-sm btn-dz-ghost flex-fill"><i class="fas fa-expand me-1"></i>Lihat</button>
+                            <button onclick="printMeja([${i}])" class="btn btn-sm btn-dz flex-fill"><i class="fas fa-print me-1"></i>Cetak</button>
+                        </div>
+                    </div>
+                </div>`).join('');
+            setTimeout(() => listMeja.forEach(m => {
+                const el = document.getElementById(`qr-thumb-${m.id}`);
+                if (el) { el.innerHTML = ''; new QRCode(el, { text: customerUrlFor(m.nomor_meja), width: 120, height: 120, colorDark: '#0b1d38', correctLevel: QRCode.CorrectLevel.M }); }
+            }), 50);
+        }
+
+        function printMeja(indexes) {
+            const list = (indexes || listMeja.map((_, i) => i)).map(i => listMeja[i]).filter(Boolean);
+            if (!list.length) return;
+            DZPrint.qrMeja({
+                cafeName: TENANT_NAME, cafeLogo: TENANT_LOGO,
+                brandLogoWhite: STATIC_LOGO_WHITE, brandLogoNavy: STATIC_LOGO_NAVY,
+                tables: list.map(m => ({ nomor: m.nomor_meja, url: customerUrlFor(m.nomor_meja) }))
+            });
+        }
+
+        async function submitTambahMeja(e) {
+            e.preventDefault();
+            const nomor = document.getElementById('inputNomorMeja').value.trim();
+            if (!nomor) return;
+            try {
+                await axios.post(`${API_BASE_URL}/meja/`, { nomor_meja: nomor, tenant: TENANT_ID });
+                document.getElementById('inputNomorMeja').value = '';
+                bootstrap.Modal.getInstance(document.getElementById('modalTambahMeja')).hide();
+                toast('success', `Meja ${nomor} ditambahkan`);
+                loadMejaData();
+            } catch (err) { Swal.fire('Gagal', 'Nomor meja mungkin sudah ada.', 'error'); }
+        }
+
+        async function deleteMeja(i) {
+            const m = listMeja[i];
+            const ok = await Swal.fire({ title: `Hapus Meja ${esc(m.nomor_meja)}?`, text: 'QR Code meja ini tidak bisa dipakai lagi.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, hapus', cancelButtonText: 'Batal' });
+            if (!ok.isConfirmed) return;
+            try { await axios.delete(`${API_BASE_URL}/meja/${m.id}/`); toast('success', 'Meja dihapus'); loadMejaData(); }
+            catch { Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus meja.', 'error'); }
+        }
+
+        function previewQrModal(i) {
+            const m = listMeja[i], url = customerUrlFor(m.nomor_meja);
+            activeQrData = { nomorMeja: m.nomor_meja, customerUrl: url };
+            document.getElementById('modalQrMejaName').innerText = `MEJA ${m.nomor_meja}`;
+            document.getElementById('modalQrTenantName').innerText = TENANT_NAME;
+            document.getElementById('modalQrUrlText').value = url;
+            const box = document.getElementById('modalQrCanvas'); box.innerHTML = '';
+            new QRCode(box, { text: url, width: 200, height: 200, colorDark: '#0b1f4d', correctLevel: QRCode.CorrectLevel.H });
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQrMeja')).show();
+        }
+
+        function copyQrUrl() { navigator.clipboard.writeText(document.getElementById('modalQrUrlText').value); toast('success', 'URL disalin'); }
+
+        function printSingleQr() {
+            if (!activeQrData) return;
+            const i = listMeja.findIndex(m => m.nomor_meja === activeQrData.nomorMeja);
+            if (i > -1) printMeja([i]);
+        }
+
+        document.querySelectorAll('#sidebar .nav-link, #sidebar .sb-logout').forEach(b => b.addEventListener('click', () => setTimeout(() => b.blur(), 150)));
+        document.querySelectorAll('#sidebar [data-bs-toggle=tab]').forEach(b => b.addEventListener('shown.bs.tab', () => {
+            document.getElementById('pageTitle').innerText = b.dataset.title;
+            document.getElementById('sidebar').classList.remove('open');
+        }));
+
+        function pratinjauGambar(input, maksMb, prev, hint) {
+            document.getElementById(input).addEventListener('change', e => {
+                const f = e.target.files[0]; if (!f) return;
+                if (f.size > maksMb * 1024 * 1024) { Swal.fire('Gambar terlalu besar', `Maksimal ${maksMb} MB.`, 'warning'); e.target.value = ''; return; }
+                const img = document.getElementById(prev); img.src = URL.createObjectURL(f); img.hidden = false;
+                const h = document.getElementById(hint); if (h) h.remove();
+            });
+        }
+        pratinjauGambar('setLogo', 2, 'setLogoPrev', 'setLogoHint');
+        pratinjauGambar('setQris', 3, 'setQrisPrev', 'setQrisHint');
+        function previewCetak(jenis) {
+            const paper = document.querySelector('input[name=print_type]:checked').value;
+            const contoh = { id: 128, nama_pemesan: 'Rina', nomor_meja: '07', metode_pembayaran: 'QRIS', status_pesanan: 'Diproses',
+                created_at: new Date().toISOString(), total_harga: 50000 + {{ tarif|default:1500 }}, biaya_layanan: {{ tarif|default:1500 }},
+                items: [{ nama_menu: 'Kopi Susu Aren', jumlah: 2, harga_satuan: 18000, catatan: 'Less sugar, es sedikit' }, { nama_menu: 'Kentang Goreng', jumlah: 1, harga_satuan: 14000 }] };
+            const logo = document.getElementById('setLogoPrev')?.src || TENANT_LOGO;
+            if (jenis === 'dapur') return DZPrint.dapur({ order: contoh, cafeName: TENANT_NAME, paper });
+            DZPrint.nota({ order: contoh, cafeName: TENANT_NAME, cafeAddress: "{{ tenant.alamat|escapejs }}", cafePhone: "{{ tenant.whatsapp|escapejs }}",
+                cafeLogo: logo, brandLogoNavy: STATIC_LOGO_NAVY, paper, footer: document.getElementById('notaFooter').value,
+                menuUrl: document.getElementById('notaQr').checked ? `${location.origin}/menu/${TENANT_SLUG}/?meja=07` : '', kasirName: 'kasir' });
+        }
+        if (location.hash === '#setelan') bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-setelan-btn')).show();
+        if (location.hash === '#tagihan') bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-tagihan-btn')).show();
+        if (location.hash === '#berkas') bootstrap.Tab.getOrCreateInstance(document.getElementById('tab-berkas-btn')).show();
+
+        loadOwnerData();
+        loadMenus();
+
+        setInterval(() => {
+            if (document.hidden) return;
+            loadOwnerData();
+            if (!document.querySelector('.modal.show')) loadMenus();
+        }, 30000);
+</script>
+</body>
+</html>

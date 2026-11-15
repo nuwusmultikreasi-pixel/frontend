@@ -1,0 +1,148 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Dinezy</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <link rel="stylesheet" href="{% static 'core/auth.css' %}">
+</head>
+<body class="auth-page login-v2">
+<div class="app-bg auth-bg" aria-hidden="true"><div class="scene"></div></div>
+<div class="auth-shell">
+    <aside class="auth-aside">
+        <a href="/" class="aside-brand">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark" alt="Logo Dinezy">
+            <span><b>{{ brand.nama }}</b><small>{{ brand.tagline }}</small></span>
+        </a>
+
+        <div class="aside-body">
+            <h1>Selamat datang<br>kembali.</h1>
+            <p>Pesanan dari meja sudah menunggu Anda.</p>
+
+            <div class="live" aria-hidden="true">
+                <div class="live-ring"></div>
+                <div class="live-card">
+                    <div class="live-head"><span class="dot"></span><b>Pesanan masuk</b><small>Hari ini</small></div>
+                    <div class="live-row r1"><span class="mj">07</span><div><b>Kopi Susu Aren ×2</b><small>QRIS · baru saja</small></div><em class="baru">Baru</em></div>
+                    <div class="live-row r2"><span class="mj">03</span><div><b>Mie Goreng Mlipir</b><small>Tunai · 2 menit lalu</small></div><em class="proses">Diproses</em></div>
+                    <div class="live-row r3"><span class="mj">12</span><div><b>Matcha Latte ×3</b><small>QRIS · 6 menit lalu</small></div><em class="selesai">Selesai</em></div>
+                </div>
+                <div class="live-chip c1"><i class="fas fa-qrcode"></i> Scan QR · Meja 07</div>
+                <div class="live-chip c2"><i class="fas fa-circle-check"></i> QRIS diterima <b>Rp 36.000</b></div>
+            </div>
+        </div>
+
+        <div class="aside-foot">&copy; <span class="js-yr"></span> PT Nuwus Multikreasi Digital</div>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-top">
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Beranda</a>
+            <a href="{% url 'register' %}" class="top-cta">Daftarkan cafe <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="auth-box">
+            <span class="box-mark"><img src="{% static 'core/img/dinezy-mark-navy.png' %}" alt="Logo Dinezy"></span>
+            <h2 class="auth-title">Masuk</h2>
+            <p class="auth-sub">Kelola cafe Anda dari satu tempat.</p>
+
+            {% if blocked %}
+            <div class="bill-block mb-4" role="alert">
+                <div class="bb-head"><span class="bb-ic"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <div><b>{% if blocked.reason == 'tagihan' %}Anda belum membayar tagihan{% else %}Akses cafe dikunci admin{% endif %}</b>
+                    <small>{{ blocked.cafe }} diblokir sementara</small></div></div>
+                {% if blocked.invoices %}
+                <div class="bb-list">
+                    {% for i in blocked.invoices %}
+                    <div><span>{{ i.periode }}<small>{{ i.nomor }} · jatuh tempo {{ i.jatuh_tempo }}</small></span><b>{{ i.total|rupiah }}{% if i.denda %}<small>termasuk denda {{ i.denda|rupiah }}</small>{% endif %}</b></div>
+                    {% endfor %}
+                    <div class="bb-total"><span>Total harus dibayar</span><b>{{ blocked.total|rupiah }}</b></div>
+                </div>
+                {% endif %}
+                <p>Silakan lakukan pembayaran dan konfirmasi ke admin. Akun akan aktif kembali otomatis setelah tagihan ditandai lunas.</p>
+                <a class="btn btn-sm bb-wa" target="_blank" rel="noopener" href="https://wa.me/{{ blocked.wa }}?text=Halo%20Admin%20Dinezy%2C%20saya%20ingin%20membayar%20tagihan%20{{ blocked.cafe|urlencode }}"><i class="fab fa-whatsapp me-2"></i>Hubungi Admin via WhatsApp</a>
+            </div>
+            {% else %}
+            {% for m in messages %}
+                <div class="dz-alert dz-alert-error mb-3" role="alert"><i class="fas fa-circle-exclamation mt-1"></i><div>{{ m }}</div></div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="role-switch mb-4" role="tablist" aria-label="Masuk sebagai">
+                <button type="button" class="{% if mode != 'admin' %}active{% endif %}" data-mode="cafe"><i class="fas fa-store me-2"></i>Owner / Kasir</button>
+                <button type="button" class="{% if mode == 'admin' %}active{% endif %}" data-mode="admin"><i class="fas fa-user-shield me-2"></i>Admin</button>
+            </div>
+
+            <form method="POST" action="{% url 'login' %}" id="formLogin" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <input type="hidden" name="mode" id="mode" value="{% if mode == 'admin' %}admin{% else %}cafe{% endif %}">
+                <div class="admin-note mb-3" id="adminNote" {% if mode != 'admin' %}hidden{% endif %}>
+                    <i class="fas fa-user-shield"></i><span>Masuk ke <b>Panel Admin</b> untuk mengelola cafe, tagihan, dan pembayaran.</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="username">Username</label>
+                    <div class="input-icon"><i class="fas fa-user"></i>
+                        <input id="username" type="text" name="username" class="form-control form-control-lg" placeholder="contoh: owner.kopi-senja" value="{{ username }}" required autocomplete="username" autocapitalize="none" spellcheck="false" autofocus></div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label" for="pwd">Password</label>
+                    <div class="input-icon position-relative"><i class="fas fa-lock"></i>
+                        <input type="password" name="password" id="pwd" class="form-control form-control-lg" placeholder="Password" required autocomplete="current-password" style="padding-right:46px">
+                        <button type="button" class="pwd-toggle" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4 small">
+                    <span class="text-muted" id="capsWarn" hidden><i class="fas fa-triangle-exclamation me-1"></i>Caps Lock aktif</span>
+                    <span class="ms-auto text-muted">Lupa password? Hubungi admin.</span>
+                </div>
+                <button type="submit" class="btn btn-dz btn-lg w-100" id="btnLogin">Masuk</button>
+            </form>
+
+            <div class="auth-note"><span>Dengan masuk, Anda menyetujui <a href="{% url 'syarat' %}" target="_blank" rel="noopener">Syarat &amp; Ketentuan Layanan</a>.</span></div>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.querySelectorAll('.js-yr').forEach(e => e.textContent = new Date().getFullYear());
+    const pwd = document.getElementById('pwd');
+    document.querySelector('.pwd-toggle').addEventListener('click', e => {
+        pwd.type = pwd.type === 'password' ? 'text' : 'password';
+        e.currentTarget.firstElementChild.classList.toggle('fa-eye-slash');
+    });
+    pwd.addEventListener('keyup', e => { document.getElementById('capsWarn').hidden = !(e.getModifierState && e.getModifierState('CapsLock')); });
+    document.querySelectorAll('.role-switch button').forEach(b => b.addEventListener('click', () => {
+        document.querySelectorAll('.role-switch button').forEach(x => x.classList.toggle('active', x === b));
+        const admin = b.dataset.mode === 'admin';
+        document.getElementById('mode').value = admin ? 'admin' : 'cafe';
+        document.getElementById('adminNote').hidden = !admin;
+        document.getElementById('username').focus();
+    }));
+    document.getElementById('formLogin').addEventListener('submit', e => {
+        const f = e.target;
+        if (!f.checkValidity()) { e.preventDefault(); f.reportValidity(); return; }
+        const b = document.getElementById('btnLogin'); b.disabled = true;
+        b.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa akun...';
+
+        if (f.dataset.go === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        e.preventDefault(); f.dataset.go = '1';
+        const sp = document.createElement('div');
+        sp.className = 'dz-splash pre'; sp.setAttribute('aria-hidden', 'true');
+        sp.innerHTML = '<div class="sp-glow"></div><div class="sp-center"><div class="sp-logo"><span class="sp-ring r1"></span><span class="sp-ring r2"></span>' +
+            '<img src="{% static "core/img/dinezy-mark-white.png" %}" alt=""></div><div class="sp-text"><small>Dinezy</small><b>Memeriksa akun…</b><span class="sp-bar"><i></i></span></div></div>';
+        document.body.classList.add('auth-leave');
+        document.body.appendChild(sp);
+        setTimeout(() => f.submit(), 850);
+    });
+
+    window.addEventListener('pageshow', ev => { if (ev.persisted) { document.querySelectorAll('.dz-splash.pre').forEach(x => x.remove()); document.body.classList.remove('auth-leave');
+        const f = document.getElementById('formLogin'); f.dataset.go = ''; const b = document.getElementById('btnLogin'); b.disabled = false; b.textContent = 'Masuk'; } });
+</script>
+</body>
+</html>

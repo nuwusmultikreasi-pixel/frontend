@@ -1,0 +1,354 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Menu — {{ tenant.nama_cafe }}</title>
+        {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <style>
+        body { background: var(--bg); padding-bottom: 100px; }
+        .cafe-head { background: var(--navy-900); color: #fff; padding: 22px 0 52px; }
+        .cafe-head h1 { color: #fff; font-size: 1.35rem; margin: 0; font-weight: 700; }
+        .cafe-head .sub { color: #a9b7cc; font-size: .85rem; }
+        .cafe-logo { width: 50px; height: 50px; border-radius: 10px; background: #fff; color: var(--navy-800); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; overflow: hidden; flex-shrink: 0; }
+        .cafe-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .meja-tag { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600; color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; padding: 3px 9px; white-space: nowrap; }
+        .search-wrap { margin-top: -26px; }
+        .search-box { background: #fff; border-radius: 10px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+        .search-box .form-control { border: 0; padding-top: .8rem; padding-bottom: .8rem; box-shadow: none !important; }
+        .cats { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; }
+        .cats::-webkit-scrollbar { display: none; }
+        .cat-chip { white-space: nowrap; border: 1px solid var(--line-strong); background: #fff; color: var(--text); border-radius: 6px; padding: 6px 14px; font-size: .84rem; font-weight: 500; }
+        .cat-chip.active { background: var(--navy-800); color: #fff; border-color: var(--navy-800); }
+
+        .menu-tile .add-row { padding: 0 12px 12px; }
+        .btn-add { width: 100%; font-size: .85rem; padding: .5rem; }
+        .btn-habis { width: 100%; border-radius: 8px; font-size: .85rem; padding: .5rem; background: #e5e7eb; color: #6b7280; border: 0; cursor: not-allowed; font-weight: 600; }
+        .qty-ctl { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--line-strong); border-radius: 8px; padding: 3px; background: #fff; }
+        .qty-ctl button { width: 32px; height: 32px; border-radius: 6px; border: 0; background: var(--navy-50); color: var(--navy-800); font-weight: 700; }
+        .qty-ctl b { color: var(--ink); }
+        .menu-tile.is-habis { pointer-events: none; user-select: none; }
+
+        .floating-cart { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: calc(100% - 24px); max-width: 520px; background: var(--navy-900); color: #fff; border-radius: 10px; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 24px rgba(7,20,38,.35); z-index: 1040; border: 0; transition: transform .25s ease, opacity .2s; }
+        .floating-cart.hidden { transform: translate(-50%, 140%); opacity: 0; pointer-events: none; }
+        .cart-badge { background: #fff; color: var(--navy-900); border-radius: 6px; min-width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 10px; padding: 0 6px; font-size: .85rem; }
+
+        .offcanvas-bottom { height: 88vh !important; border-radius: 14px 14px 0 0; border: 0; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); gap: 12px; }
+        .cart-item .qty-ctl button { width: 28px; height: 28px; }
+        .cart-line { padding: 12px 0; border-bottom: 1px solid var(--line); } .cart-line .cart-item { padding: 0; border: 0; }
+        .note-btn { margin-top: 6px; border: 0; background: none; padding: 0; font-size: .8rem; font-weight: 600; color: var(--navy-700); }
+        .note-btn i { margin-right: 5px; }
+        .note-box { margin-top: 8px; position: relative; }
+        .note-box textarea { width: 100%; resize: none; border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px 18px; font-size: .85rem; background: #fffdf5; }
+        .note-box textarea:focus { outline: none; border-color: var(--navy-600, #2a5594); box-shadow: 0 0 0 3px rgba(42,85,148,.12); background: #fff; }
+        .note-box small { position: absolute; right: 9px; bottom: 6px; font-size: .68rem; color: var(--muted); }
+        .note-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .note-chips button { border: 1px solid var(--line-strong); background: #fff; border-radius: 999px; padding: 3px 10px; font-size: .74rem; color: var(--text); }
+        .note-chips button:active { background: var(--navy-50); }
+        .pay-opt { border: 1px solid var(--line-strong); border-radius: 8px; padding: 11px 14px; display: flex; gap: 12px; align-items: center; cursor: pointer; background: #fff; }
+        .pay-opt .ic { width: 34px; height: 34px; border-radius: 6px; background: var(--navy-50); color: var(--navy-700); display: flex; align-items: center; justify-content: center; }
+        .pay-input:checked + .pay-opt { border-color: var(--navy-700); background: var(--navy-50); box-shadow: inset 0 0 0 1px var(--navy-700); }
+        .qris-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: center; margin-bottom: 14px; }
+        .qris-card .qc-head { display: flex; justify-content: space-between; align-items: center; font-size: .78rem; color: var(--muted); margin-bottom: 10px; }
+        .qris-card .qc-head b { color: #0b1d38; font-size: 1.05rem; }
+        .qris-img { width: 100%; max-width: 260px; border-radius: 10px; background: #fff; cursor: zoom-in; }
+        .qris-steps { text-align: left; font-size: .78rem; color: var(--muted); margin: 10px 0 0; padding-left: 18px; }
+        .qris-empty { font-size: .82rem; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+        .fee-rows { padding: 12px 0 10px; border-top: 1px solid var(--line); }
+        .total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 14px; border-top: 1px dashed var(--line); margin-bottom: 18px; }
+</style>
+</head>
+<body>
+    <header class="cafe-head">
+        <div class="container" style="max-width:960px">
+            <div class="d-flex align-items-center gap-3">
+                <div class="cafe-logo">{% if tenant.logo %}<img src="{{ tenant.logo.url }}" alt="">{% else %}<i class="fas fa-mug-hot"></i>{% endif %}</div>
+                <div class="flex-grow-1 min-w-0">
+                    <h1 class="text-truncate" id="cafeName">{{ tenant.nama_cafe }}</h1>
+                    <div class="sub mb-2">Silakan pilih menu dan kirim pesanan dari meja Anda</div>
+                    <span class="meja-tag"><i class="fas fa-chair"></i> Meja <span id="nomorMejaDisplay">-</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="max-width:960px">
+        <div class="search-wrap">
+            <div class="search-box input-icon"><i class="fas fa-search"></i><input type="search" id="searchMenu" class="form-control" placeholder="Cari kopi, mie, snack..." oninput="renderMenus()"></div>
+        </div>
+        <div class="cats" id="catChips"></div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2 mb-3 px-1">
+            <h5 class="mb-0" style="font-size:1.05rem" id="sectionTitle">Semua Menu</h5>
+            <span class="small text-muted" id="availInfo"></span>
+        </div>
+        <div class="row g-3" id="menu-container">
+            <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div><p class="text-muted mt-2 small">Menyiapkan daftar hidangan...</p></div>
+        </div>
+        <div class="text-center text-muted small mt-5 d-flex align-items-center justify-content-center gap-2">
+            <img src="{% static 'core/img/dinezy-mark-navy.png' %}" alt="" style="height:18px;opacity:.7"> Didukung oleh Dinezy
+        </div>
+    </main>
+
+    <button class="floating-cart hidden" id="floatingCart" data-bs-toggle="offcanvas" data-bs-target="#checkoutCanvas">
+        <span class="d-flex align-items-center"><span class="cart-badge" id="cartCount">0</span><span class="fw-semibold">Lihat Pesanan</span></span>
+        <span class="fw-bold" id="cartTotal">Rp 0</span>
+    </button>
+
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="checkoutCanvas">
+                <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title">Pesanan Anda</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body pb-5">
+            <div class="mx-auto" style="max-width:560px">
+                <div id="cartItemsContainer" class="mb-3"></div>
+                <div class="fee-rows">
+                    <div class="d-flex justify-content-between small text-muted"><span>Subtotal</span><span id="checkoutSubtotal">Rp 0</span></div>
+                    <div class="d-flex justify-content-between small text-muted mt-1"><span>Biaya layanan <i class="fas fa-circle-info ms-1" title="Biaya layanan aplikasi pemesanan, dikenakan sekali per nota"></i></span><span id="checkoutFee">Rp 0</span></div>
+                </div>
+                <div class="total-row">
+                    <span class="fw-semibold text-dark">Total bayar</span><span class="fw-bold fs-5 text-dark" id="checkoutTotal">Rp 0</span>
+                </div>
+
+                <label class="form-label">Nama Pemesan</label>
+                <div class="input-icon mb-4"><i class="fas fa-user"></i><input type="text" class="form-control form-control-lg" id="inputNama" placeholder="Nama Anda (mis: Budi)" maxlength="100"></div>
+
+                <label class="form-label">Metode Pembayaran</label>
+                <div class="d-grid gap-2 mb-3">
+                    <input type="radio" class="btn-check pay-input" name="metode" id="payTunai" value="TUNAI" checked onchange="toggleQrisForm()">
+                    <label class="pay-opt" for="payTunai"><span class="ic"><i class="fas fa-money-bill-wave"></i></span><span><b class="d-block text-dark">Tunai</b><span class="small text-muted">Bayar di kasir</span></span></label>
+                    <input type="radio" class="btn-check pay-input" name="metode" id="payQris" value="QRIS" onchange="toggleQrisForm()">
+                    <label class="pay-opt" for="payQris"><span class="ic"><i class="fas fa-qrcode"></i></span><span><b class="d-block text-dark">QRIS / Transfer</b><span class="small text-muted">Unggah bukti pembayaran</span></span></label>
+                </div>
+
+                <div id="qrisSection" class="d-none p-3 rounded-2 mb-3" style="background:#fafbfc;border:1px solid var(--line)">
+                    <div id="qrisImgWrap" class="qris-card d-none">
+                        <div class="qc-head"><span>Bayar ke <b class="d-block text-start" id="qrisCafe"></b></span><span class="text-end">Total<b class="d-block" id="qrisTotal">Rp 0</b></span></div>
+                        <a id="qrisZoom" target="_blank" rel="noopener"><img id="qrisImg" class="qris-img" alt="QRIS cafe"></a>
+                        <a id="qrisSave" class="btn btn-sm btn-dz-outline w-100 mt-2" download="QRIS.png"><i class="fas fa-download me-2"></i>Simpan gambar QRIS</a>
+                        <ol class="qris-steps"><li>Scan QRIS di atas dengan e-wallet / m-banking (atau simpan gambar lalu pilih dari galeri).</li><li>Bayar sesuai total, lalu unggah bukti di bawah.</li></ol>
+                    </div>
+                    <div id="qrisEmpty" class="qris-empty d-none"><i class="fas fa-circle-info me-1"></i>Cafe belum mengunggah QRIS. Minta kode QRIS ke kasir, lalu unggah bukti pembayaran.</div>
+                    <p class="small fw-semibold mb-2 text-dark">Unggah bukti pembayaran:</p>
+                    <input class="form-control" type="file" id="buktiTransfer" accept="image/png,image/jpeg,image/webp">
+                </div>
+
+                <button class="btn btn-dz btn-lg w-100 mt-2" onclick="prosesPesanan()" id="btnProses">Kirim Pesanan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>const BIAYA_LAYANAN = {{ biaya_layanan|default:0 }};</script>
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const tenantSlug = "{{ tenant_slug|escapejs }}";
+
+        axios.defaults.xsrfCookieName = 'csrftoken';
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+        axios.defaults.withCredentials = true;
+
+        const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        const nomorMeja = new URLSearchParams(location.search).get('meja') || '';
+        document.getElementById('nomorMejaDisplay').innerText = nomorMeja || '-';
+
+        let tenantId = null, menus = [], cart = [], activeCat = 'Semua';
+
+        async function loadData() {
+            try {
+                const t = await axios.get(`${API_BASE_URL}/tenant/${encodeURIComponent(tenantSlug)}/`);
+                tenantId = t.data.id;
+                document.getElementById('qrisCafe').textContent = t.data.nama_cafe;
+                if (t.data.qris_image) {
+                    document.getElementById('qrisImg').src = t.data.qris_image;
+                    document.getElementById('qrisZoom').href = t.data.qris_image;
+                    document.getElementById('qrisSave').href = t.data.qris_image;
+                    document.getElementById('qrisImgWrap').classList.remove('d-none');
+                } else {
+                    document.getElementById('qrisEmpty').classList.remove('d-none');
+                }
+                await loadMenus();
+            } catch (e) {
+                document.getElementById('menu-container').innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-plug-circle-exclamation"></i></div><h6>Gagal memuat menu</h6><p class="small mb-0">Silakan muat ulang halaman.</p></div></div>`;
+            }
+        }
+
+        async function loadMenus() {
+            const res = await axios.get(`${API_BASE_URL}/menu/?tenant=${tenantId}`);
+            menus = res.data;
+
+            const habisDiCart = cart.filter(c => { const m = menus.find(x => x.id === c.id); return !m || !m.tersedia; });
+            if (habisDiCart.length) {
+                cart = cart.filter(c => !habisDiCart.includes(c));
+                Swal.fire({ icon: 'info', title: 'Menu habis', html: `<b>${habisDiCart.map(c => esc(c.nama)).join(', ')}</b> baru saja habis dan dikeluarkan dari keranjang.`, confirmButtonColor: '#102849' });
+            }
+            renderCats(); renderMenus(); updateCartUI();
+        }
+
+        function renderCats() {
+            const cats = ['Semua', ...new Set(menus.map(m => m.kategori || 'Lainnya'))];
+            if (!cats.includes(activeCat)) activeCat = 'Semua';
+            document.getElementById('catChips').innerHTML = cats.map(c => `<button class="cat-chip ${c === activeCat ? 'active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+            document.querySelectorAll('.cat-chip').forEach(b => b.onclick = () => { activeCat = b.dataset.cat; renderCats(); renderMenus(); });
+        }
+
+        function renderMenus() {
+            const c = document.getElementById('menu-container');
+            const q = document.getElementById('searchMenu').value.toLowerCase().trim();
+            const list = menus.filter(m => (activeCat === 'Semua' || m.kategori === activeCat) && (!q || m.nama_menu.toLowerCase().includes(q) || (m.deskripsi || '').toLowerCase().includes(q)))
+                              .sort((a, b) => (b.tersedia - a.tersedia));
+            const avail = menus.filter(m => m.tersedia).length;
+            document.getElementById('sectionTitle').innerText = activeCat === 'Semua' ? 'Semua Menu' : activeCat;
+            document.getElementById('availInfo').innerText = menus.length ? `${avail} dari ${menus.length} tersedia` : '';
+
+            if (!menus.length) { c.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-utensils"></i></div><h6>Menu belum tersedia</h6></div></div>`; return; }
+            if (!list.length) { c.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><h6>Menu tidak ditemukan</h6><p class="small mb-0">Coba kata kunci lain.</p></div></div>`; return; }
+
+            c.innerHTML = list.map(m => {
+                const inCart = cart.find(x => x.id === m.id);
+                let action;
+                if (!m.tersedia) action = `<button class="btn-habis" disabled aria-disabled="true">Habis</button>`;
+                else if (inCart) action = `<div class="qty-ctl"><button onclick="updateCartQty(${m.id},-1)" aria-label="Kurangi">−</button><b>${inCart.qty}</b><button onclick="updateCartQty(${m.id},1)" aria-label="Tambah">+</button></div>`;
+                else action = `<button class="btn btn-dz btn-add" onclick="addToCart(${m.id})">Tambah</button>`;
+                return `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="menu-tile ${m.tersedia ? '' : 'is-habis'}" ${m.tersedia ? '' : 'aria-disabled="true"'}>
+                        <div class="thumb">
+                            ${m.foto ? `<img src="${esc(m.foto)}" alt="${esc(m.nama_menu)}" loading="lazy">` : `<div class="ph"><i class="fas fa-mug-hot"></i></div>`}
+                            <span class="cat">${esc(m.kategori || 'Lainnya')}</span>
+                            ${m.tersedia ? '' : '<div class="sold-out"><span>HABIS</span></div>'}
+                        </div>
+                        <div class="body">
+                            <div class="name">${esc(m.nama_menu)}</div>
+                            ${m.deskripsi ? `<div class="desc">${esc(m.deskripsi)}</div>` : ''}
+                            <div class="price">${rp(m.harga)}</div>
+                        </div>
+                        <div class="add-row">${action}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function addToCart(id) {
+            const m = menus.find(x => x.id === id);
+            if (!m || !m.tersedia) return;
+            const ex = cart.find(x => x.id === id);
+            if (ex) ex.qty++; else cart.push({ id, nama: m.nama_menu, harga: m.harga, qty: 1, catatan: '', buka: false });
+            updateCartUI(); renderMenus();
+        }
+
+        function updateCartQty(id, d) {
+            const i = cart.findIndex(x => x.id === id);
+            if (i > -1) { cart[i].qty += d; if (cart[i].qty <= 0) cart.splice(i, 1); }
+            updateCartUI(); renderMenus();
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((s, i) => s + i.qty, 0), subtotal = cart.reduce((s, i) => s + i.harga * i.qty, 0);
+            const fee = count ? BIAYA_LAYANAN : 0, total = subtotal + fee;
+            document.getElementById('cartCount').innerText = count;
+            document.getElementById('cartTotal').innerText = rp(total);
+            document.getElementById('checkoutSubtotal').innerText = rp(subtotal);
+            document.getElementById('checkoutFee').innerText = rp(fee);
+            document.getElementById('checkoutTotal').innerText = rp(total);
+            document.getElementById('qrisTotal').innerText = rp(total);
+            document.getElementById('floatingCart').classList.toggle('hidden', count === 0);
+            document.getElementById('cartItemsContainer').innerHTML = cart.length ? cart.map(i => `
+                <div class="cart-line">
+                    <div class="cart-item">
+                        <div class="min-w-0"><div class="fw-bold text-dark text-truncate">${esc(i.nama)}</div><div class="small text-muted">${rp(i.harga)} · <b class="text-dark">${rp(i.harga * i.qty)}</b></div></div>
+                        <div class="qty-ctl"><button onclick="updateCartQty(${i.id},-1)">−</button><b class="mx-2">${i.qty}</b><button onclick="updateCartQty(${i.id},1)">+</button></div>
+                    </div>
+                    ${i.buka || i.catatan ? `
+                    <div class="note-box">
+                        <textarea rows="2" maxlength="150" placeholder="Catatan untuk ${esc(i.nama)}, mis. tidak pedas, es sedikit" oninput="setCatatan(${i.id}, this)">${esc(i.catatan)}</textarea>
+                        <small id="nc${i.id}">${(i.catatan || '').length}/150</small>
+                    </div>
+                    <div class="note-chips">${NOTE_CHIPS.map(c => `<button type="button" onclick="addChip(${i.id}, '${c}')">+ ${c}</button>`).join('')}</div>`
+                    : `<button type="button" class="note-btn" onclick="bukaCatatan(${i.id})"><i class="far fa-note-sticky"></i>Tambah catatan</button>`}
+                </div>`).join('') : `<div class="dz-empty py-4"><h6>Keranjang masih kosong</h6></div>`;
+        }
+
+        const NOTE_CHIPS = ['Tidak pedas', 'Pedas', 'Less sugar', 'Es sedikit', 'Tanpa es', 'Dibungkus'];
+        function bukaCatatan(id) {
+            const it = cart.find(x => x.id === id); if (!it) return;
+            it.buka = true; updateCartUI();
+            const ta = document.querySelector(`#cartItemsContainer textarea[oninput*="setCatatan(${id},"]`); ta && ta.focus();
+        }
+        function setCatatan(id, el) {
+            const it = cart.find(x => x.id === id); if (!it) return;
+            it.catatan = el.value.slice(0, 150);
+            const c = document.getElementById('nc' + id); if (c) c.textContent = it.catatan.length + '/150';
+        }
+        function addChip(id, teks) {
+            const it = cart.find(x => x.id === id); if (!it) return;
+            const ada = it.catatan.split(',').map(s => s.trim().toLowerCase());
+            if (!ada.includes(teks.toLowerCase())) it.catatan = (it.catatan ? it.catatan.replace(/[,\s]+$/, '') + ', ' : '') + teks;
+            it.catatan = it.catatan.slice(0, 150); updateCartUI();
+        }
+
+        const metode = () => document.querySelector('input[name=metode]:checked').value;
+        function toggleQrisForm() { document.getElementById('qrisSection').classList.toggle('d-none', metode() !== 'QRIS'); }
+
+        async function prosesPesanan() {
+            const nama = document.getElementById('inputNama').value.trim();
+            const m = metode();
+            const btn = document.getElementById('btnProses');
+            if (!cart.length) return Swal.fire({ icon: 'warning', title: 'Keranjang kosong', text: 'Silakan pilih menu terlebih dahulu.', confirmButtonColor: '#102849' });
+            if (!nama) return Swal.fire({ icon: 'warning', title: 'Nama wajib diisi', text: 'Mohon isi nama Anda.', confirmButtonColor: '#102849' });
+            if (m === 'QRIS' && !document.getElementById('buktiTransfer').files[0]) return Swal.fire({ icon: 'warning', title: 'Bukti QRIS kosong', text: 'Mohon unggah bukti transfer.', confirmButtonColor: '#102849' });
+
+            btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...';
+            try {
+                const res = await axios.post(`${API_BASE_URL}/order/`, {
+                    tenant: tenantId, nama_pemesan: nama, nomor_meja: nomorMeja || 'Kasir', metode_pembayaran: m,
+                    items: cart.map(i => ({ menu: i.id, jumlah: i.qty, catatan: (i.catatan || '').trim() }))
+                });
+                const orderId = res.data.id;
+                const akses = { headers: { 'X-Order-Token': res.data.akses_token } };
+
+                if (m === 'QRIS') {
+                    const fd = new FormData(); fd.append('bukti_pembayaran', document.getElementById('buktiTransfer').files[0]);
+                    await axios.post(`${API_BASE_URL}/order/${orderId}/upload_bukti/`, fd, akses);
+                    Swal.fire({
+                        title: 'Menunggu Konfirmasi', text: 'Bukti transfer terkirim. Pesanan sedang diverifikasi kasir.', icon: 'info',
+                        confirmButtonText: '<i class="fas fa-rotate me-2"></i>Cek Status', confirmButtonColor: '#102849',
+                        allowOutsideClick: false, allowEscapeKey: false, showLoaderOnConfirm: true,
+                        preConfirm: async () => {
+                            try {
+                                const r = await axios.get(`${API_BASE_URL}/order/${orderId}/`, akses);
+                                if (r.data.status_pesanan === 'Pending') { Swal.showValidationMessage('Kasir belum mengonfirmasi. Tunggu sebentar ya.'); return false; }
+                                return r.data.status_pesanan;
+                            } catch { Swal.showValidationMessage('Gagal mengecek status.'); return false; }
+                        }
+                    }).then(r => { if (r.isConfirmed) Swal.fire({ title: 'Pesanan Diverifikasi!', text: 'Hidangan Anda segera disiapkan.', icon: 'success', confirmButtonColor: '#102849' }).then(() => location.reload()); });
+                } else {
+                    Swal.fire({ title: 'Pesanan Terkirim!', text: 'Silakan lakukan pembayaran di kasir.', icon: 'success', confirmButtonText: 'Mengerti', confirmButtonColor: '#102849' }).then(() => location.reload());
+                }
+            } catch (error) {
+                let msg = 'Terjadi kesalahan pada server.';
+                const d = error?.response?.data;
+                if (d && typeof d === 'object') msg = Object.values(d).flat().join('\n');
+                Swal.fire({ title: 'Gagal Mengirim Pesanan', text: msg, icon: 'error', confirmButtonColor: '#ef4444' });
+
+                loadMenus().catch(() => {});
+                btn.disabled = false; btn.innerHTML = 'Kirim Pesanan';
+            }
+        }
+
+        loadData();
+
+        setInterval(() => { if (tenantId) loadMenus().catch(() => {}); }, 15000);
+</script>
+</body>
+</html>

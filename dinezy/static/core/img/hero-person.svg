@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 450" width="420" height="450">
+  <!-- Ilustrasi orisinal Nuwus Smart Cafe: pelanggan bingung memegang HP di meja cafe -->
+  <defs>
+    <linearGradient id="sweater" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8db3ee"/><stop offset="1" stop-color="#5f8fd6"/>
+    </linearGradient>
+    <linearGradient id="table" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9eef6"/><stop offset="1" stop-color="#c9d4e6"/>
+    </linearGradient>
+    <clipPath id="screen"><rect x="262" y="246" width="58" height="104" rx="8"/></clipPath>
+  </defs>
+
+  <!-- latar lingkaran -->
+  <circle cx="210" cy="240" r="185" fill="#7ea6e6" opacity=".10"/>
+  <circle cx="210" cy="240" r="140" fill="#7ea6e6" opacity=".10"/>
+
+  <!-- kursi (sandaran) -->
+  <rect x="100" y="240" width="220" height="190" rx="28" fill="#17345e" opacity=".9"/>
+
+  <!-- badan / sweater -->
+  <path d="M112 432 C112 360 146 300 210 300 C274 300 308 360 308 432 Z" fill="url(#sweater)"/>
+  <path d="M184 303 L210 332 L236 303 Z" fill="#ffffff" opacity=".9"/>
+  <path d="M170 312 Q210 342 250 312" fill="none" stroke="#4c7bc2" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+
+  <!-- leher -->
+  <rect x="193" y="262" width="34" height="44" rx="14" fill="#e0a97f"/>
+
+  <!-- lengan kiri: tangan menggaruk kepala (bingung) -->
+  <path d="M132 360 C112 318 112 270 136 214" fill="none" stroke="url(#sweater)" stroke-width="40" stroke-linecap="round"/>
+  <path d="M132 360 C112 318 112 270 136 214" fill="none" stroke="#4c7bc2" stroke-width="40" stroke-linecap="round" opacity=".18"/>
+  <ellipse cx="142" cy="198" rx="21" ry="24" fill="#f0bf96" transform="rotate(-20 142 198)"/>
+  <path d="M130 186 q8 -14 22 -8" fill="none" stroke="#d99a6f" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- kepala -->
+  <ellipse cx="212" cy="214" rx="54" ry="62" fill="#f0bf96"/>
+  <ellipse cx="160" cy="222" rx="10" ry="15" fill="#e7ad83"/>
+  <ellipse cx="264" cy="222" rx="10" ry="15" fill="#e7ad83"/>
+  <!-- rambut -->
+  <path d="M156 206 C150 150 196 130 228 140 C262 148 276 176 268 212 C258 186 238 178 214 182 C194 186 172 184 156 206 Z" fill="#1d1b2e"/>
+  <path d="M190 148 C204 132 236 132 250 146" fill="none" stroke="#2c2a44" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- alis: satu naik (bingung) -->
+  <path d="M182 196 Q194 188 206 194" fill="none" stroke="#2a2235" stroke-width="5" stroke-linecap="round"/>
+  <path d="M222 190 Q234 180 246 186" fill="none" stroke="#2a2235" stroke-width="5" stroke-linecap="round"/>
+  <!-- mata melirik ke HP -->
+  <ellipse cx="196" cy="214" rx="7" ry="8" fill="#ffffff"/><circle cx="200" cy="216" r="4.2" fill="#1d1b2e"/>
+  <ellipse cx="234" cy="212" rx="7" ry="8" fill="#ffffff"/><circle cx="238" cy="214" r="4.2" fill="#1d1b2e"/>
+  <!-- hidung & mulut miring -->
+  <path d="M216 222 q5 12 -3 16" fill="none" stroke="#d99a6f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M200 252 q10 -6 24 2" fill="none" stroke="#a5523a" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="186" cy="236" r="7" fill="#f29f8b" opacity=".35"/><circle cx="246" cy="234" r="7" fill="#f29f8b" opacity=".35"/>
+
+  <!-- meja -->
+  <rect x="60" y="410" width="300" height="22" rx="10" fill="url(#table)"/>
+  <rect x="60" y="428" width="300" height="10" rx="5" fill="#9fb0ca" opacity=".5"/>
+  <!-- gelas kopi -->
+  <path d="M86 372 h40 l-5 40 h-30 z" fill="#ffffff"/>
+  <rect x="84" y="364" width="44" height="10" rx="4" fill="#dfe6f1"/>
+  <rect x="92" y="386" width="28" height="12" rx="3" fill="#17345e" opacity=".85"/>
+  <path class="steam" d="M98 356 q-6 -10 2 -18 q8 -8 0 -18" fill="none" stroke="#c9d6ea" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+  <path class="steam s2" d="M112 356 q-6 -10 2 -18 q8 -8 0 -18" fill="none" stroke="#c9d6ea" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+  <!-- stiker QR di meja -->
+  <g transform="translate(316 360) rotate(8)">
+    <rect x="0" y="0" width="40" height="54" rx="6" fill="#0b1d38" stroke="#7ea6e6" stroke-width="2"/>
+    <rect x="7" y="7" width="26" height="26" rx="2" fill="#ffffff"/>
+    <rect x="10" y="10" width="7" height="7" fill="#0b1d38"/><rect x="23" y="10" width="7" height="7" fill="#0b1d38"/><rect x="10" y="23" width="7" height="7" fill="#0b1d38"/>
+    <rect x="20" y="20" width="4" height="4" fill="#0b1d38"/><rect x="25" y="25" width="5" height="5" fill="#0b1d38"/>
+    <rect x="9" y="39" width="22" height="4" rx="2" fill="#7ea6e6"/>
+  </g>
+
+  <!-- lengan kanan memegang HP -->
+  <path d="M288 372 C304 350 302 322 290 300" fill="none" stroke="url(#sweater)" stroke-width="38" stroke-linecap="round"/>
+  <!-- HP -->
+  <g transform="rotate(-8 291 298)">
+    <rect x="256" y="238" width="70" height="120" rx="13" fill="#0a0f1a"/>
+    <g clip-path="url(#screen)">
+      <rect x="262" y="246" width="58" height="104" fill="#f3f6fb"/>
+      <rect x="262" y="246" width="58" height="26" fill="#0b1d38"/>
+      <rect x="268" y="254" width="26" height="4" rx="2" fill="#ffffff"/>
+      <rect x="268" y="262" width="18" height="3" rx="1.5" fill="#7ea6e6"/>
+      <rect x="266" y="278" width="24" height="26" rx="3" fill="#dfe6f1"/>
+      <rect x="293" y="278" width="24" height="26" rx="3" fill="#dfe6f1"/>
+      <rect x="266" y="308" width="24" height="26" rx="3" fill="#dfe6f1"/>
+      <rect x="293" y="308" width="24" height="26" rx="3" fill="#e5e7eb"/>
+      <rect x="266" y="338" width="51" height="9" rx="3" fill="#0b1d38"/>
+    </g>
+    <rect x="281" y="241" width="20" height="3" rx="1.5" fill="#2a3346"/>
+  </g>
+  <!-- jari memegang HP -->
+  <ellipse cx="282" cy="330" rx="17" ry="14" fill="#f0bf96"/>
+  <rect x="266" y="316" width="10" height="20" rx="5" fill="#e7ad83"/>
+</svg>

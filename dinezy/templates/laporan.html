@@ -1,0 +1,188 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Rekap Keuangan {{ label }} — {{ tenant.nama_cafe }}</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @page { size: A4; margin: 12mm 0; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { margin: 0; background: #e8ecf2; font-family: 'Inter', Arial, sans-serif; color: #0f172a; font-size: 12.5px; }
+        .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+        .toolbar { position: sticky; top: 0; z-index: 5; background: #0b1d38; padding: 12px 16px; }
+        .toolbar form { max-width: 210mm; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: #b7c4d8; font-size: 13px; }
+        .toolbar input { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; color-scheme: dark; }
+        .toolbar button, .toolbar a { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; text-decoration: none; cursor: pointer; white-space: nowrap; }
+        .toolbar .primary { background: #fff; color: #0b1d38; border-color: #fff; }
+        .toolbar .sp { flex: 1; }
+        .quick a { padding: 6px 10px; font-weight: 500; font-size: 12px; }
+        .sheet { width: 210mm; margin: 24px auto; background: #fff; box-shadow: 0 20px 50px rgba(11,29,56,.18); }
+        @media print { body { background: #fff; } .toolbar { display: none; } .sheet { margin: 0 auto; box-shadow: none; } }
+        @media screen and (max-width: 840px) { .sheet { width: 100%; margin: 0; } }
+
+        .kop { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 30px 40px 22px; }
+        .brand { display: flex; gap: 16px; align-items: center; }
+        .brand .lg { width: 62px; height: 62px; border-radius: 14px; border: 1px solid #e3e8f0; padding: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; }
+        .brand .lg img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .brand .lg span { font-family: 'Inter Tight', 'Inter', sans-serif; font-weight: 800; font-size: 26px; color: #0b1d38; }
+        .brand b { display: block; font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 21px; color: #0b1d38; letter-spacing: -.02em; }
+        .brand small { display: block; color: #64748b; font-size: 11.5px; margin-top: 3px; max-width: 320px; line-height: 1.5; }
+        .doc { text-align: right; }
+        .doc small { display: block; font-size: 10px; letter-spacing: .16em; color: #64748b; font-weight: 700; }
+        .doc h1 { margin: 4px 0 0; font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 22px; color: #0b1d38; letter-spacing: -.01em; }
+        .rule { height: 4px; margin: 0 40px; border-radius: 4px; background: linear-gradient(90deg, #0b1d38 0 70%, #7ea6e6 70% 100%); }
+
+        .body { padding: 22px 40px 10px; }
+        .info { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #e5e9f0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .info div { padding: 11px 14px; border-right: 1px solid #e5e9f0; }
+        .info div:last-child { border-right: 0; }
+        .info small { display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 3px; }
+        .info b { font-size: 12.5px; color: #0b1d38; font-weight: 600; }
+
+        .summary { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; background: #0b1d38; color: #fff; margin-bottom: 26px; }
+        .summary div { padding: 18px 20px; border-right: 1px solid rgba(255,255,255,.1); }
+        .summary div:last-child { border-right: 0; }
+        .summary small { display: block; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #a9c4ee; font-weight: 600; }
+        .summary b { display: block; font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 22px; margin-top: 6px; letter-spacing: -.01em; }
+        .summary div:first-child b { font-size: 27px; }
+        .summary span { font-size: 11px; color: #a9c4ee; }
+
+        .sec { margin-bottom: 24px; }
+        .sec-h { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .sec-h .no { width: 24px; height: 24px; border-radius: 7px; background: #0b1d38; color: #fff; font-weight: 700; font-size: 11.5px; display: flex; align-items: center; justify-content: center; }
+        .sec-h h2 { margin: 0; font-size: 14px; color: #0b1d38; }
+        .sec-h p { margin: 0 0 0 auto; font-size: 11px; color: #64748b; }
+
+        table.t { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #e5e9f0; border-radius: 12px; overflow: hidden; }
+        .t th { background: #f3f6fb; color: #475569; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; text-align: left; padding: 10px 12px; font-weight: 700; border-bottom: 1px solid #e5e9f0; }
+        .t td { padding: 9px 12px; border-bottom: 1px solid #eef1f5; }
+        .t tbody tr:nth-child(even) td { background: #fbfcfe; }
+        .t .r { text-align: right; } .t .c { text-align: center; }
+        .t tr.group td { background: #eef3fb !important; font-weight: 700; color: #17345e; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+        .t tr.subtotal td { font-weight: 600; color: #0b1d38; background: #fff !important; border-bottom: 1px solid #dbe3ef; }
+        .t tfoot td { background: #0b1d38; color: #fff; font-weight: 700; border-bottom: 0; }
+        .t tr { break-inside: avoid; }
+        .muted { color: #94a3b8; }
+        .empty { text-align: center; color: #64748b; padding: 34px; border: 1px dashed #dbe3ef; border-radius: 12px; }
+
+        .closing { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 30px; break-inside: avoid; }
+        .closing .note { font-size: 11px; color: #64748b; line-height: 1.6; }
+        .sign { text-align: center; font-size: 12px; }
+        .sign .line { height: 66px; border-bottom: 1px solid #0f172a; margin: 0 14px 6px; }
+        .sign span { color: #64748b; font-size: 11px; }
+        .foot { padding: 14px 40px 22px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eef1f5; color: #64748b; font-size: 10.5px; margin-top: 22px; }
+        .foot img { height: 18px; vertical-align: middle; margin-right: 6px; }
+</style>
+</head>
+<body>
+<div class="toolbar">
+    <form method="get">
+        <a href="{% url 'owner_dashboard' tenant.slug %}" title="Kembali"><i class="fas fa-arrow-left"></i></a>
+        <span>Periode</span>
+        <input type="date" name="mulai" value="{{ mulai|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}">
+        <span>s/d</span>
+        <input type="date" name="sampai" value="{{ sampai|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}">
+        <button type="submit">Terapkan</button>
+        <span class="quick"><a href="?mulai={{ today|date:'Y-m-d' }}&sampai={{ today|date:'Y-m-d' }}">Hari ini</a><a href="?">Bulan ini</a></span>
+        <span class="sp"></span>
+        <button type="button" class="primary" onclick="window.print()"><i class="fas fa-print"></i>&nbsp; Cetak / PDF</button>
+    </form>
+</div>
+
+<div class="sheet">
+    <div class="kop">
+        <div class="brand">
+            <div class="lg">{% if tenant.logo %}<img src="{{ tenant.logo.url }}" alt="" onerror="this.replaceWith('{{ tenant.nama_cafe|slice:":1"|upper|escapejs }}')">{% else %}<span>{{ tenant.nama_cafe|slice:":1"|upper }}</span>{% endif %}</div>
+            <div><b>{{ tenant.nama_cafe }}</b><small>{{ tenant.alamat }}{% if tenant.whatsapp %}<br>WhatsApp {{ tenant.whatsapp }}{% endif %}{% if tenant.email_owner %} · {{ tenant.email_owner }}{% endif %}</small></div>
+        </div>
+        <div class="doc"><small>DOKUMEN INTERNAL</small><h1>Laporan Rekap Keuangan</h1></div>
+    </div>
+    <div class="rule"></div>
+
+    <div class="body">
+        <div class="info">
+            <div><small>Periode</small><b>{{ label }}</b></div>
+            <div><small>No. dokumen</small><b style="font-size:11px">{{ nomor }}</b></div>
+            <div><small>Tanggal cetak</small><b>{{ dicetak|date:"d/m/Y H:i" }}</b></div>
+            <div><small>Disusun oleh</small><b>{{ oleh }}</b></div>
+        </div>
+
+        <div class="summary">
+            <div><small>Total penerimaan</small><b class="num">{{ kpi.pendapatan|rupiah }}</b><span>{{ kpi.nota }} transaksi · penjualan menu {{ kpi.penjualan|rupiah }}</span></div>
+            <div><small>Tunai</small><b class="num">{{ kpi.tunai|rupiah }}</b><span>{{ bayar_list.0.nota }} transaksi</span></div>
+            <div><small>QRIS</small><b class="num">{{ kpi.qris|rupiah }}</b><span>{{ bayar_list.1.nota }} transaksi</span></div>
+        </div>
+
+        {% if kpi.nota %}
+        <div class="sec">
+            <div class="sec-h"><span class="no">A</span><h2>Rekap Penerimaan per Metode Pembayaran</h2></div>
+            <table class="t">
+                <thead><tr><th>Metode pembayaran</th><th class="c">Jumlah transaksi</th><th class="r">Jumlah penerimaan</th></tr></thead>
+                <tbody>{% for b in bayar_list %}<tr><td>{{ b.metode }}</td><td class="c num">{{ b.nota }}</td><td class="r num">{{ b.total|rupiah }}</td></tr>{% endfor %}</tbody>
+                <tfoot><tr><td>Total</td><td class="c num">{{ kpi.nota }}</td><td class="r num">{{ kpi.pendapatan|rupiah }}</td></tr></tfoot>
+            </table>
+        </div>
+
+        <div class="sec">
+            <div class="sec-h"><span class="no">B</span><h2>Rekap Penerimaan Harian</h2><p>Hanya tanggal yang memiliki transaksi</p></div>
+            <table class="t">
+                <thead><tr><th class="c" style="width:42px">No</th><th>Tanggal</th><th class="c">Transaksi</th><th class="r">Tunai</th><th class="r">QRIS</th><th class="r">Total</th></tr></thead>
+                <tbody>
+                {% for h in hari %}
+                    <tr><td class="c">{{ forloop.counter }}</td><td>{{ h.tgl|tgl:True }}</td><td class="c num">{{ h.nota }}</td>
+                        <td class="r num">{% if h.TUNAI %}{{ h.TUNAI|rupiah }}{% else %}<span class="muted">-</span>{% endif %}</td>
+                        <td class="r num">{% if h.QRIS %}{{ h.QRIS|rupiah }}{% else %}<span class="muted">-</span>{% endif %}</td>
+                        <td class="r num"><b>{{ h.total|rupiah }}</b></td></tr>
+                {% endfor %}
+                </tbody>
+                <tfoot><tr><td></td><td>Total</td><td class="c num">{{ kpi.nota }}</td><td class="r num">{{ kpi.tunai|rupiah }}</td><td class="r num">{{ kpi.qris|rupiah }}</td><td class="r num">{{ kpi.pendapatan|rupiah }}</td></tr></tfoot>
+            </table>
+        </div>
+
+        <div class="sec">
+            <div class="sec-h"><span class="no">C</span><h2>Rekap Penjualan per Menu</h2><p>Dikelompokkan per kategori</p></div>
+            <table class="t">
+                <thead><tr><th class="c" style="width:42px">No</th><th>Menu</th><th class="r">Harga</th><th class="c">Porsi</th><th class="r">Jumlah</th></tr></thead>
+                <tbody>
+                {% for g in kategori_list %}
+                    <tr class="group"><td colspan="5">{{ g.kategori }}</td></tr>
+                    {% for m in g.menu %}<tr><td class="c">{{ forloop.counter }}</td><td>{{ m.nama }}</td><td class="r num">{{ m.harga|rupiah }}</td><td class="c num">{{ m.qty }}</td><td class="r num">{{ m.total|rupiah }}</td></tr>{% endfor %}
+                    <tr class="subtotal"><td></td><td>Subtotal {{ g.kategori }}</td><td></td><td class="c num">{{ g.qty }}</td><td class="r num">{{ g.total|rupiah }}</td></tr>
+                {% endfor %}
+                </tbody>
+                <tfoot><tr><td></td><td>Total penjualan menu</td><td></td><td class="c num">{{ kpi.item }}</td><td class="r num">{{ kpi.penjualan|rupiah }}</td></tr></tfoot>
+            </table>
+        </div>
+
+        <div class="sec">
+            <div class="sec-h"><span class="no">D</span><h2>Rekonsiliasi Penerimaan</h2><p>Uang diterima dari pelanggan</p></div>
+            <table class="t">
+                <tbody>
+                    <tr><td>Penjualan menu (pendapatan cafe)</td><td class="r num">{{ kpi.penjualan|rupiah }}</td></tr>
+                    <tr><td>Biaya layanan aplikasi <span class="muted">· {{ kpi.nota }} nota, diteruskan ke Dinezy lewat invoice bulanan</span></td><td class="r num">{{ kpi.layanan|rupiah }}</td></tr>
+                </tbody>
+                <tfoot><tr><td>Total penerimaan</td><td class="r num">{{ kpi.pendapatan|rupiah }}</td></tr></tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div class="sec empty"><i class="fas fa-receipt" style="font-size:20px;display:block;margin-bottom:8px"></i>Tidak ada transaksi yang diproses pada periode {{ label }}.</div>
+        {% endif %}
+
+        <div class="closing">
+            <div class="note"><b>Catatan</b><br>Rekap mencakup pesanan berstatus Diproses dan Selesai.{% if kpi.pending %} Terdapat {{ kpi.pending }} pesanan menunggu konfirmasi yang belum dihitung.{% endif %}</div>
+            <div class="sign">&nbsp;<br>Dibuat oleh,<div class="line"></div><b>{{ oleh }}</b><br><span>&nbsp;</span></div>
+            <div class="sign">{{ today|tgl:True }}<br>Mengetahui,<div class="line"></div><b>{{ tenant.nama_owner|default:oleh }}</b><br><span>Owner {{ tenant.nama_cafe }}</span></div>
+        </div>
+    </div>
+
+    <div class="foot">
+        <div><img src="{% static 'core/img/dinezy-mark-navy.png' %}" alt="">Dibuat otomatis oleh Dinezy</div>
+        <div>{{ nomor }}</div>
+    </div>
+</div>
+</body>
+</html>

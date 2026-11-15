@@ -1,0 +1,37 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}Perjanjian{% endblock %}
+{% block heading %}Perjanjian Kerja Sama{% endblock %}
+{% block content %}
+<div class="pcard">
+    <div class="pcard-h">
+        <div><h2>Status PKS tiap cafe</h2><p>Owner menandatangani dari dashboard → admin membubuhkan e-meterai → unggah PDF final</p></div>
+        <div class="filter-bar">
+            <div class="seg">
+                <a href="?" class="{% if not f %}active{% endif %}">Semua</a>
+                {% for k, label in status_list %}<a href="?status={{ k }}" class="{% if f == k %}active{% endif %}">{{ label }} <b>{{ hitung|get_item:k }}</b></a>{% endfor %}
+            </div>
+            <a href="{% url 'syarat' %}" target="_blank" class="btn btn-xs btn-line"><i class="fas fa-scale-balanced me-1"></i>Lihat S&amp;K</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>Cafe</th><th>Nomor PKS</th><th>S&amp;K disetujui</th><th>Tanda tangan</th><th>Status</th><th class="text-end">Aksi</th></tr></thead>
+            <tbody>
+            {% for r in rows %}{% with p=r.p %}
+                <tr>
+                    <td><b>{{ p.tenant.nama_cafe }}</b><small class="d-block">{{ p.tenant.nama_owner }}</small></td>
+                    <td class="num">{{ p.nomor }}</td>
+                    <td class="num">{% if p.sk_disetujui_at %}{{ p.sk_disetujui_at|date:"d/m/Y H:i" }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                    <td class="num">{% if p.ttd_at %}{{ p.ttd_at|date:"d/m/Y H:i" }}<small class="d-block">{{ p.nama_penandatangan }}</small>{% else %}<span class="{% if r.lewat %}text-danger fw-semibold{% else %}text-muted{% endif %}">batas {{ r.batas|tgl }}</span>{% endif %}</td>
+                    <td>{% if p.status == 'bermeterai' %}<span class="pill green">Final bermeterai</span>{% elif p.status == 'ditandatangani' %}<span class="pill blue">Perlu e-meterai</span>{% elif r.lewat %}<span class="pill red">Lewat batas</span>{% else %}<span class="pill amber">Menunggu TTD</span>{% endif %}</td>
+                    <td class="text-end"><div class="act">
+                        <a href="{% url 'panel_perjanjian_detail' p.pk %}" class="btn btn-xs btn-line"><i class="fas fa-file-signature me-1"></i>Buka PKS</a>
+                        {% if p.file_final %}<a href="{% url 'perjanjian_final' p.pk %}" class="btn btn-xs btn-line"><i class="fas fa-download me-1"></i>PDF</a>{% endif %}
+                    </div></td>
+                </tr>
+            {% endwith %}{% empty %}<tr class="empty-row"><td colspan="6">Belum ada perjanjian untuk filter ini.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

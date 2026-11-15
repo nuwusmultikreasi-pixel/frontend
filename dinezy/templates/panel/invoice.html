@@ -1,0 +1,175 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ inv.nomor }} — {{ inv.tenant.nama_cafe }}</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @page { size: A4; margin: 0; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { margin: 0; background: #e8ecf2; font-family: 'Inter', Arial, sans-serif; color: #0f172a; font-size: 13px; }
+        .toolbar { position: sticky; top: 0; z-index: 5; display: flex; justify-content: center; gap: 8px; padding: 12px; background: #0b1d38; }
+        .toolbar a, .toolbar button { font: inherit; font-weight: 600; font-size: 13px; padding: 9px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; text-decoration: none; cursor: pointer; }
+        .toolbar .primary { background: #fff; color: #0b1d38; border-color: #fff; }
+        .sheet { width: 210mm; min-height: 297mm; margin: 24px auto; background: #fff; box-shadow: 0 20px 50px rgba(11,29,56,.18); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        @media print { body { background: #fff; } .toolbar { display: none; } .sheet { margin: 0; box-shadow: none; } }
+
+        .top { background: #0b1d38; color: #fff; padding: 34px 44px 30px; display: flex; justify-content: space-between; align-items: flex-start; position: relative; overflow: hidden; }
+        .top::before { content: ''; position: absolute; right: -60px; top: -90px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(126,166,230,.35), transparent 65%); }
+        .top::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1.2px); background-size: 14px 14px; -webkit-mask-image: linear-gradient(90deg, transparent 40%, #000); mask-image: linear-gradient(90deg, transparent 40%, #000); }
+        .brand { position: relative; z-index: 1; display: flex; gap: 14px; align-items: center; }
+        .brand img { height: 48px; }
+        .brand b { display: block; font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 19px; letter-spacing: -.02em; }
+        .brand small { display: block; color: #a9c4ee; font-size: 11.5px; margin-top: 2px; }
+        .title { position: relative; z-index: 1; text-align: right; }
+        .title h1 { margin: 0; font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 34px; letter-spacing: .12em; font-weight: 800; }
+        .title .no { font-size: 13px; color: #a9c4ee; margin-top: 4px; font-weight: 600; }
+
+        .body { padding: 30px 44px 24px; flex: 1; }
+        .meta { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 18px; margin-bottom: 26px; }
+        .box small { display: block; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 6px; }
+        .box b { display: block; font-size: 15px; color: #0b1d38; }
+        .bill-to { display: flex; align-items: center; gap: 10px; }
+        .bill-to img { width: 40px; height: 40px; object-fit: contain; border: 1px solid #e5e9f0; border-radius: 8px; padding: 3px; background: #fff; }
+        .box p { margin: 3px 0 0; color: #475569; line-height: 1.5; font-size: 12.5px; }
+        .dates { background: #f3f6fb; border-radius: 10px; padding: 12px 14px; }
+        .dates div { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12.5px; }
+        .dates span { color: #64748b; } .dates strong { color: #0b1d38; }
+
+        .stamp-wrap { text-align: right; margin: -4px 6px 10px; }
+        .stamp { display: inline-block; transform: rotate(-6deg); border: 3px solid currentColor; border-radius: 10px; padding: 6px 16px; font-family: 'Inter Tight', 'Inter', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .14em; opacity: .9; }
+        .stamp.paid { color: #15803d; } .stamp.unpaid { color: #d97706; } .stamp.overdue { color: #dc2626; }
+        .stamp small { display: block; font-size: 9px; letter-spacing: .1em; text-align: center; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; }
+        .items th { background: #0b1d38; color: #fff; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; text-align: left; padding: 11px 14px; font-weight: 600; }
+        .items th:first-child { border-radius: 8px 0 0 8px; } .items th:last-child { border-radius: 0 8px 8px 0; }
+        .items td { padding: 16px 14px; border-bottom: 1px solid #e5e9f0; vertical-align: top; }
+        .items .r { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .items td b { display: block; font-size: 14px; color: #0b1d38; }
+        .items td small { color: #64748b; }
+
+        .split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 26px; margin-top: 22px; }
+        .daily h3, .pay h3 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #64748b; margin: 0 0 8px; }
+        .daily table td { white-space: nowrap; padding: 6px 8px; font-size: 11.5px; border-bottom: 1px dashed #e5e9f0; font-variant-numeric: tabular-nums; }
+        .daily table td:nth-child(2), .daily table td:nth-child(3) { text-align: right; }
+        .daily .cols { columns: 2; column-gap: 18px; }
+        .daily .cols table { break-inside: avoid; }
+        .sum div { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px solid #eef1f5; }
+        .sum span { color: #64748b; }
+        .grand { margin-top: 10px; background: #0b1d38; color: #fff; border-radius: 12px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .grand span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #a9c4ee; font-weight: 700; }
+        .denda-note { margin: 10px 0 0; font-size: 11px; line-height: 1.5; color: #9a3412; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 8px 12px; }
+        .grand b { font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 26px; letter-spacing: -.02em; }
+
+        .pay { margin-top: 24px; border: 1px solid #dbe3ef; border-radius: 12px; padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #fafcff; }
+        .pay .acc b { display: block; font-size: 17px; font-family: 'Inter Tight', 'Inter', sans-serif; letter-spacing: .02em; color: #0b1d38; }
+        .pay .acc span { color: #475569; font-size: 12.5px; }
+        .warn { font-size: 12px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; line-height: 1.5; }
+        .warn.ok { color: #166534; background: #f0fdf4; border-color: #bbf7d0; }
+
+        .foot { padding: 18px 44px 26px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eef1f5; color: #64748b; font-size: 11.5px; }
+        .foot .sig { text-align: right; }
+        .foot img { height: 22px; vertical-align: middle; margin-right: 6px; }
+</style>
+</head>
+<body>
+<div class="toolbar">
+    <button class="primary" onclick="window.print()"><i class="fas fa-print"></i>&nbsp; Cetak / Simpan PDF</button>
+    {% if is_admin %}<a href="{% url 'panel_tagihan' %}"><i class="fas fa-arrow-left"></i>&nbsp; Kembali ke Tagihan</a>
+    {% else %}<a href="javascript:history.back()"><i class="fas fa-arrow-left"></i>&nbsp; Kembali</a>{% endif %}
+</div>
+
+<div class="sheet">
+    <div class="top">
+        <div class="brand">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" alt="Dinezy">
+            <div><b>Dinezy</b><small>PT Nuwus Multikreasi Digital · {{ pay.alamat }}</small><small>WhatsApp +{{ pay.wa }}</small></div>
+        </div>
+        <div class="title"><h1>INVOICE</h1><div class="no">{{ inv.nomor }}</div></div>
+    </div>
+
+    <div class="body">
+        <div class="meta">
+            <div class="box">
+                <small>Ditagihkan kepada</small>
+                <div class="bill-to">{% if inv.tenant.logo %}<img src="{{ inv.tenant.logo.url }}" alt="" onerror="this.remove()">{% endif %}<b>{{ inv.tenant.nama_cafe }}</b></div>
+                <p>{{ inv.tenant.nama_owner }}<br>{{ inv.tenant.alamat }}<br>{{ inv.tenant.email_owner }} · {{ inv.tenant.whatsapp }}</p>
+            </div>
+            <div class="box">
+                <small>Periode layanan</small>
+                <b>{{ inv.periode }}</b>
+                <p>{{ inv.jumlah_nota }} nota pesanan<br>{% if inv.tarif_seragam %}Tarif {{ inv.tarif|rupiah }} / nota{% else %}Tarif sesuai biaya tiap nota{% endif %}</p>
+            </div>
+            <div class="box dates">
+                <div><span>Tanggal terbit</span><strong>{{ inv.tanggal_terbit|tgl }}</strong></div>
+                <div><span>Jatuh tempo</span><strong>{{ inv.jatuh_tempo|tgl }}</strong></div>
+                <div><span>Kode cafe</span><strong>{{ inv.tenant.slug }}</strong></div>
+            </div>
+        </div>
+
+        <table class="items">
+            <thead><tr><th>Deskripsi</th><th class="r">Jumlah</th><th class="r">Tarif</th><th class="r">Subtotal</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><b>Biaya layanan Dinezy</b><small>Sistem pemesanan QR, kasir realtime, dan laporan · periode {{ inv.periode }}</small></td>
+                    <td class="r">{{ inv.jumlah_nota|angka }} nota</td>
+                    <td class="r">{% if inv.tarif_seragam %}{{ inv.tarif|rupiah }}{% else %}Beragam{% endif %}</td>
+                    <td class="r"><b>{{ inv.total|rupiah }}</b></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="split">
+            <div class="daily">
+                <h3>Rincian nota per tanggal</h3>
+                {% if rows %}
+                <table>
+                    {% for r in rows %}<tr><td>{{ r.tgl|tgl }}</td><td>{{ r.n }} nota</td><td>{{ r.subtotal|rupiah }}</td></tr>{% endfor %}
+                </table>
+                {% else %}<p style="color:#64748b;margin:0">Tidak ada rincian.</p>{% endif %}
+            </div>
+            <div>
+                <div class="stamp-wrap">
+                {% if inv.status == 'paid' %}<div class="stamp paid">LUNAS<small>{{ inv.dibayar_pada|date:"d/m/Y" }}</small></div>
+                {% elif inv.terlambat %}<div class="stamp overdue">JATUH TEMPO</div>
+                {% else %}<div class="stamp unpaid">BELUM DIBAYAR</div>{% endif %}
+                </div>
+                <div class="sum">
+                    <div><span>Subtotal</span><strong>{{ inv.total|rupiah }}</strong></div>
+                    {% if inv.denda_berjalan %}<div><span>Denda keterlambatan ({{ inv.hari_denda }} hari)</span><strong>{{ inv.denda_berjalan|rupiah }}</strong></div>{% endif %}
+                    <div><span>Pajak</span><strong>Rp 0</strong></div>
+                </div>
+                <div class="grand"><span>Total tagihan</span><b>{{ inv.total_bayar|rupiah }}</b></div>
+                {% if inv.status != 'paid' %}<p class="denda-note">Masa tenggang sampai {{ inv.jatuh_tempo|tgl }} + {{ denda.tenggang }} hari. Setelahnya dikenakan denda {{ denda.permil_teks }}‰ per hari dari nilai tagihan, maksimal {{ denda.maks_teks }}% (Pasal 6 PKS).</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="pay">
+            <div class="acc">
+                <h3 style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#64748b;margin:0 0 8px">Pembayaran</h3>
+                <span>{{ pay.bank }}</span>
+                <b>{{ pay.rek }}</b>
+                <span>a.n. {{ pay.nama }}</span><br>
+                <span>Berita: {{ inv.nomor }}</span>
+            </div>
+            <div>
+                {% if inv.status == 'paid' %}
+                <div class="warn ok"><b>Terima kasih!</b> Tagihan ini telah dibayar pada {{ inv.dibayar_pada|date:"d/m/Y H:i" }}.{% if inv.catatan %} Catatan: {{ inv.catatan }}{% endif %}</div>
+                {% else %}
+                <div class="warn"><b>Mohon dibayar sebelum {{ inv.jatuh_tempo|tgl:True }}.</b> Kirim bukti transfer ke WhatsApp admin +{{ pay.wa }}. Jika melewati jatuh tempo, login Owner & Kasir akan diblokir otomatis hingga tagihan dilunasi.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="foot">
+        <div><img src="{% static 'core/img/dinezy-mark-navy.png' %}" alt="">Dokumen ini dibuat otomatis oleh sistem Dinezy.</div>
+        <div class="sig">Dicetak {% now "d/m/Y H:i" %}</div>
+    </div>
+</div>
+</body>
+</html>

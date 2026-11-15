@@ -1,0 +1,387 @@
+{% load dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice Tagihan System - Dinezy</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 12mm;
+            background-color: #f8fafc;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            font-size: 10pt;
+            line-height: 1.5;
+        }
+
+        .header-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            padding: 20px 24px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .brand-title {
+            font-size: 20pt;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .brand-subtitle {
+            font-size: 9pt;
+            color: #93c5fd;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .invoice-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 8px 16px;
+            text-align: right;
+            color: #ffffff;
+        }
+
+        .invoice-badge .title {
+            font-size: 14pt;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .invoice-badge .number {
+            font-size: 8.5pt;
+            color: #dbeafe;
+            margin-top: 2px;
+        }
+
+        .info-section {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px 0;
+            margin-left: -12px;
+            margin-right: -12px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            width: 50%;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #2563eb;
+            border-radius: 8px;
+            padding: 14px 16px;
+            vertical-align: top;
+        }
+
+        .card-title {
+            font-size: 10pt;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 6px;
+        }
+
+        .info-list {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .info-list td {
+            padding: 3px 0;
+            font-size: 9.5pt;
+        }
+
+        .info-label {
+            color: #64748b;
+            width: 40%;
+        }
+
+        .info-value {
+            color: #0f172a;
+            font-weight: 600;
+            width: 60%;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-locked {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .item-table th {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        .item-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 9.5pt;
+            color: #334155;
+        }
+
+        .item-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .item-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        .bottom-section {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px 0;
+            margin-left: -12px;
+            margin-right: -12px;
+            margin-bottom: 20px;
+        }
+
+        .payment-card {
+            width: 58%;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 14px 16px;
+            vertical-align: top;
+        }
+
+        .total-card {
+            width: 42%;
+            background-color: #1e3a8a;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            vertical-align: top;
+            text-align: right;
+        }
+
+        .payment-title {
+            font-size: 10pt;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .payment-detail {
+            font-size: 9pt;
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+
+        .total-label {
+            font-size: 9pt;
+            color: #93c5fd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .total-amount {
+            font-size: 18pt;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .total-note {
+            font-size: 8pt;
+            color: #cbd5e1;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #cbd5e1;
+            text-align: center;
+            color: #64748b;
+            font-size: 8.5pt;
+        }
+
+        .footer strong {
+            color: #1e3a8a;
+        }
+</style>
+</head>
+<body>
+
+    <div class="header-card">
+        <table class="header-table">
+            <tr>
+                <td>
+                    <div class="brand-title">DINEZY</div>
+                    <div class="brand-subtitle">Platform Manajemen Cafe & Kasir Digital</div>
+                </td>
+                <td class="text-right">
+                    <div class="invoice-badge">
+                        <div class="title">INVOICE</div>
+                        <div class="number">INV/{{ tahun }}/{{ tenant.id }}</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="info-section">
+        <tr>
+            <td class="info-card">
+                <div class="card-title">Informasi Tenant / Cafe</div>
+                <table class="info-list">
+                    <tr>
+                        <td class="info-label">Nama Cafe</td>
+                        <td class="info-value">: {{ tenant.nama_cafe }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Pemilik</td>
+                        <td class="info-value">: {{ tenant.nama_owner }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Email Owner</td>
+                        <td class="info-value">: {{ tenant.email_owner }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Status Akses</td>
+                        <td class="info-value">: 
+                            {% if tenant.is_locked %}
+                                <span class="status-pill status-locked">Terkunci</span>
+                            {% else %}
+                                <span class="status-pill status-active">Aktif</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+            <td class="info-card">
+                <div class="card-title">Rincian Tagihan</div>
+                <table class="info-list">
+                    <tr>
+                        <td class="info-label">Periode Tagihan</td>
+                        <td class="info-value">: {{ bulan }} {{ tahun }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Tanggal Cetak</td>
+                        <td class="info-value">: {{ tanggal_cetak }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Metode Layanan</td>
+                        <td class="info-value">: {% tarif_nota %} / Pesanan</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div class="table-container">
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">No</th>
+                    <th style="width: 52%;">Deskripsi Layanan & Penggunaan</th>
+                    <th style="width: 20%;" class="text-center">Tarif Per Order</th>
+                    <th style="width: 20%;" class="text-right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">1</td>
+                    <td>
+                        <strong>Biaya Layanan Sistem Dinezy</strong><br>
+                        <span style="font-size: 8.5pt; color: #64748b;">Penggunaan transaksi sistem pesanan & QRIS periode {{ bulan }} {{ tahun }}</span>
+                    </td>
+                    <td class="text-center">{% tarif_nota %}</td>
+                    <td class="text-right" style="font-weight: 600;">Rp {{ tenant.unpaid_bill }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table class="bottom-section">
+        <tr>
+            <td class="payment-card">
+                <div class="payment-title">💳 Petunjuk Pembayaran Transfer Bank</div>
+                <div class="payment-detail">
+                    Silakan lakukan transfer pembayaran tagihan ke rekening resmi berikut:<br>
+                    <strong>Bank Mandiri:</strong> 8730-9912-34<br>
+                    <strong>Atas Nama:</strong> M. Faza Musyaffa Al Azizi<br>
+                    <em>*Harap simpan dan konfirmasi bukti transfer ke Admin Server.</em>
+                </div>
+            </td>
+
+            <td class="total-card">
+                <div class="total-label">Total Tagihan Harus Dibayar</div>
+                <div class="total-amount">Rp {{ tenant.unpaid_bill }}</div>
+                <div class="total-note">*Sudah termasuk PPN & Biaya Sistem</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        Dokumen ini diterbitkan secara elektronik oleh <strong>Dinezy Server</strong> dan sah tanpa tanda tangan basah.<br>
+        Jika ada pertanyaan mengenai tagihan ini, hubungi Tim Customer Support Official.
+    </div>
+
+</body>
+</html>

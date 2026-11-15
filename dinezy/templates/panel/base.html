@@ -1,0 +1,59 @@
+{% load static dinezy %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel Admin{% endblock %} — Dinezy</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <link rel="stylesheet" href="{% static 'core/panel.css' %}">
+</head>
+<body class="app-body">
+<div class="app-bg" aria-hidden="true"><div class="scene"></div></div>
+{% include "partials/splash.html" %}
+<div class="app">
+    <aside class="app-sidebar" id="sidebar" aria-label="Navigasi admin">
+        <div class="sb-brand">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark" alt="Logo Dinezy">
+            <div class="txt min-w-0"><b>Dinezy</b><small>Panel Admin</small></div>
+        </div>
+        <div class="sb-label">Kelola</div>
+        <nav class="nav">
+            <a class="nav-link {% if active == 'dashboard' %}active{% endif %}" href="{% url 'panel_dashboard' %}" title="Ringkasan"><i class="fas fa-chart-pie"></i><span class="lbl">Ringkasan</span></a>
+            <a class="nav-link {% if active == 'cafe' %}active{% endif %}" href="{% url 'panel_cafe' %}" title="Cafe"><i class="fas fa-store"></i><span class="lbl">Cafe & Akun</span></a>
+            <a class="nav-link {% if active == 'akun' %}active{% endif %}" href="{% url 'panel_akun' %}" title="Akun cafe"><i class="fas fa-user-lock"></i><span class="lbl">Akun & Password</span></a>
+            <a class="nav-link {% if active == 'tagihan' %}active{% endif %}" href="{% url 'panel_tagihan' %}" title="Tagihan"><i class="fas fa-file-invoice-dollar"></i><span class="lbl">Tagihan</span></a>
+            <a class="nav-link {% if active == 'perjanjian' %}active{% endif %}" href="{% url 'panel_perjanjian' %}" title="Perjanjian"><i class="fas fa-file-signature"></i><span class="lbl">Perjanjian</span></a>
+            <a class="nav-link {% if active == 'pengumuman' %}active{% endif %}" href="{% url 'panel_pengumuman' %}" title="Pengumuman & Surat"><i class="fas fa-bullhorn"></i><span class="lbl">Pengumuman & Surat</span></a>
+        </nav>
+        <div class="sb-foot">
+            <div class="sb-user">
+                <div class="sb-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+                <div class="txt min-w-0"><b class="text-truncate">{{ request.user.username }}</b><small>Administrator</small></div>
+            </div>
+            <a href="/logout/" class="sb-logout" title="Keluar"><i class="fas fa-right-from-bracket"></i><span class="lbl">Keluar</span></a>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div><div class="crumb">Panel Admin · {% now "j F Y" %}</div><h1>{% block heading %}{% endblock %}</h1></div>
+            <div class="d-flex align-items-center gap-2">{% block actions %}{% endblock %}</div>
+        </header>
+        <div class="app-content">
+            {% dz_messages_json messages %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'core/dinezy-ui.js' %}"></script>
+<script>
+    document.querySelectorAll('#sidebar .nav-link, #sidebar .sb-logout').forEach(b => b.addEventListener('click', () => setTimeout(() => b.blur(), 150)));
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

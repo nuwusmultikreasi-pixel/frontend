@@ -1,0 +1,55 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database belum tersambung — Dinezy</title>
+    <link rel="icon" href="{% static 'core/img/favicon-64.png' %}">
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+               font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #c7d2e3;
+               background: radial-gradient(800px 500px at 85% 0%, rgba(42,85,148,.55), transparent 60%), #071426; }
+        .box { max-width: 620px; width: 100%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 20px; padding: 32px; }
+        img { height: 44px; }
+        h1 { color: #fff; font-size: 1.6rem; margin: 20px 0 8px; letter-spacing: -.02em; }
+        p { line-height: 1.7; margin: 0 0 16px; }
+        ol { padding-left: 20px; line-height: 1.8; margin: 0 0 18px; }
+        code { background: rgba(255,255,255,.08); color: #fff; padding: 2px 7px; border-radius: 5px; font-size: .9em; }
+        .info { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: .88rem; background: rgba(0,0,0,.25); padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; }
+        .info span { color: #8fa1bd; } .info b { color: #fff; font-weight: 600; }
+        .detail { font-family: ui-monospace, monospace; font-size: .8rem; color: #fca5a5; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); padding: 12px; border-radius: 10px; word-break: break-word; }
+        a.btn { display: inline-block; margin-top: 18px; background: #fff; color: #0b1d38; text-decoration: none; font-weight: 600; padding: 10px 18px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="box">
+    <img src="{% static 'core/img/dinezy-mark-white.png' %}" alt="Dinezy">
+    {% if jenis == 'migrasi' %}
+        <h1>Struktur database belum diperbarui</h1>
+        <p>Database tersambung, tetapi ada tabel/kolom baru yang belum dibuat.</p>
+        <ol><li>Jalankan <code>python manage.py migrate</code>, atau</li><li>restart server (<code>runserver</code>), karena migrasi berjalan otomatis saat server start.</li></ol>
+    {% elif jenis == 'database' %}
+        <h1>Database "{{ db_name }}" tidak ditemukan</h1>
+        <ol><li>Buka phpMyAdmin / HeidiSQL di Laragon.</li><li>Buat database <code>{{ db_name }}</code>, lalu import file <code>db_dinezy.sql</code>.</li><li>Atau ubah <code>DINEZY_DB_NAME</code> di file <code>.env</code>.</li></ol>
+    {% elif jenis == 'akses' %}
+        <h1>Login ke MySQL ditolak</h1>
+        <p>Username / password MySQL tidak cocok. Sesuaikan <code>DINEZY_DB_USER</code> dan <code>DINEZY_DB_PASSWORD</code> di file <code>.env</code>.</p>
+    {% elif jenis == 'koneksi' %}
+        <h1>Server database tidak dapat dihubungi</h1>
+        <ol><li>Pastikan MySQL sudah <b>Start</b> di Laragon (ikon MySQL berwarna hijau).</li>
+            <li>Cek host & port: <code>{{ db_host }}:{{ db_port }}</code>. Jika MySQL Laragon memakai port lain, ubah <code>DINEZY_DB_PORT</code> di <code>.env</code>.</li>
+            <li>Setelah MySQL menyala, cukup muat ulang halaman ini. Sistem tersambung ulang otomatis.</li></ol>
+    {% else %}
+        <h1>Terjadi masalah pada database</h1>
+        <p>Jalankan <code>python manage.py cek_database</code> untuk diagnosa lengkap.</p>
+    {% endif %}
+    <div class="info">
+        <span>Engine</span><b>{{ engine }}</b>
+        <span>Database</span><b>{{ db_name }}</b>
+        {% if db_host %}<span>Host</span><b>{{ db_host }}:{{ db_port }}</b><span>User</span><b>{{ db_user }}</b>{% endif %}
+    </div>
+    {% if detail %}<div class="detail">{{ detail }}</div>{% endif %}
+    <a href="" class="btn">Coba lagi</a>
+</div>
+</body>
+</html>

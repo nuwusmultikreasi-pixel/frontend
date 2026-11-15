@@ -1,0 +1,408 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir — {{ tenant.nama_cafe }}</title>
+    {% include 'partials/favicon.html' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'core/dinezy.css' %}">
+    <style>
+        .order-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+        .order-card .oh { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); border-left: 3px solid var(--st, var(--line)); }
+        .order-card .oid { font-weight: 600; color: var(--navy-800); font-size: .9rem; }
+        .order-card .ob { padding: 14px 16px; display: flex; flex-direction: column; flex: 1; }
+        .order-card .cust { font-weight: 600; color: var(--ink); font-size: 1.02rem; }
+        .meta { display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 12px; font-size: .8rem; color: var(--muted); }
+        .items { border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px; margin-bottom: 12px; font-size: .85rem; }
+        .items .row-i { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f1f3; }
+        .items .row-i:last-child { border-bottom: 0; }
+        .items .row-i > span:first-child { min-width: 0; }
+        .item-note { display: block; margin-top: 3px; font-size: .78rem; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 2px 8px; width: fit-content; max-width: 100%; }
+        .item-note i { font-size: .65rem; margin-right: 5px; }
+        .total-box { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 12px; margin-top: auto; border-top: 1px dashed var(--line-strong); }
+        .total-box .l { font-size: .82rem; color: var(--muted); font-weight: 500; }
+        .total-box .v { font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+        .new-flash { box-shadow: 0 0 0 2px var(--navy-500); }
+        .live { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); }
+        .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; }
+</style>
+</head>
+<body class="app-body">
+<div class="app-bg" aria-hidden="true"><div class="scene"></div></div>
+{% include "partials/splash.html" %}
+<div class="app">
+    <aside class="app-sidebar" id="sidebar" aria-label="Navigasi">
+        <div class="sb-brand">
+            <img src="{% static 'core/img/dinezy-mark-white.png' %}" class="dz-mark" alt="Logo Dinezy">
+            <div class="txt min-w-0"><b class="text-truncate">{{ tenant.nama_cafe }}</b><small>Panel Kasir</small></div>
+        </div>
+        <div class="sb-label">Menu Utama</div>
+        <nav class="nav" role="tablist">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-order" data-title="Pesanan Masuk" type="button" title="Pesanan"><i class="fas fa-receipt"></i><span class="lbl">Pesanan</span><span class="count" id="cntPending">0</span></button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-menu" data-title="Ketersediaan Menu" type="button" title="Daftar Menu"><i class="fas fa-utensils"></i><span class="lbl">Daftar Menu</span><span class="count" id="cntHabis" title="Menu habis">0</span></button>
+        </nav>
+        <div class="sb-foot">
+            <div class="sb-user">
+                <div class="sb-avatar"><i class="fas fa-user"></i></div>
+                <div class="txt min-w-0"><b class="text-truncate">{{ request.user.username }}</b><small>Kasir</small></div>
+            </div>
+            <button onclick="konfirmasiLogout()" class="sb-logout" title="Keluar"><i class="fas fa-right-from-bracket"></i><span class="lbl">Keluar</span></button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div><div class="crumb">{{ tenant.nama_cafe }} · Kasir</div><h1 id="pageTitle">Pesanan Masuk</h1></div>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="hdr-chip dapur-chip" id="dapurChip" onclick="toggleDapur()"></button>
+                <span class="hdr-chip d-none d-sm-inline-flex"><i class="dot"></i>Live · <span id="lastSync">-</span></span>
+                <button onclick="refreshAll()" class="btn btn-dz-outline" title="Muat ulang"><i class="fas fa-rotate"></i><span class="d-none d-md-inline ms-2">Muat ulang</span></button>
+            </div>
+        </header>
+
+        <div class="app-content">
+        {% include 'partials/banner_pesan.html' %}
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab-order">
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-3"><div class="stat-card"><div class="stat-title">Antrean</div><div class="stat-value" id="sPending">0</div></div></div>
+                    <div class="col-6 col-lg-3"><div class="stat-card"><div class="stat-title">Diproses</div><div class="stat-value" id="sProses">0</div></div></div>
+                    <div class="col-6 col-lg-3"><div class="stat-card"><div class="stat-title">Selesai Hari Ini</div><div class="stat-value" id="sSelesai">0</div></div></div>
+                    <div class="col-6 col-lg-3"><div class="stat-card"><div class="stat-title">Omzet Hari Ini</div><div class="stat-value" id="sOmzet">Rp 0</div></div></div>
+                </div>
+
+                <div class="dz-card p-3 ps-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                    <h2 class="dz-section-title">Daftar Pesanan</h2>
+                    <div class="seg status-filter">
+                        <button class="active" onclick="filterStatus('all', this)">Semua</button>
+                        <button onclick="filterStatus('Pending', this)">Antrean</button>
+                        <button onclick="filterStatus('Diproses', this)">Diproses</button>
+                        <button onclick="filterStatus('Selesai', this)">Selesai</button>
+                    </div>
+                </div>
+
+                <div class="row g-3" id="order-list-container">
+                    <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div><p class="text-muted mt-2 fw-semibold">Memuat pesanan...</p></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-menu">
+                <div class="dz-card dz-card-pad mb-4">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                        <div>
+                            <h4 class="dz-section-title">Ketersediaan Menu</h4>
+                            <p class="dz-section-sub">Geser tombol untuk menandai menu <b>Tersedia</b> atau <b>Habis</b>. Perubahan langsung tampil di layar pelanggan.</p>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="input-icon" style="min-width:220px"><i class="fas fa-search"></i><input type="search" id="menuSearch" class="form-control form-control-sm" placeholder="Cari menu..." oninput="renderMenus()"></div>
+                            <select id="menuFilter" class="form-select form-select-sm" style="width:auto" onchange="renderMenus()">
+                                <option value="all">Semua status</option>
+                                <option value="tersedia">Tersedia</option>
+                                <option value="habis">Habis</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 mt-3 small fw-bold">
+                        <span class="badge-soft badge-soft-green"><i class="fas fa-circle-check me-1"></i><span id="mTersedia">0</span> tersedia</span>
+                        <span class="badge-soft badge-soft-gray"><i class="fas fa-ban me-1"></i><span id="mHabis">0</span> habis</span>
+                    </div>
+                </div>
+                <div class="row g-3" id="menuGrid">
+                    <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+    <div class="modal fade" id="buktiModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-800"><i class="fas fa-receipt me-2 text-primary"></i>Bukti Pembayaran</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body text-center"><img id="imgBukti" src="" class="img-fluid rounded-4" alt="Bukti Transfer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="{% static 'core/print-templates.js' %}"></script>
+    <script src="{% static 'core/dinezy-ui.js' %}"></script>
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const TENANT_SLUG = "{{ tenant.slug|escapejs }}";
+        const TENANT_NAMA = "{{ tenant.nama_cafe|escapejs }}";
+        const TENANT_ALAMAT = "{{ tenant.alamat|escapejs }}";
+        const TENANT_WA = "{{ tenant.whatsapp|escapejs }}";
+        const TENANT_LOGO = "{% if tenant.logo %}{{ tenant.logo.url|escapejs }}{% endif %}";
+        const KASIR_NAMA = "{{ request.user.username|escapejs }}";
+        const STATIC_LOGO_NAVY = "{% static 'core/img/dinezy-mark-navy.png' %}";
+
+        const PRINT_TYPE = "{{ tenant.print_type|escapejs }}";
+        const KITCHEN_MODE = "{{ tenant.kitchen_print|escapejs }}";
+        const NOTA_FOOTER = "{{ tenant.nota_footer|escapejs }}";
+        const NOTA_QR = {{ tenant.nota_show_qr|yesno:"true,false" }};
+
+        let allOrders = [], allMenus = [], currentStatusFilter = 'all', knownIds = null;
+
+        axios.defaults.xsrfCookieName = 'csrftoken';
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+        axios.defaults.withCredentials = true;
+
+        const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        const toast = (icon, title) => window.DZUI
+            ? DZUI.toast({ type: icon === 'error' ? 'error' : icon, title, timeout: 2600 })
+            : Swal.fire({ toast: true, position: 'top-end', icon, title, timer: 1800, showConfirmButton: false });
+        const stamp = () => document.getElementById('lastSync').innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.querySelectorAll('#sidebar .nav-link, #sidebar .sb-logout').forEach(b => b.addEventListener('click', () => setTimeout(() => b.blur(), 150)));
+        document.querySelectorAll('#sidebar [data-bs-toggle=tab]').forEach(b => b.addEventListener('shown.bs.tab', () => { document.getElementById('pageTitle').innerText = b.dataset.title; document.getElementById('sidebar').classList.remove('open'); }));
+
+        function konfirmasiLogout() {
+            Swal.fire({ title: 'Keluar dari kasir?', icon: 'question', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonText: 'Batal', confirmButtonText: 'Ya, keluar' })
+                .then(r => { if (r.isConfirmed) location.href = '/logout/'; });
+        }
+
+        function refreshAll() { loadOrders(); loadMenus(); }
+
+        async function loadOrders() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/order/?tenant_slug=${encodeURIComponent(TENANT_SLUG)}`);
+                const fresh = new Set(res.data.map(o => o.id));
+                const newOnes = knownIds ? res.data.filter(o => !knownIds.has(o.id)).sort((a, b) => a.id - b.id) : [];
+                knownIds = fresh;
+                const firstLoad = knownIds === null;
+                allOrders = res.data;
+                if (firstLoad) {
+
+                    res.data.forEach(o => markPrinted(o.id));
+                }
+                renderOrders(newOnes.map(o => o.id));
+                if (KITCHEN_MODE === 'masuk' && autoDapurOn()) newOnes.forEach(o => printDapur(o.id, true));
+                if (newOnes.length) toast('info', `${newOnes.length} pesanan baru masuk`);
+                stamp();
+            } catch (error) {
+                if (error?.response?.status === 403) { location.href = '/login/'; return; }
+                document.getElementById('order-list-container').innerHTML = `
+                    <div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-plug-circle-exclamation"></i></div>
+                    <h6>Gagal mengambil data</h6><p class="small">Pastikan server berjalan.</p>
+                    <button onclick="loadOrders()" class="btn btn-dz btn-sm"><i class="fas fa-rotate me-1"></i>Coba lagi</button></div></div>`;
+            }
+        }
+
+        function renderSummary() {
+            const today = new Date().toISOString().substring(0, 10);
+            const isToday = o => (o.created_at || '').substring(0, 10) === today;
+            const pending = allOrders.filter(o => o.status_pesanan === 'Pending' || o.status_pesanan === 'Menunggu').length;
+            document.getElementById('sPending').innerText = pending;
+            document.getElementById('cntPending').innerText = pending;
+            document.getElementById('sProses').innerText = allOrders.filter(o => o.status_pesanan === 'Diproses').length;
+            const selesaiToday = allOrders.filter(o => o.status_pesanan === 'Selesai' && isToday(o));
+            document.getElementById('sSelesai').innerText = selesaiToday.length;
+            document.getElementById('sOmzet').innerText = rp(allOrders.filter(o => ['Diproses', 'Selesai'].includes(o.status_pesanan) && isToday(o)).reduce((s, o) => s + Number(o.total_harga || 0), 0));
+        }
+
+        function renderOrders(highlight = []) {
+            renderSummary();
+            const c = document.getElementById('order-list-container');
+            let list = [...allOrders];
+            if (currentStatusFilter !== 'all') list = list.filter(o => o.status_pesanan === currentStatusFilter || (currentStatusFilter === 'Pending' && o.status_pesanan === 'Menunggu'));
+
+            if (!list.length) {
+                c.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-inbox"></i></div><h6>Tidak ada pesanan</h6><p class="small mb-0">Belum ada pesanan untuk status ini.</p></div></div>`;
+                return;
+            }
+
+            c.innerHTML = list.map(o => {
+                const st = o.status_pesanan;
+                const badge = st === 'Diproses' ? '<span class="badge-soft badge-soft-blue">Diproses</span>'
+                    : st === 'Selesai' ? '<span class="badge-soft badge-soft-green">Selesai</span>'
+                    : '<span class="badge-soft badge-soft-amber">Antrean</span>';
+                const stripe = st === 'Diproses' ? 'var(--navy-600)' : st === 'Selesai' ? 'var(--green)' : 'var(--dz-amber)';
+
+                let bukti = '';
+                if (o.metode_pembayaran === 'QRIS') {
+                    bukti = o.bukti_pembayaran
+                        ? `<button onclick="showBukti(${o.id})" class="btn btn-dz-outline w-100 mb-2"><i class="fas fa-image me-2"></i>Lihat Bukti QRIS</button>`
+                        : `<div class="dz-alert dz-alert-error py-2 mb-2 small"><i class="fas fa-circle-info mt-1"></i>Belum ada bukti QRIS</div>`;
+                }
+                const action = (st === 'Pending' || st === 'Menunggu')
+                    ? `<button onclick="ubahStatusPesanan(${o.id}, 'Diproses')" class="btn btn-dz w-100"><i class="fas fa-check me-2"></i>Proses Pesanan</button>`
+                    : st === 'Diproses'
+                    ? `<button onclick="ubahStatusPesanan(${o.id}, 'Selesai')" class="btn btn-dz-outline w-100"><i class="fas fa-check-double me-2"></i>Tandai Selesai</button>`
+                    : `<div class="text-center small text-muted py-2">Pesanan telah selesai</div>`;
+
+                const items = (o.items || []).length
+                    ? o.items.map(it => `<div class="row-i"><span><b class="text-dark">${it.jumlah}×</b> ${esc(it.nama_menu || 'Item')}${it.catatan ? `<span class="item-note"><i class="fas fa-pen"></i>${esc(it.catatan)}</span>` : ''}</span><span class="text-muted">${rp(it.harga_satuan * it.jumlah)}</span></div>`).join('')
+                    : '<div class="text-muted small">Tidak ada detail menu</div>';
+                const waktu = o.created_at ? new Date(o.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
+
+                return `
+                <div class="col-md-6 col-xl-4">
+                    <div class="order-card ${highlight.includes(o.id) ? 'new-flash' : ''}">
+                        <div class="oh" style="--st:${stripe}">
+                            <span class="oid">#ORD-${o.id}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button onclick="printDapur(${o.id})" class="btn btn-sm btn-dz-outline" title="Cetak tiket dapur"><i class="fas fa-fire-burner me-1"></i>Dapur</button>
+                                <button onclick="printNota(${o.id})" class="btn btn-sm btn-dz-outline" title="Cetak Nota"><i class="fas fa-print me-1"></i>Nota</button>
+                                ${badge}
+                            </div>
+                        </div>
+                        <div class="ob">
+                            <div class="cust">${esc(o.nama_pemesan || 'Pelanggan')}</div>
+                            <div class="meta">
+                                <span>Meja <b class="text-dark">${esc(o.nomor_meja || '-')}</b></span>
+                                <span>${esc(o.metode_pembayaran || 'TUNAI')}</span>
+                                <span>${waktu}</span>
+                            </div>
+                            <div class="items">${items}</div>
+                            <div class="total-box"><div class="l">Total${Number(o.biaya_layanan) ? `<small class="d-block fw-normal" style="font-size:.7rem;opacity:.75">termasuk biaya layanan ${rp(o.biaya_layanan)}</small>` : ``}</div><div class="v">${rp(o.total_harga)}</div></div>
+                            ${bukti}${action}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterStatus(status, el) {
+            currentStatusFilter = status;
+            document.querySelectorAll('.status-filter button').forEach(b => b.classList.remove('active'));
+            el && el.classList.add('active');
+            renderOrders();
+        }
+
+        async function ubahStatusPesanan(id, statusBaru) {
+            try {
+                await axios.patch(`${API_BASE_URL}/order/${id}/`, { status_pesanan: statusBaru });
+                if (statusBaru === 'Diproses' && KITCHEN_MODE === 'proses' && autoDapurOn()) {
+                    const o = allOrders.find(x => x.id === id); if (o) { o.status_pesanan = 'Diproses'; dapurPrinted.delete(id); printDapur(id, true); }
+                }
+                toast('success', statusBaru === 'Diproses' ? 'Pesanan diproses' : 'Pesanan selesai');
+                loadOrders();
+            } catch { Swal.fire('Gagal!', 'Terjadi kesalahan saat mengubah status.', 'error'); }
+        }
+
+        function showBukti(id) {
+            const o = allOrders.find(x => x.id === id); if (!o) return;
+            document.getElementById('imgBukti').src = o.bukti_pembayaran;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('buktiModal')).show();
+        }
+
+        function printNota(id) {
+            const o = allOrders.find(x => x.id === id); if (!o) return;
+            DZPrint.nota({
+                order: o, cafeName: TENANT_NAMA, cafeAddress: TENANT_ALAMAT, cafePhone: TENANT_WA,
+                cafeLogo: TENANT_LOGO, brandLogoNavy: STATIC_LOGO_NAVY, paper: PRINT_TYPE, footer: NOTA_FOOTER,
+                menuUrl: (NOTA_QR && o.nomor_meja) ? `${location.origin}/menu/${TENANT_SLUG}/?meja=${encodeURIComponent(o.nomor_meja)}` : '',
+                kasirName: KASIR_NAMA
+            });
+        }
+
+        const DAPUR_KEY = `dz_dapur_printed_${TENANT_SLUG}`;
+        const DAPUR_ON_KEY = `dz_dapur_auto_${TENANT_SLUG}`;
+        const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+                        set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+        let dapurPrinted = new Set(store.get(DAPUR_KEY, []));
+        let dapurQueue = [], dapurBusy = false;
+        const autoDapurOn = () => KITCHEN_MODE !== 'off' && store.get(DAPUR_ON_KEY, true);
+
+        function markPrinted(id) {
+            dapurPrinted.add(id);
+            store.set(DAPUR_KEY, [...dapurPrinted].slice(-300));
+        }
+        function printDapur(id, auto = false) {
+            const o = allOrders.find(x => x.id === id); if (!o) return;
+            if (auto && dapurPrinted.has(id)) return;
+            markPrinted(id);
+            dapurQueue.push(o); runDapurQueue();
+        }
+        function runDapurQueue() {
+            if (dapurBusy || !dapurQueue.length) return;
+            dapurBusy = true;
+            const o = dapurQueue.shift();
+            DZPrint.dapur({ order: o, cafeName: TENANT_NAMA, paper: PRINT_TYPE });
+            toast('info', `Tiket dapur #${o.id} · Meja ${o.nomor_meja} dicetak`);
+            setTimeout(() => { dapurBusy = false; runDapurQueue(); }, 4000);
+        }
+        function renderDapurChip() {
+            const el = document.getElementById('dapurChip'); if (!el) return;
+            if (KITCHEN_MODE === 'off') { el.innerHTML = '<i class="fas fa-fire-burner"></i>Dapur: manual'; el.classList.remove('on'); return; }
+            const on = autoDapurOn();
+            el.classList.toggle('on', on);
+            el.innerHTML = `<i class="fas fa-fire-burner"></i>Cetak dapur: <b>${on ? 'OTOMATIS' : 'MATI'}</b>`;
+            el.title = (KITCHEN_MODE === 'masuk' ? 'Saat pesanan masuk' : 'Saat pesanan diproses') + ' · klik untuk mengubah di perangkat ini';
+        }
+        function toggleDapur() {
+            if (KITCHEN_MODE === 'off') { Swal.fire('Cetak dapur manual', 'Owner mengatur cetak dapur ke mode manual (menu Setelan). Gunakan tombol "Dapur" di setiap pesanan.', 'info'); return; }
+            store.set(DAPUR_ON_KEY, !autoDapurOn()); renderDapurChip();
+        }
+
+        async function loadMenus() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/menu/?tenant_slug=${encodeURIComponent(TENANT_SLUG)}`);
+                allMenus = res.data; renderMenus(); stamp();
+            } catch {
+                document.getElementById('menuGrid').innerHTML = `<div class="col-12"><div class="dz-alert dz-alert-error">Gagal memuat daftar menu.</div></div>`;
+            }
+        }
+
+        function renderMenus() {
+            const q = document.getElementById('menuSearch').value.toLowerCase().trim();
+            const f = document.getElementById('menuFilter').value;
+            const habis = allMenus.filter(m => !m.tersedia).length;
+            document.getElementById('mTersedia').innerText = allMenus.length - habis;
+            document.getElementById('mHabis').innerText = habis;
+            document.getElementById('cntHabis').innerText = habis;
+
+            const list = allMenus.filter(m => (!q || m.nama_menu.toLowerCase().includes(q)) && (f === 'all' || (f === 'tersedia' ? m.tersedia : !m.tersedia)));
+            const grid = document.getElementById('menuGrid');
+            if (!allMenus.length) { grid.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><div class="ico"><i class="fas fa-utensils"></i></div><h6>Belum ada menu</h6><p class="small mb-0">Owner belum menambahkan menu.</p></div></div>`; return; }
+            if (!list.length) { grid.innerHTML = `<div class="col-12"><div class="dz-card dz-empty"><h6>Tidak ada menu yang cocok</h6></div></div>`; return; }
+
+            grid.innerHTML = list.map(m => `
+                <div class="col-6 col-md-4 col-xl-3 col-xxl-2">
+                    <div class="menu-tile ${m.tersedia ? '' : 'is-habis'}">
+                        <div class="thumb">
+                            ${m.foto ? `<img src="${esc(m.foto)}" alt="${esc(m.nama_menu)}" loading="lazy">` : `<div class="ph"><i class="fas fa-mug-hot"></i></div>`}
+                            <span class="cat">${esc(m.kategori || 'Lainnya')}</span>
+                            ${m.tersedia ? '' : '<div class="sold-out"><span>HABIS</span></div>'}
+                        </div>
+                        <div class="body">
+                            <div class="name">${esc(m.nama_menu)}</div>
+                            <div class="price">${rp(m.harga)}</div>
+                        </div>
+                        <label class="avail-switch mb-0" style="cursor:pointer">
+                            <span class="small fw-bold ${m.tersedia ? 'text-success' : 'text-secondary'}">${m.tersedia ? 'Tersedia' : 'Habis'}</span>
+                            <span class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" ${m.tersedia ? 'checked' : ''} onchange="setTersedia(${m.id}, this.checked, this)" aria-label="Status ${esc(m.nama_menu)}"></span>
+                        </label>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function setTersedia(id, value, el) {
+            el.disabled = true;
+            try {
+                const res = await axios.post(`${API_BASE_URL}/menu/${id}/toggle_tersedia/`, { tersedia: value });
+                const i = allMenus.findIndex(m => m.id === id); if (i > -1) allMenus[i] = res.data.data;
+                renderMenus();
+                toast(value ? 'success' : 'warning', res.data.message);
+            } catch (err) {
+                el.checked = !value; el.disabled = false;
+                Swal.fire('Gagal', 'Tidak dapat mengubah status menu.', 'error');
+            }
+        }
+
+        renderDapurChip();
+        refreshAll();
+        setInterval(loadOrders, 5000);
+        setInterval(loadMenus, 20000);
+</script>
+</body>
+</html>

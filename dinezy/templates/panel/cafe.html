@@ -1,0 +1,98 @@
+{% extends 'panel/base.html' %}{% load dinezy %}
+{% block title %}Cafe & Akun{% endblock %}
+{% block heading %}Cafe & Akun{% endblock %}
+{% block actions %}
+<form method="get" class="d-none d-md-block"><div class="input-icon"><i class="fas fa-search"></i><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Cari cafe / owner..." style="width:240px"></div></form>
+{% endblock %}
+{% block content %}
+<div class="pcard">
+    <div class="pcard-h"><div><h2>Daftar cafe</h2><p>Pantau penjualan, atur biaya layanan per cafe, kunci manual, dan kelola akun</p></div><span class="pill gray"><i class="fas fa-tag me-1"></i>Tarif standar {{ tarif|rupiah }} / nota</span></div>
+    <div class="table-responsive">
+        <table class="ptable">
+            <thead><tr><th>Cafe</th><th>Akun login</th><th>Penjualan {{ bulan }}</th><th>Biaya layanan</th><th>Tagihan</th><th>Status</th><th class="text-end">Aksi</th></tr></thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td><div class="cafe"><div class="av">{% if r.t.logo %}<img src="{{ r.t.logo.url }}" alt="" onerror="this.replaceWith('{{ r.t.nama_cafe|slice:":1"|upper|escapejs }}')">{% else %}{{ r.t.nama_cafe|slice:":1"|upper }}{% endif %}</div><div><b>{{ r.t.nama_cafe }}</b><small>kode: {{ r.t.slug }} · {{ r.t.nama_owner }}</small><small>{{ r.t.whatsapp }}</small></div></div></td>
+                    <td>{% for u, role in r.akun %}<span class="pill blue mb-1">{{ role|capfirst }}: {{ u }}</span><br>{% empty %}<span class="pill gray">Belum ada akun</span>{% endfor %}{% if r.akun %}<a href="{% url 'panel_akun' %}?sorot={{ r.t.pk }}#cafe-{{ r.t.pk }}" class="lihat-pw"><i class="fas fa-eye me-1"></i>Lihat password</a>{% endif %}</td>
+                    <td class="num">
+                        <b class="d-block">{{ r.jual.penjualan|rupiah }}</b>
+                        <small class="d-block">{{ r.jual.nota|angka }} nota{% if r.jual.nota %} · rata-rata {{ r.jual.rata|rupiah }}{% endif %}</small>
+                        <small class="d-block text-muted">{{ bulan_lalu }}: {{ r.jual_lalu.penjualan|rupiah }} ({{ r.jual_lalu.nota|angka }} nota)</small>
+                    </td>
+                    <td>
+                        <div class="tarif-cell">
+                            <div><b>{{ r.tarif|rupiah }}</b><small>/ nota</small></div>
+                            {% if r.khusus %}<span class="pill blue">Khusus</span>{% else %}<span class="pill gray">Standar</span>{% endif %}
+                        </div>
+                        {% if r.porsi is not None %}<small class="d-block {% if r.porsi > 10 %}text-danger{% elif r.porsi > 6 %}text-warning{% else %}text-muted{% endif %}">≈ {{ r.porsi }}% dari rata-rata nota</small>{% endif %}
+                        <form method="post" action="{% url 'panel_cafe_tarif' r.t.pk %}" class="js-tarif" data-nama="{{ r.t.nama_cafe }}" data-tarif="{{ r.tarif }}" data-khusus="{{ r.khusus|yesno:'1,0' }}" data-rata="{{ r.jual.rata|default:r.jual_lalu.rata }}">{% csrf_token %}
+                            <input type="hidden" name="tarif"><input type="hidden" name="standar" value="0">
+                            <button type="button" class="btn btn-xs btn-line mt-1 js-tarif-btn"><i class="fas fa-pen me-1"></i>Ubah tarif</button>
+                        </form>
+                    </td>
+                    <td class="num">{{ r.run.jumlah_nota|angka }} nota · {{ r.run.total|rupiah }}<small class="d-block">berjalan {{ bulan }}</small>
+                        {% if r.st.total_unpaid %}<b class="d-block text-danger mt-1">{{ r.st.total_unpaid|rupiah }}</b>{% if r.st.next_due %}<small class="d-block">belum dibayar · tempo {{ r.st.next_due|tgl }}</small>{% endif %}{% endif %}</td>
+                    <td><span class="pill {{ r.badge.0 }}">{{ r.badge.1 }}</span></td>
+                    <td class="text-end">
+                        <div class="act">
+                            <a href="{% url 'panel_tagihan' %}?cafe={{ r.t.slug }}" class="btn btn-xs btn-line" title="Tagihan"><i class="fas fa-file-invoice-dollar"></i></a>
+                            <form method="post" action="{% url 'panel_cafe_akun' r.t.pk %}" {% if r.akun %}data-confirm="Reset password {{ r.t.nama_cafe }}?" data-confirm-text="Password Owner & Kasir diganti dengan password acak baru dan dikirim ke {{ r.t.email_owner }}." data-confirm-variant="warning" data-confirm-icon="fa-key" data-confirm-ok="Ya, reset"{% endif %}>{% csrf_token %}
+                                {% if r.akun %}<input type="hidden" name="reset" value="1"><button class="btn btn-xs btn-line" title="Reset password"><i class="fas fa-key me-1"></i>Reset</button>
+                                {% else %}<button class="btn btn-xs btn-line"><i class="fas fa-user-plus me-1"></i>Buat akun</button>{% endif %}
+                            </form>
+                            <form method="post" action="{% url 'panel_cafe_kunci' r.t.pk %}" {% if r.t.is_locked %}data-confirm="Buka kunci {{ r.t.nama_cafe }}?" data-confirm-text="Owner & Kasir dapat login kembali." data-confirm-variant="success" data-confirm-icon="fa-lock-open" data-confirm-ok="Ya, buka"{% else %}data-confirm="Kunci {{ r.t.nama_cafe }}?" data-confirm-text="Owner & Kasir tidak bisa login sampai kunci dibuka kembali." data-confirm-variant="danger" data-confirm-ok="Ya, kunci"{% endif %}>{% csrf_token %}
+                                {% if r.t.is_locked %}<button class="btn btn-xs btn-ok"><i class="fas fa-lock-open me-1"></i>Buka</button>
+                                {% else %}<button class="btn btn-xs btn-lock"><i class="fas fa-lock me-1"></i>Kunci</button>{% endif %}
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}<tr class="empty-row"><td colspan="7">Tidak ada cafe yang cocok.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<style>
+    .tarif-cell { display: flex; align-items: center; gap: 8px; } .tarif-cell b { font-size: .95rem; } .tarif-cell small { color: var(--muted, #64748b); margin-left: 3px; }
+    .cafe small { display: block; }
+    .dlg-tarif .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .dlg-tarif .presets button { border: 1px solid #dbe3ef; background: #fff; border-radius: 999px; padding: 4px 12px; font-size: .8rem; font-weight: 600; color: #17345e; }
+    .dlg-tarif .presets button:hover { background: #eef3fb; }
+    .dlg-tarif .rp { position: relative; } .dlg-tarif .rp span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: #64748b; }
+    .dlg-tarif .rp input { padding-left: 38px; font-weight: 700; font-size: 1.1rem; }
+    .dlg-tarif .hint { margin-top: 10px; font-size: .8rem; color: #64748b; line-height: 1.5; }
+    .dlg-tarif .std { margin-top: 10px; font-size: .82rem; } .dlg-tarif .std input { margin-right: 6px; }
+</style>
+<script>
+    const TARIF_STD = {{ tarif }};
+    const rupiah = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+    function hintTarif(rata) {
+        const v = Number((document.getElementById('dlgTarif') || {}).value || 0), h = document.getElementById('dlgHint');
+        if (!h) return;
+        h.innerHTML = rata ? `Rata-rata nota cafe ini <b>${rupiah(rata)}</b>. Tarif ${rupiah(v)} ≈ <b>${(v / rata * 100).toLocaleString('id-ID', { maximumFractionDigits: 1 })}%</b> dari belanja pelanggan.` : 'Belum ada data penjualan untuk cafe ini.';
+    }
+    document.querySelectorAll('.js-tarif-btn').forEach(b => b.addEventListener('click', async () => {
+        const f = b.closest('form'), rata = Number(f.dataset.rata || 0);
+        const ok = await DZUI.confirm({
+            title: 'Biaya layanan ' + f.dataset.nama, icon: 'fa-tag', ok: 'Simpan tarif',
+            text: 'Ditambahkan ke setiap nota pelanggan dan ditagihkan bulanan. Berlaku untuk pesanan berikutnya.',
+            html: `<div class="dlg-tarif">
+                <div class="rp"><span>Rp</span><input type="number" id="dlgTarif" class="form-control" min="0" max="50000" step="100" value="${f.dataset.tarif}" oninput="hintTarif(${rata})"></div>
+                <div class="presets">${[1000, 1500, 2000, 2500, 3000].map(v => `<button type="button" onclick="document.getElementById('dlgTarif').value=${v};document.getElementById('dlgStd').checked=false;hintTarif(${rata})">${rupiah(v)}</button>`).join('')}</div>
+                <label class="std d-block"><input type="checkbox" id="dlgStd" ${f.dataset.khusus === '1' ? '' : 'checked'} onchange="if(this.checked){document.getElementById('dlgTarif').value=TARIF_STD;hintTarif(${rata})}">Pakai tarif standar (${rupiah(TARIF_STD)})</label>
+                <div class="hint" id="dlgHint"></div></div>`
+        });
+        const v = (document.getElementById('dlgTarif') || {}).value, std = (document.getElementById('dlgStd') || {}).checked;
+        if (!ok) return;
+        if (!std && (v === '' || Number(v) < 0 || Number(v) > 50000)) return DZUI.toast({ type: 'error', title: 'Tarif tidak valid', text: 'Isi angka antara 0 dan 50.000.' });
+        f.tarif.value = std ? '' : String(Math.round(Number(v)));
+        f.standar.value = std ? '1' : '0';
+        f.submit();
+    }));
+    document.addEventListener('click', e => { if (e.target.closest('.js-tarif-btn')) setTimeout(() => { const f = e.target.closest('form'); hintTarif(Number(f.dataset.rata || 0)); }, 60); });
+    document.addEventListener('input', e => { if (e.target.id === 'dlgTarif') { const s = document.getElementById('dlgStd'); if (s && Number(e.target.value) !== TARIF_STD) s.checked = false; } });
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+
+body, .content-wrapper { font-family: 'Inter', system-ui, sans-serif; }
+.content-wrapper { background: #f4f6fa !important; }
+.main-header.navbar { background: #0b1d38 !important; border: 0 !important; }
+.main-sidebar, .brand-link { background: #071426 !important; }
+.brand-link { border-bottom: 1px solid rgba(255,255,255,.08) !important; }
+.brand-link .brand-image { max-height: 30px; box-shadow: none !important; opacity: 1 !important; }
+.nav-sidebar .nav-link.active, .nav-pills .nav-link.active { background: #17345e !important; color: #fff !important; box-shadow: none !important; }
+.nav-sidebar .nav-link { border-radius: 8px !important; color: #c7d2e3 !important; }
+.nav-sidebar .nav-link:hover { background: rgba(255,255,255,.06) !important; }
+.card { border: 0 !important; border-radius: 14px !important; box-shadow: 0 6px 20px -10px rgba(11,29,56,.25) !important; }
+.card-header { background: #fff !important; border-bottom: 1px solid #eef1f5 !important; }
+.btn-primary, .btn-info, .bg-primary { background: #102849 !important; border-color: #102849 !important; }
+.btn-primary:hover { background: #0b1d38 !important; }
+a { color: #1e4278; }
+.table thead th { background: #f8fafc; color: #64748b; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #e5e7eb !important; }
